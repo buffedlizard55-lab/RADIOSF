@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RADIOSF — Live sports on the stations you get</title>
+  <meta name="description" content="Click a day to see verified live sports broadcasts on 680, 810, 960, 1050, 104.5, and 107.7 in the San Francisco Bay Area.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%231c1915'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-size='11' fill='%23f3efe6' font-family='Georgia'%3E680%3C/text%3E%3C/svg%3E">
+  <style>
+    :root {
+      --bg: #f3efe6;
+      --paper: #fffdf8;
+      --ink: #1c1915;
+      --muted: #6d655c;
+      --line: #e4d9cb;
+      --accent: #9a3412;
+      --live: #0f6b4c;
+      --tbd: #8a5a00;
+      --review: #9f2d2d;
+      --quiet: #8a8176;
+      --shadow: 0 1px 0 rgba(28, 25, 21, 0.04);
+      --680: #c2410c;
+      --1045: #9a3412;
+      --810: #1d4ed8;
+      --960: #047857;
+      --1050: #6d28d9;
+      --1077: #a16207;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 400px at 10% -10%, #fff 0%, transparent 50%),
+        var(--bg);
+      font: 16px/1.45 "Avenir Next", "Segoe UI", "Trebuchet MS", sans-serif;
+    }
+    a { color: var(--accent); }
+    a:hover { text-decoration-thickness: 2px; }
+    button, input { font: inherit; color: inherit; }
+    .skip {
+      position: absolute; left: 12px; top: -40px; background: var(--ink); color: white;
+      padding: 8px 12px; z-index: 5;
+    }
+    .skip:focus { top: 12px; }
+    .wrap { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    header.mast {
+      padding: 28px 0 8px;
+      border-bottom: 1px solid var(--ink);
+    }
+    .kicker {
+      margin: 0;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    h1 {
+      font-family: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
+      font-weight: 600;
+      font-size: clamp(40px, 6vw, 64px);
+      line-height: 0.9;
+      margin: 6px 0 8px;
+      letter-spacing: -0.03em;
+    }
+    .lede { max-width: 68ch; margin: 0 0 8px; font-size: 18px; }
+    .verified {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .freqs {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin: 0 0 18px; padding: 0; list-style: none;
+    }
+    .freqs button, .chip {
+      border: 1px solid var(--line);
+      background: var(--paper);
+      border-radius: 999px;
+      padding: 6px 10px;
+      cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .freqs button[aria-pressed="true"] {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: #f6f1e8;
+    }
+    .dot {
+      width: 9px; height: 9px; border-radius: 50%; display: inline-block;
+    }
+    .s-680 { background: var(--680); }
+    .s-1045 { background: var(--1045); }
+    .s-810 { background: var(--810); }
+    .s-960 { background: var(--960); }
+    .s-1050 { background: var(--1050); }
+    .s-1077 { background: var(--1077); }
+    .block.s-680 { background: var(--680); }
+    .block.s-1045 { background: var(--1045); }
+    .block.s-810 { background: var(--810); }
+    .block.s-960 { background: var(--960); }
+    .block.s-1050 { background: var(--1050); }
+    .block.s-1077 { background: var(--1077); }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+      gap: 28px;
+      padding: 22px 0 40px;
+    }
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+    h2 {
+      font-family: "Iowan Old Style", Palatino, Georgia, serif;
+      font-size: 28px;
+      margin: 0 0 6px;
+      letter-spacing: -0.02em;
+    }
+    h3 { margin: 22px 0 8px; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .day-nav { display: flex; gap: 8px; align-items: center; margin: 8px 0 12px; flex-wrap: wrap; }
+    .day-nav button, .month-nav button {
+      border: 1px solid var(--line); background: var(--paper); border-radius: 8px;
+      padding: 6px 10px; cursor: pointer;
+    }
+    .day-nav button:hover, .month-nav button:hover, .freqs button:hover { border-color: var(--ink); }
+    .answer {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--accent);
+      padding: 12px 14px;
+      margin: 0 0 14px;
+      box-shadow: var(--shadow);
+    }
+    .answer strong { font-family: Georgia, serif; }
+    .meter { height: 8px; background: #efe8dc; border-radius: 99px; overflow: hidden; margin-top: 8px; }
+    .meter span { display: block; height: 100%; background: var(--live); }
+    .timeline {
+      position: relative;
+      height: 54px;
+      margin: 8px 0 16px;
+      background: repeating-linear-gradient(90deg, transparent, transparent calc(100% / 18 - 1px), var(--line) calc(100% / 18 - 1px), var(--line) calc(100% / 18));
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .band {
+      position: absolute; top: 0; bottom: 0;
+      background: rgba(154, 52, 18, 0.08);
+      border-left: 1px dashed var(--accent);
+      border-right: 1px dashed var(--accent);
+    }
+    .block {
+      position: absolute; top: 16px; height: 22px; border-radius: 4px;
+      min-width: 4px; opacity: 0.9;
+    }
+    .ticks { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; margin-top: -4px; }
+    .log-wrap { overflow-x: auto; }
+    .log { width: 100%; border-collapse: collapse; background: var(--paper); }
+    .log th, .log td { text-align: left; vertical-align: top; padding: 10px 8px; border-bottom: 1px solid var(--line); }
+    .log th { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .title { font-weight: 650; }
+    .notes { color: var(--muted); font-size: 13px; margin: 4px 0 0; }
+    .badge {
+      display: inline-block; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
+      border-radius: 99px; padding: 2px 7px; border: 1px solid var(--line); margin-right: 4px;
+    }
+    .badge.official { color: var(--live); border-color: #b7d7cb; background: #f3faf7; }
+    .badge.indicated { color: #1e3a8a; border-color: #c7d2fe; background: #f5f7ff; }
+    .badge.review { color: var(--review); border-color: #f0c9c9; background: #fff6f6; }
+    .badge.final, .badge.aired { color: var(--muted); }
+    .badge.pregame, .badge.on { color: var(--live); border-color: #b7d7cb; }
+    .pills { display: flex; flex-wrap: wrap; gap: 4px; }
+    .pill {
+      font-size: 12px; font-variant-numeric: tabular-nums;
+      border-radius: 99px; padding: 2px 7px; color: white; white-space: nowrap;
+    }
+    .warn {
+      background: #fff8ee; border: 1px solid #ead7b2; padding: 8px 10px; margin: 8px 0; font-size: 14px;
+    }
+    .calendar { background: var(--paper); border: 1px solid var(--line); padding: 12px; }
+    .month-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .month-nav h2 { font-size: 22px; }
+    .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .dow, .cell { text-align: center; font-size: 12px; }
+    .dow { color: var(--muted); padding-bottom: 4px; }
+    .cell {
+      border: 1px solid transparent; background: transparent; border-radius: 8px;
+      min-height: 58px; padding: 4px 2px; cursor: pointer;
+    }
+    .cell:disabled { cursor: default; color: #b3aa9f; }
+    .cell.in { background: #f7f3ec; }
+    .cell.has { background: #fff; border-color: var(--line); }
+    .cell.selected { outline: 2px solid var(--ink); }
+    .cell.today .num { text-decoration: underline; text-underline-offset: 3px; }
+    .num { font-variant-numeric: tabular-nums; font-weight: 650; }
+    .mini { display: flex; justify-content: center; gap: 2px; margin-top: 4px; min-height: 8px; }
+    .mini i { width: 6px; height: 6px; border-radius: 50%; display: block; }
+    .search { width: 100%; border: 1px solid var(--line); background: var(--paper); border-radius: 8px; padding: 8px 10px; margin: 8px 0 12px; }
+    .results { list-style: none; padding: 0; margin: 0 0 12px; }
+    .results button { width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding: 8px 0; cursor: pointer; }
+    section.ref { padding: 8px 0 48px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+    .card { background: var(--paper); border: 1px solid var(--line); padding: 12px; }
+    .card h3 { margin: 0 0 6px; letter-spacing: 0; text-transform: none; color: var(--ink); font-size: 16px; }
+    details { background: var(--paper); border: 1px solid var(--line); padding: 10px 12px; margin: 8px 0; }
+    summary { cursor: pointer; font-weight: 650; }
+    .flag-id { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12px; }
+    .error { background: #fff6f6; border: 1px solid #f0c9c9; padding: 12px; }
+    footer { border-top: 1px solid var(--ink); padding: 18px 0 32px; color: var(--muted); font-size: 14px; }
+    button:disabled { opacity: 0.35; cursor: default; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#day">Skip to the day</a>
+  <header class="mast">
+    <div class="wrap">
+      <p class="kicker">San Francisco Bay Area · the six stations you get</p>
+      <h1>RADIOSF</h1>
+      <p class="lede">When is there a live game on the radio? Click any day. Same idea as <a href="https://buffedlizard55-lab.github.io/ScheduleFreeTime/">ScheduleFreeTime</a>, narrowed to the six stations you get. Each row keeps the source link.</p>
+      <p class="verified" id="verified">Loading the verified snapshot…</p>
+      <ul class="freqs" id="filters" aria-label="Filter by station"></ul>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="layout">
+      <section id="day" aria-live="polite" tabindex="-1">
+        <h2 id="day-title">Selected day</h2>
+        <div class="day-nav">
+          <button type="button" id="prev">← Previous day</button>
+          <button type="button" id="today">Today</button>
+          <button type="button" id="next">Next day →</button>
+        </div>
+        <div id="answer" class="answer"></div>
+        <div class="timeline" id="timeline" aria-hidden="true"></div>
+        <div class="ticks" aria-hidden="true"><span>6a</span><span>10a</span><span>2p</span><span>6p</span><span>10p</span><span>12a</span></div>
+        <div id="conflicts"></div>
+        <h3>On the radio this day</h3>
+        <div id="log"></div>
+      </section>
+      <aside>
+        <div class="calendar">
+          <div class="month-nav">
+            <button type="button" id="prev-month" aria-label="Previous month">←</button>
+            <h2 id="month-label">Month</h2>
+            <button type="button" id="next-month" aria-label="Next month">→</button>
+          </div>
+          <div class="grid" id="cal"></div>
+          <p class="notes">A dot means a verified broadcast on a station you get. Days before Sep 26, 2026 are outside this snapshot, not “no game.” A thin Thursday, Sunday, or Monday before November may be a missing page chunk, not a quiet night.</p>
+        </div>
+        <h3>Find a game</h3>
+        <input class="search" id="q" type="search" placeholder="Giants, 49ers, Stanford, Westwood One…" aria-label="Find a broadcast">
+        <ul class="results" id="results"></ul>
+        <div id="unplaced"></div>
+      </aside>
+    </div>
+    <section class="ref" id="sources">
+      <h2>Stations</h2>
+      <div class="cards" id="stations"></div>
+      <h2>What this does not claim</h2>
+      <p>Sports talk on KNBR, ESPN Radio on 1050, and Fox Sports Radio on 960 can fill a lot of the day. Those shows are not games, and no source published a standing 10 AM–10 PM live-game grid. The meter above counts verified game broadcasts only, using estimated lengths. Open a source link if a row is marked review or indicated.</p>
+      <h3>Irregularities flagged for review</h3>
+      <div id="flags"></div>
+    </section>
+  </main>
+  <footer>
+    <div class="wrap">
+      <p>Line-by-line list: <a href="docs/LINE_BY_LINE.md">docs/LINE_BY_LINE.md</a>. Limits and the next pass: <a href="docs/LIMITATIONS.md">docs/LIMITATIONS.md</a>. Charter: <a href="docs/PROJECT_PROMPT.md">docs/PROJECT_PROMPT.md</a>.</p>
+      <p>This is a static snapshot, not a live station log. Rebuild with <code>python3 scripts/build_feed.py</code> after a fresh source check.</p>
+    </div>
+  </footer>
+  <script src="scripts/logic.js"></script>
+  <script>
+    (function () {
+      var L = window.RadioLogic;
+      var DATA = null;
+      var state = { date: "2026-09-26", month: 9, year: 2026, stations: {} };
+      var STATION_CLASS = { "680": "s-680", "104.5": "s-1045", "810": "s-810", "960": "s-960", "1050": "s-1050", "107.7": "s-1077" };
+
+      function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+        });
+      }
+      function laNow() {
+        var fmt = new Intl.DateTimeFormat("en-US", {
+          timeZone: "America/Los_Angeles",
+          year: "numeric", month: "2-digit", day: "2-digit",
+          hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+        });
+        var parts = {};
+        fmt.formatToParts(new Date()).forEach(function (p) { parts[p.type] = p.value; });
+        return { iso: parts.year + "-" + parts.month + "-" + parts.day, minutes: (+parts.hour) * 60 + (+parts.minute) };
+      }
+      function selectedStations() {
+        return Object.keys(state.stations).filter(function (k) { return state.stations[k]; });
+      }
+      function visible(list) {
+        var on = selectedStations();
+        if (!on.length) return list;
+        return list.filter(function (b) {
+          return b.stations.some(function (s) { return on.indexOf(s) !== -1; });
+        });
+      }
+      function pills(stations) {
+        return '<span class="pills">' + stations.map(function (s) {
+          var meta = DATA.meta.stations.find(function (x) { return x.id === s; });
+          return '<span class="pill ' + STATION_CLASS[s] + '">' + esc(meta ? meta.label : s) + "</span>";
+        }).join("") + "</span>";
+      }
+      function airState(b, now) {
+        if (!b.date) return "unplaced";
+        if (b.status === "final") return "aired";
+        if (!b.start_pt) return "tba";
+        if (b.date < now.iso) return "aired";
+        if (b.date > now.iso) return "upcoming";
+        var start = L.minutes(b.start_pt);
+        var end = start + (b.duration_est_min || 0);
+        if (now.minutes < start) return b.status === "pregame" ? "pregame" : "upcoming";
+        if (now.minutes < end) return "on";
+        return "aired";
+      }
+      function stateLabel(code) {
+        return {
+          aired: "Aired",
+          upcoming: "Scheduled",
+          pregame: "Pre-game",
+          on: "Estimated on air",
+          tba: "Time TBD",
+          unplaced: "Date TBD"
+        }[code] || code;
+      }
+
+      function renderFilters() {
+        var html = '<li><button type="button" id="all" aria-pressed="' + (selectedStations().length ? "false" : "true") + '">All six</button></li>';
+        DATA.meta.stations.forEach(function (s) {
+          var pressed = !!state.stations[s.id];
+          html += '<li><button type="button" data-station="' + esc(s.id) + '" aria-pressed="' + pressed + '">' +
+            '<i class="dot ' + STATION_CLASS[s.id] + '"></i>' + esc(s.label) + " " + esc(s.call) + "</button></li>";
+        });
+        document.getElementById("filters").innerHTML = html;
+      }
+      function renderStations() {
+        document.getElementById("stations").innerHTML = DATA.meta.stations.map(function (s) {
+          return '<article class="card"><h3><i class="dot ' + STATION_CLASS[s.id] + '"></i> ' +
+            esc(s.label) + " · " + esc(s.call) + "</h3><p>" + esc(s.role) + "</p>" +
+            (s.listen ? '<p><a href="' + esc(s.listen) + '">Station source</a></p>' : "") + "</article>";
+        }).join("");
+      }
+      function renderFlags() {
+        document.getElementById("flags").innerHTML = DATA.flags.map(function (f) {
+          return "<details><summary>" + esc(f.title) + " <span class=\"flag-id\">" + esc(f.id) + "</span></summary><p>" +
+            esc(f.detail) + ' <a href="' + esc(f.url) + '">Source</a></p></details>';
+        }).join("");
+      }
+      function renderUnplaced() {
+        var rows = DATA.broadcasts.filter(function (b) { return !b.date; });
+        document.getElementById("unplaced").innerHTML = rows.map(function (b) {
+          return '<div class="warn"><strong>Not placed on a day.</strong> ' + esc(b.title) +
+            ". " + esc(b.notes) + " " + pills(b.stations) + sourceLinks(b) + "</div>";
+        }).join("");
+      }
+      function sourceLinks(b) {
+        return '<p class="notes">' + b.sources.map(function (s) {
+          return '<a href="' + esc(s.url) + '">' + esc(s.label) + "</a>";
+        }).join(" · ") + "</p>";
+      }
+      function renderDay() {
+        var now = laNow();
+        var date = state.date;
+        var meta = DATA.meta;
+        var zone = date < "2026-11-01" ? "PDT (UTC−7)" : "PST (UTC−8)";
+        document.getElementById("day-title").textContent = L.formatLong(date) + " · " + zone;
+        var before = date < meta.window_start;
+        var after = date > meta.window_end;
+        var rows = L.sortBroadcasts(visible(L.byDate(DATA.broadcasts, date)));
+        var answer = document.getElementById("answer");
+        if (before || after) {
+          answer.innerHTML = "<strong>Outside this snapshot.</strong> The verified list runs " +
+            esc(L.formatLong(meta.window_start)) + " through " + esc(L.formatLong(meta.window_end)) +
+            ". A blank day in that range means no verified game, not a promise the air is empty of talk.";
+          document.getElementById("timeline").innerHTML = "";
+          document.getElementById("conflicts").innerHTML = "";
+          document.getElementById("log").innerHTML = "";
+          return;
+        }
+        var lo = 10 * 60, hi = 22 * 60;
+        var covered = L.unionMinutes(rows, lo, hi);
+        var pct = Math.round(covered / (hi - lo) * 100);
+        var majority = covered > (hi - lo) / 2;
+        var tbd = rows.filter(function (b) { return !b.start_pt; }).length;
+        answer.innerHTML =
+          "<strong>" + rows.length + " verified broadcast" + (rows.length === 1 ? "" : "s") + ".</strong> " +
+          "Estimated live-game time between 10 AM and 10 PM: " + L.formatDuration(covered) + " of 12h" +
+          (tbd ? " (plus " + tbd + " kickoff" + (tbd === 1 ? "" : "s") + " still TBD, not counted)" : "") +
+          ". " + (majority
+            ? "That estimated union is a majority of the window today. It is not a standing weekday pattern."
+            : "That is not a majority of the 10 AM–10 PM window. Talk shows may still be on. They are not listed as games.") +
+          '<div class="meter" aria-hidden="true"><span style="width:' + pct + '%"></span></div>';
+
+        var timeline = document.getElementById("timeline");
+        var origin = 6 * 60, span = 18 * 60;
+        var bandLeft = ((lo - origin) / span) * 100;
+        var bandWidth = ((hi - lo) / span) * 100;
+        var blocks = rows.filter(function (b) { return b.start_pt; }).map(function (b) {
+          var start = Math.max(origin, L.minutes(b.start_pt));
+          var end = Math.min(origin + span, L.minutes(b.start_pt) + b.duration_est_min);
+          if (end <= origin || start >= origin + span) return "";
+          var left = ((start - origin) / span) * 100;
+          var width = Math.max(0.8, ((end - start) / span) * 100);
+          return '<i class="block ' + STATION_CLASS[b.stations[0]] + '" style="left:' + left.toFixed(2) + '%;width:' + width.toFixed(2) + '%" title="' + esc(b.title) + '"></i>';
+        }).join("");
+        timeline.innerHTML = '<div class="band" style="left:' + bandLeft.toFixed(2) + '%;width:' + bandWidth.toFixed(2) + '%"></div>' + blocks;
+
+        var conflicts = L.sameDayConflicts(rows);
+        var dow = L.weekdayIndex(date);
+        var prime = dow === 0 || dow === 1 || dow === 4;
+        var gap = date < "2026-11-01" && prime
+          ? '<div class="warn">This is a Thursday, Sunday, or Monday before November. The opening chunk of the Westwood One NFL schedule was not returned, so a national game may be missing. That is a fetch gap, not a verified quiet night. <a href="https://www.westwoodonesports.com/nfl-schedule/">Open the schedule</a>.</div>'
+          : "";
+        document.getElementById("conflicts").innerHTML = gap + conflicts.map(function (c) {
+          return '<div class="warn">' + esc(c.text) + "</div>";
+        }).join("");
+
+        if (!rows.length) {
+          document.getElementById("log").innerHTML = '<p class="answer">No verified live game on your stations this day. KNBR, 1050, and 960 may still be airing sports talk. That is not a game broadcast.</p>';
+          return;
+        }
+        var body = rows.map(function (b) {
+          var code = airState(b, now);
+          return "<tr><td>" + esc(b.start_pt ? L.label12(b.start_pt) : "Time TBD") +
+            "<div class=\"notes\">" + (b.duration_est_min && b.start_pt ? "est. " + L.formatDuration(b.duration_est_min) : "") + "</div></td>" +
+            "<td>" + pills(b.stations) + "</td>" +
+            "<td><div class=\"title\">" + esc(b.title) + "</div>" +
+            '<span class="badge ' + esc(b.confidence) + '">' + esc(b.confidence) + "</span>" +
+            '<span class="badge ' + esc(code) + '">' + esc(stateLabel(code)) + "</span>" +
+            (b.result ? '<span class="badge final">' + esc(b.result) + "</span>" : "") +
+            (b.confidence === "review" ? (b.flag_ids || []).map(function (id) {
+              var f = DATA.flags.find(function (x) { return x.id === id; });
+              return f && f.severity === "review" ? '<div class="notes">Review: ' + esc(f.title) + "</div>" : "";
+            }).join("") : "") +
+            "<p class=\"notes\">" + esc(b.venue) + (b.venue ? " · " : "") + esc(b.notes) + "</p>" +
+            sourceLinks(b) + "</td></tr>";
+        }).join("");
+        document.getElementById("log").innerHTML =
+          '<div class="log-wrap"><table class="log"><thead><tr><th>PT</th><th>Station</th><th>Broadcast</th></tr></thead><tbody>' + body + "</tbody></table></div>";
+      }
+      function renderCal() {
+        document.getElementById("month-label").textContent = L.formatMonth(state.year, state.month);
+        document.getElementById("prev-month").disabled = state.year === 2026 && state.month === 9;
+        document.getElementById("next-month").disabled = state.year === 2027 && state.month === 2;
+        var cells = L.monthCells(state.year, state.month);
+        var head = ["S", "M", "T", "W", "T", "F", "S"].map(function (d) {
+          return '<div class="dow">' + d + "</div>";
+        }).join("");
+        var now = laNow().iso;
+        var html = cells.map(function (iso) {
+          if (!iso) return '<div class="cell"></div>';
+          var inWin = L.inWindow(iso, DATA.meta.window_start, DATA.meta.window_end);
+          var rows = inWin ? visible(L.byDate(DATA.broadcasts, iso)) : [];
+          var dots = {};
+          rows.forEach(function (b) { b.stations.forEach(function (s) { dots[s] = 1; }); });
+          var mini = Object.keys(dots).slice(0, 4).map(function (s) {
+            return '<i class="' + STATION_CLASS[s] + '"></i>';
+          }).join("");
+          var cls = "cell" + (inWin ? " in" : "") + (rows.length ? " has" : "") +
+            (iso === state.date ? " selected" : "") + (iso === now ? " today" : "");
+          return '<button type="button" class="' + cls + '" data-date="' + iso + '"' + (inWin ? "" : "") + '>' +
+            '<div class="num">' + L.parseISO(iso).d + "</div><div class=\"mini\">" + mini + "</div></button>";
+        }).join("");
+        document.getElementById("cal").innerHTML = head + html;
+      }
+      function setDate(iso, push) {
+        state.date = iso;
+        var p = L.parseISO(iso);
+        state.year = p.y;
+        state.month = p.m;
+        if (push !== false) history.replaceState(null, "", "#" + iso);
+        renderDay();
+        renderCal();
+      }
+      function shiftMonth(n) {
+        var m = state.month + n;
+        var y = state.year;
+        if (m < 1) { m = 12; y -= 1; }
+        if (m > 12) { m = 1; y += 1; }
+        if (y < 2026 || (y === 2026 && m < 9) || y > 2027 || (y === 2027 && m > 2)) return;
+        state.year = y;
+        state.month = m;
+        renderCal();
+      }
+      function bind() {
+        document.getElementById("filters").addEventListener("click", function (ev) {
+          var btn = ev.target.closest("button");
+          if (!btn) return;
+          if (btn.id === "all") state.stations = {};
+          else {
+            var id = btn.getAttribute("data-station");
+            state.stations[id] = !state.stations[id];
+          }
+          renderFilters();
+          renderDay();
+          renderCal();
+        });
+        document.getElementById("prev").addEventListener("click", function () { setDate(L.addDays(state.date, -1)); });
+        document.getElementById("next").addEventListener("click", function () { setDate(L.addDays(state.date, 1)); });
+        document.getElementById("today").addEventListener("click", function () {
+          var now = laNow().iso;
+          if (L.inWindow(now, DATA.meta.window_start, DATA.meta.window_end)) setDate(now);
+          else setDate(DATA.meta.snapshot_date);
+        });
+        document.getElementById("prev-month").addEventListener("click", function () { shiftMonth(-1); });
+        document.getElementById("next-month").addEventListener("click", function () { shiftMonth(1); });
+        document.getElementById("cal").addEventListener("click", function (ev) {
+          var btn = ev.target.closest("[data-date]");
+          if (!btn) return;
+          setDate(btn.getAttribute("data-date"));
+          document.getElementById("day").focus();
+        });
+        document.getElementById("q").addEventListener("input", function (ev) {
+          var q = ev.target.value.trim().toLowerCase();
+          var box = document.getElementById("results");
+          if (q.length < 2) { box.innerHTML = ""; return; }
+          var hits = DATA.broadcasts.filter(function (b) {
+            return (b.title + " " + (b.date || "") + " " + b.stations.join(" ")).toLowerCase().indexOf(q) !== -1;
+          }).slice(0, 8);
+          box.innerHTML = hits.map(function (b) {
+            return '<li><button type="button" data-jump="' + esc(b.date || "") + '">' +
+              esc(b.date || "Date TBD") + " · " + esc(b.title) + "</button></li>";
+          }).join("") || "<li>No match in this snapshot.</li>";
+        });
+        document.getElementById("results").addEventListener("click", function (ev) {
+          var btn = ev.target.closest("[data-jump]");
+          if (!btn || !btn.getAttribute("data-jump")) return;
+          setDate(btn.getAttribute("data-jump"));
+        });
+        document.addEventListener("keydown", function (ev) {
+          if (ev.target.matches("input, textarea")) return;
+          if (ev.key === "ArrowLeft") setDate(L.addDays(state.date, -1));
+          if (ev.key === "ArrowRight") setDate(L.addDays(state.date, 1));
+        });
+      }
+      function boot(data) {
+        DATA = data;
+        document.getElementById("verified").textContent =
+          "Verified snapshot " + data.meta.snapshot_date + " · " + data.meta.timezone +
+          " · " + data.meta.counts.broadcasts + " broadcasts (" + data.meta.counts.official + " official, " +
+          data.meta.counts.indicated + " indicated, " + data.meta.counts.review + " need review). " +
+          data.meta.verified_note;
+        renderFilters();
+        renderStations();
+        renderFlags();
+        renderUnplaced();
+        bind();
+        var hash = location.hash.replace("#", "");
+        var now = laNow().iso;
+        var start = data.meta.snapshot_date;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(hash)) start = hash;
+        else if (L.inWindow(now, data.meta.window_start, data.meta.window_end)) start = now;
+        setDate(start, false);
+      }
+      fetch("data/broadcasts.json")
+        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+        .then(boot)
+        .catch(function (err) {
+          document.getElementById("verified").innerHTML =
+            '<span class="error">Could not load data/broadcasts.json (' + esc(err.message) +
+            "). Open the GitHub Pages site, or serve this folder over HTTP.</span>";
+        });
+    })();
+  </script>
+</body>
+</html>

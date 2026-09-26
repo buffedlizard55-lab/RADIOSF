@@ -1,0 +1,3637 @@
+{
+  "meta": {
+    "name": "RADIOSF",
+    "snapshot_date": "2026-09-26",
+    "window_start": "2026-09-26",
+    "window_end": "2027-02-28",
+    "timezone": "America/Los_Angeles",
+    "verified_note": "Line-checked against pages fetched 2026-09-26. Not a live scrape. National NFL games that were only on the unread opening chunk of the Westwood One schedule are omitted.",
+    "duration_estimates_min": {
+      "MLB": 165,
+      "NFL": 195,
+      "NCAAF": 204,
+      "MLS": 120
+    },
+    "band": {
+      "start": "10:00",
+      "end": "22:00",
+      "label": "10 AM\u201310 PM, the window you asked about"
+    },
+    "stations": [
+      {
+        "id": "680",
+        "label": "680 AM",
+        "call": "KNBR",
+        "brand": "KNBR 680",
+        "role": "Giants flagship. 49ers from Week 4. Westwood One NFL affiliate.",
+        "listen": "https://www.thesportsleader.com/"
+      },
+      {
+        "id": "104.5",
+        "label": "104.5 FM",
+        "call": "KNBR-FM",
+        "brand": "KNBR 104.5",
+        "role": "Full-time simulcast of 680 since 2019. Same games as 680 when a source lists both.",
+        "listen": "https://www.thesportsleader.com/"
+      },
+      {
+        "id": "810",
+        "label": "810 AM",
+        "call": "KSFO",
+        "brand": "810 KSFO",
+        "role": "49ers Weeks 1\u20133. Cal football. Earthquakes English.",
+        "listen": "https://www.ksfo.com/"
+      },
+      {
+        "id": "960",
+        "label": "960 AM",
+        "call": "KNEW",
+        "brand": "960 KNEW",
+        "role": "Athletics baseball. Otherwise Fox Sports Radio talk, not listed as games.",
+        "listen": "https://www.mlb.com/athletics/schedule/affiliates"
+      },
+      {
+        "id": "1050",
+        "label": "1050 AM",
+        "call": "KTCT",
+        "brand": "KNBR 1050",
+        "role": "Stanford football. Westwood One NFL affiliate. ESPN Radio talk otherwise.",
+        "listen": "https://www.thesportsleader.com/knbr1050shows"
+      },
+      {
+        "id": "107.7",
+        "label": "107.7 FM",
+        "call": "KSAN",
+        "brand": "107.7 The Bone",
+        "role": "49ers FM flagship, every listed regular-season game. Classic rock otherwise.",
+        "listen": "https://www.49ers.com/schedule/"
+      }
+    ],
+    "counts": {
+      "broadcasts": 103,
+      "placed": 102,
+      "unplaced": 1,
+      "official": 40,
+      "indicated": 59,
+      "review": 4
+    }
+  },
+  "flags": [
+    {
+      "id": "NO_STANDING_10_TO_10",
+      "severity": "limitation",
+      "title": "10 AM\u201310 PM is not a verified live-game block",
+      "detail": "KNBR's own weekly grid (thesportsleader.com/shows, week of Aug 31\u2013Sep 7, 2026) fills late morning with sports talk (Fair & Biased), not play-by-play. KNEW 960's published weekday lineup is Fox Sports Radio talk, and KTCT 1050 is an ESPN Radio pass-through plus The Jim Rome Show. Those are not games. No official source lists a standing live-game feed from 10 AM to 10 PM on these stations.",
+      "url": "https://www.thesportsleader.com/shows/"
+    },
+    {
+      "id": "KNBR_GRID_STALE",
+      "severity": "review",
+      "title": "KNBR weekly grid on the site is not the current week",
+      "detail": "Fetched 2026-09-26, thesportsleader.com/shows still prints Monday 8-31 through Monday 9-7. It is evidence of the format (talk vs Giants vs Westwood One), not a current-day clearance log. Do not treat those clock times as this week's schedule.",
+      "url": "https://www.thesportsleader.com/shows/"
+    },
+    {
+      "id": "WWO_PREEMPTION",
+      "severity": "review",
+      "title": "Westwood One affiliates do not air every game",
+      "detail": "Station finder, fetched 2026-09-26: \"Because of local blackouts and/or programming conflicts, not every affiliate can air every Westwood One Sports broadcast.\" San Francisco NFL affiliates on that page: KNBR-AM, KNBR-FM, KTCT-AM, and KNBR-F2. KNBR-F2 is an HD subchannel and is not counted. A local Giants, 49ers, or Stanford broadcast can preempt the national feed on the station it occupies.",
+      "url": "https://www.westwoodonesports.com/station-finder/"
+    },
+    {
+      "id": "WWO_LISTED_START",
+      "severity": "review",
+      "title": "Westwood One printed time is a listed start, not a confirmed kickoff",
+      "detail": "Event 548494 prints \"Sun Sep 27, 2026 7:30 PM \u2013 11:59 PM (EDT).\" 11:59 PM is a placeholder end, not a real ending. 49ers.com kickoffs for the four 49ers games that Westwood One also lists are 45 to 75 minutes later than the Westwood One printed start. This feed converts the printed Eastern time to Pacific and labels it a listed start. It does not invent a kickoff.",
+      "url": "https://www.westwoodonesports.com/events/548494"
+    },
+    {
+      "id": "WWO_EIGHT_VS_SEVEN",
+      "severity": "review",
+      "title": "Press release says eight international games; the schedule page lists seven",
+      "detail": "Cumulus release 2026-09-09 says the package includes eight International Games. The nfl-schedule page fetched 2026-09-26 lists seven: London Oct 4, Oct 11, Oct 18; Paris Oct 25; Madrid Nov 8; Munich Nov 15; Mexico City Nov 22. The eighth was not on that page. It is not added here.",
+      "url": "https://www.globenewswire.com/news-release/2026/09/09/3358684/9032/en/cumulus-media-s-westwood-one-official-network-audio-partner-of-the-nfl-celebrates-40th-consecutive-season-and-reveals-2026-nfl-lineup-and-programming-highlights-from-nfl-kickoff-to.html"
+    },
+    {
+      "id": "WWO_POSTSEASON_UNDATED",
+      "severity": "limitation",
+      "title": "NFL postseason games are promised but not dated on the schedule page",
+      "detail": "The same release says Westwood One carries every NFL postseason game through Super Bowl LXI on February 14, 2027 at SoFi Stadium. The nfl-schedule page fetched 2026-09-26 ends at Week 18 TBA windows. Wild-card, divisional, and conference championship dates are not on that page, so they are not placed on the calendar. Only Super Bowl LXI is placed, and only as date / stadium / time TBD.",
+      "url": "https://www.globenewswire.com/news-release/2026/09/09/3358684/9032/en/cumulus-media-s-westwood-one-official-network-audio-partner-of-the-nfl-celebrates-40th-consecutive-season-and-reveals-2026-nfl-lineup-and-programming-highlights-from-nfl-kickoff-to.html"
+    },
+    {
+      "id": "NCAAF_FINDER_TAB",
+      "severity": "review",
+      "title": "NCAA football clearance uses the NFL affiliate row, not a separate tab extract",
+      "detail": "The station-finder NFL table, fetched 2026-09-26, lists San Francisco as KNBR-AM, KNBR-FM, KTCT-AM. The NCAA Football tab of that page was not separately extracted in this session. NCAA games are marked indicated, not per-game confirmed. KNBR's own grid does list a daypart called Westwood One Sports.",
+      "url": "https://www.westwoodonesports.com/station-finder/"
+    },
+    {
+      "id": "BIG_GAME_STATIONS",
+      "severity": "review",
+      "title": "Nov 21 Big Game station claims disagree",
+      "detail": "gostanford.com on 2026-07-30 says the football radio team is on KNBR/KTCT 1050 AM. calbears.com/sports/football/schedule prints \"Radio: KNBR 104.5 FM / 680 AM\" on the Nov 21 Stanford row, and does not print KSFO on that row in the rendered index. Both claims are shown. Neither is dropped.",
+      "url": "https://calbears.com/sports/football/schedule"
+    },
+    {
+      "id": "CAL_RADIO_INDEX",
+      "severity": "review",
+      "title": "Cal radio column was read from the rendered schedule index",
+      "detail": "A non-JavaScript fetch of calbears.com/sports/football/schedule on 2026-09-26 returned the scoreboard, not the radio table. Radio rows used here are the ones present in the rendered index of that same official URL (page index dated 2026-09-25). Open the schedule page and check the Radio column before relying on a row.",
+      "url": "https://calbears.com/sports/football/schedule"
+    },
+    {
+      "id": "SFT_RADIO_DIFF",
+      "severity": "review",
+      "title": "This site and ScheduleFreeTime do not list the same radio games",
+      "detail": "On 2026-09-26 ScheduleFreeTime did not put a radio icon on Athletics games. The club affiliates page lists 960 AM KNEW, Bay Area, with no home-only asterisk, so those two games are here. ScheduleFreeTime also lists KZSF 1370 AM on Earthquakes broadcasts. 1370 is not one of the six stations, so it is omitted. Oklahoma at Georgia is 12:00 PM PT here because Westwood One lists 3:00 PM ET. ScheduleFreeTime's table showed 12:30 PM PT, which is the 3:30 PM ET kickoff.",
+      "url": "https://www.mlb.com/athletics/schedule/affiliates"
+    },
+    {
+      "id": "CAL_WAKE_ROW",
+      "severity": "review",
+      "title": "Oct 17 Cal vs Wake Forest radio row was not in the captured excerpt",
+      "detail": "The scoreboard fetch shows Oct 17 vs Wake Forest in Berkeley with no time. ESPN also has the date and kickoff TBD. The rendered-index excerpts quoted KSFO 810 AM on the other 2026 rows and KNBR on the Big Game, but did not quote the Wake Forest row. 810 AM is shown with a review badge, not as a fully quoted row.",
+      "url": "https://calbears.com/sports/football/schedule"
+    },
+    {
+      "id": "STANFORD_OCT17_TIME",
+      "severity": "review",
+      "title": "Stanford vs Elon kickoff is from ESPN, not the school excerpt",
+      "detail": "ESPN's Stanford schedule prints Sat Oct 17, 7:30 PM, which is 4:30 PM PT. The gostanford.com news release lists Elon on Oct 17 with no kickoff. The rendered schedule index excerpt captured this session did not include that kickoff. Station 1050 AM is from the July 30 school release, not from ESPN.",
+      "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
+    },
+    {
+      "id": "QUAKES_SUBJECT_TO_CHANGE",
+      "severity": "review",
+      "title": "Earthquakes radio table is dated Feb 16, 2026 and says times can change",
+      "detail": "The club's radio release is the only per-game English-station table found. It says \"All times and dates are subject to change.\" The live schedule widget did not render in a text fetch on 2026-09-26, so later kickoff moves would not be visible here until the next verification pass. Spanish 1370 AM is not one of the six stations and is not listed as a station you get.",
+      "url": "https://www.sjearthquakes.com/news/news-earthquakes-announce-radio-stations-for-2026-mls-season"
+    },
+    {
+      "id": "WEEK18_UNPLACED",
+      "severity": "review",
+      "title": "49ers Week 18 has stations but no date",
+      "detail": "49ers.com/schedule prints Week 18 at Arizona Cardinals, State Farm Stadium, TV TBD, radio KSAN 107.7 / KNBR 104.5 / 680, and no date. It is not placed on Jan 9 or Jan 10. Those days have separate Westwood One \"teams TBA\" windows.",
+      "url": "https://www.49ers.com/schedule/"
+    },
+    {
+      "id": "MEXICO_VENUE_NAMES",
+      "severity": "review",
+      "title": "Nov 22 venue name disagrees",
+      "detail": "49ers.com prints Estadio Banorte. Westwood One event 548491 prints Estadio Azteca. Both names are kept. Kickoff used here is the club time, 5:20 PM PT.",
+      "url": "https://www.49ers.com/schedule/"
+    },
+    {
+      "id": "NINERS_BOILERPLATE",
+      "severity": "review",
+      "title": "Week 1\u20133 listen articles say \"all games\" are on KSFO; the schedule page switches in October",
+      "detail": "Ways-to-listen articles for Weeks 1\u20133 (latest fetched: Week 3, published Sep 23, 2026) say all games can be heard on KSFO 810 / KSAN 107.7. The live schedule page, fetched 2026-09-26, prints KSFO/KSAN for Week 3 and KSAN plus KNBR 104.5/680 from Week 4 on. This feed follows the per-game line on the schedule page.",
+      "url": "https://www.49ers.com/news/ways-to-watch-and-listen-cardinals-vs-49ers-week-3-x8427"
+    },
+    {
+      "id": "HD_NOT_COUNTED",
+      "severity": "limitation",
+      "title": "HD subchannels are not counted as the stations you get",
+      "detail": "Westwood One lists KNBR-F2. KSAN's HD3 simulcasts KTCT. A standard AM/FM radio does not decode those. Only 680, 810, 960, 1050, 104.5, and 107.7 are listed.",
+      "url": "https://www.westwoodonesports.com/station-finder/"
+    },
+    {
+      "id": "TALK_NOT_GAMES",
+      "severity": "limitation",
+      "title": "ESPN Radio and Fox Sports Radio game clearances are not published per affiliate",
+      "detail": "KTCT is mainly ESPN Radio. KNEW's weekday daypart is Fox Sports Radio talk (Dan Patrick, Colin Cowherd, and the rest of that announced lineup), then Premiere talk. No 2026 per-game list was found that says which national play-by-play, if any, clears on 1050 or 960 besides Athletics baseball on 960. Those games are not invented.",
+      "url": "https://en.wikipedia.org/wiki/KNEW_(AM)"
+    },
+    {
+      "id": "MBB_NO_RADIO_ROWS",
+      "severity": "limitation",
+      "title": "2026-27 Cal men's basketball page has no radio rows in the fetch",
+      "detail": "calbears.com/sports/mens-basketball/schedule fetched 2026-09-26 is the 2026-27 schedule. The scoreboard lists games from Nov 2 with TBD times and no radio column. Basketball is not added. Stanford basketball was not re-verified onto 1050 this session and is not added.",
+      "url": "https://calbears.com/sports/mens-basketball/schedule"
+    },
+    {
+      "id": "ATHLETICS_SACRAMENTO",
+      "severity": "note",
+      "title": "Athletics home games are in Sacramento; 960 AM still carries them",
+      "detail": "mlb.com/athletics/schedule/affiliates lists 960 AM KNEW, Bay Area, with no home-only asterisk. Flagship is 650 AM KSTE in Sacramento. Home venue in the Stats API is Sutter Health Park.",
+      "url": "https://www.mlb.com/athletics/schedule/affiliates"
+    },
+    {
+      "id": "SPANISH_EXCLUDED",
+      "severity": "note",
+      "title": "Spanish calls are not on the six stations",
+      "detail": "Giants Spanish is KSFN 1510 / KXZM 93.7. Earthquakes Spanish is KZSF 1370. 49ers Spanish in the Week 3 listen article is the 49ers app and 49ers.com/esp, not these six stations. Those calls are omitted.",
+      "url": "https://www.mlb.com/giants/schedule/tv"
+    },
+    {
+      "id": "WWO_CHUNK_MISSING",
+      "severity": "review",
+      "title": "The opening chunk of the Westwood One NFL schedule was not returned",
+      "detail": "On 2026-09-26 the nfl-schedule page was fetched from the middle of the list forward. Rows that appeared only in the unread opening chunk are not in this file. A thin Thursday, Sunday night, or Monday before November is a fetch gap, not a verified quiet night. Re-fetch https://www.westwoodonesports.com/nfl-schedule/ and add a game only if the line is on the page.",
+      "url": "https://www.westwoodonesports.com/nfl-schedule/"
+    },
+    {
+      "id": "WWO_SPLIT_LINE",
+      "severity": "review",
+      "title": "Oct 26 Cowboys at Eagles was split across two fetches",
+      "detail": "The first fetched chunk ended on Dallas at Philadelphia, Oct 26, 7:00 PM ET. The next chunk opened on event 548539. The row is kept because both fragments match, and marked review.",
+      "url": "https://www.westwoodonesports.com/events/548539/"
+    },
+    {
+      "id": "SNAPSHOT_START",
+      "severity": "limitation",
+      "title": "This snapshot starts September 26, 2026",
+      "detail": "Earlier September games were on these stations. They are not in this file, so days before Sep 26 are marked \"before this snapshot\" instead of \"no game.\" Extending backward needs another line-by-line pass.",
+      "url": "https://www.mlb.com/giants/schedule/tv"
+    },
+    {
+      "id": "DURATION_ESTIMATE",
+      "severity": "note",
+      "title": "End times are estimates",
+      "detail": "No source publishes a per-game radio sign-off. The timeline uses typical lengths (MLB 2:45, NFL 3:15, college football 3:24, MLS 2:00) and labels them estimates. They are not official endings. Pregame length is not added; the Sep 1\u20136 KNBR grid started some Giants blocks an hour before first pitch, but that was one stale week.",
+      "url": "https://www.thesportsleader.com/shows/"
+    }
+  ],
+  "broadcasts": [
+    {
+      "id": "giants-2026-09-26",
+      "date": "2026-09-26",
+      "start_pt": "13:05",
+      "title": "Los Angeles Dodgers at San Francisco Giants",
+      "league": "MLB",
+      "venue": "Oracle Park",
+      "status": "final",
+      "result": "Dodgers 4, Giants 3",
+      "stations": [
+        "680",
+        "104.5"
+      ],
+      "confidence": "official",
+      "duration_est_min": 165,
+      "sources": [
+        {
+          "label": "MLB Stats API gamePk 823165, first pitch 2026-09-26T20:05:00Z",
+          "url": "https://statsapi.mlb.com/api/v1.1/game/823165/feed/live"
+        },
+        {
+          "label": "Giants English radio: KNBR 680 AM & 104.5 FM",
+          "url": "https://www.mlb.com/giants/schedule/tv"
+        }
+      ],
+      "notes": "Final when fetched. 20:05 UTC is 1:05 PM PDT. English call only.",
+      "flag_ids": [
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "giants-2026-09-27",
+      "date": "2026-09-27",
+      "start_pt": "12:05",
+      "title": "Los Angeles Dodgers at San Francisco Giants",
+      "league": "MLB",
+      "venue": "Oracle Park",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5"
+      ],
+      "confidence": "official",
+      "duration_est_min": 165,
+      "sources": [
+        {
+          "label": "MLB Stats API gamePk 823164, first pitch 2026-09-27T19:05:00Z",
+          "url": "https://statsapi.mlb.com/api/v1.1/game/823164/feed/live"
+        },
+        {
+          "label": "Giants English radio: KNBR 680 AM & 104.5 FM",
+          "url": "https://www.mlb.com/giants/schedule/tv"
+        }
+      ],
+      "notes": "Last Giants game returned by the Stats API through 2026-10-02. No later Giants game is added.",
+      "flag_ids": [
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "athletics-2026-09-26",
+      "date": "2026-09-26",
+      "start_pt": "18:40",
+      "title": "Houston Astros at Athletics",
+      "league": "MLB",
+      "venue": "Sutter Health Park, Sacramento",
+      "status": "pregame",
+      "result": null,
+      "stations": [
+        "960"
+      ],
+      "confidence": "official",
+      "duration_est_min": 165,
+      "sources": [
+        {
+          "label": "MLB Stats API gamePk 824949, first pitch 2026-09-27T01:40:00Z",
+          "url": "https://statsapi.mlb.com/api/v1.1/game/824949/feed/live"
+        },
+        {
+          "label": "A's Radio Network: 960 AM KNEW, Bay Area",
+          "url": "https://www.mlb.com/athletics/schedule/affiliates"
+        }
+      ],
+      "notes": "Status was Pre-Game when fetched. Home games are in Sacramento. 960 has no home-only asterisk on the affiliate page. ScheduleFreeTime did not mark this game as Bay Area radio; this row follows the club affiliates page.",
+      "flag_ids": [
+        "ATHLETICS_SACRAMENTO",
+        "SFT_RADIO_DIFF",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "athletics-2026-09-27",
+      "date": "2026-09-27",
+      "start_pt": "12:05",
+      "title": "Houston Astros at Athletics",
+      "league": "MLB",
+      "venue": "Sutter Health Park, Sacramento",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "960"
+      ],
+      "confidence": "official",
+      "duration_est_min": 165,
+      "sources": [
+        {
+          "label": "MLB Stats API gamePk 824948, first pitch 2026-09-27T19:05:00Z",
+          "url": "https://statsapi.mlb.com/api/v1.1/game/824948/feed/live"
+        },
+        {
+          "label": "A's Radio Network: 960 AM KNEW, Bay Area",
+          "url": "https://www.mlb.com/athletics/schedule/affiliates"
+        }
+      ],
+      "notes": "Last Athletics game returned by the Stats API through 2026-10-05. No postseason Athletics game is added. ScheduleFreeTime did not mark Athletics games as Bay Area radio; this row follows the club affiliates page.",
+      "flag_ids": [
+        "ATHLETICS_SACRAMENTO",
+        "SFT_RADIO_DIFF",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "niners-2026-09-27",
+      "date": "2026-09-27",
+      "start_pt": "13:05",
+      "title": "Arizona Cardinals at San Francisco 49ers",
+      "league": "NFL",
+      "venue": "Levi's Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "810",
+        "107.7"
+      ],
+      "confidence": "official",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "49ers.com schedule, Week 3, radio line as printed",
+          "url": "https://www.49ers.com/schedule/"
+        },
+        {
+          "label": "Week 3 ways to listen, 1:05 PM PT, KSFO 810 / KSAN 107.7",
+          "url": "https://www.49ers.com/news/ways-to-watch-and-listen-cardinals-vs-49ers-week-3-x8427"
+        }
+      ],
+      "notes": "Week 3. TV on the schedule page: FOX. Times are the PT clock printed by 49ers.com.",
+      "flag_ids": [
+        "NINERS_BOILERPLATE",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "niners-2026-10-04",
+      "date": "2026-10-04",
+      "start_pt": "13:25",
+      "title": "Denver Broncos at San Francisco 49ers",
+      "league": "NFL",
+      "venue": "Levi's Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "107.7",
+        "104.5",
+        "680"
+      ],
+      "confidence": "official",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "49ers.com schedule, Week 4, radio line as printed",
+          "url": "https://www.49ers.com/schedule/"
+        }
+      ],
+      "notes": "Week 4. TV on the schedule page: CBS. Times are the PT clock printed by 49ers.com.",
+      "flag_ids": [
+        "NINERS_BOILERPLATE",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "niners-2026-10-11",
+      "date": "2026-10-11",
+      "start_pt": "13:25",
+      "title": "San Francisco 49ers at Seattle Seahawks",
+      "league": "NFL",
+      "venue": "Lumen Field",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "107.7",
+        "104.5",
+        "680"
+      ],
+      "confidence": "official",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "49ers.com schedule, Week 5, radio line as printed",
+          "url": "https://www.49ers.com/schedule/"
+        }
+      ],
+      "notes": "Week 5. TV on the schedule page: FOX. Times are the PT clock printed by 49ers.com.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "niners-2026-10-19",
+      "date": "2026-10-19",
+      "start_pt": "17:15",
+      "title": "Washington Commanders at San Francisco 49ers",
+      "league": "NFL",
+      "venue": "Levi's Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "107.7",
+        "104.5",
+        "680"
+      ],
+      "confidence": "official",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "49ers.com schedule, Week 6, radio line as printed",
+          "url": "https://www.49ers.com/schedule/"
+        }
+      ],
+      "notes": "Week 6. TV on the schedule page: ESPN & ABC. Times are the PT clock printed by 49ers.com. Westwood One event 548538 prints 7:00 PM ET (4:00 PM PT) for this game. Club kickoff is 5:15 PM PT. Local call is the one on the stations below.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "niners-2026-10-25",
+      "date": "2026-10-25",
+      "start_pt": "10:00",
+      "title": "San Francisco 49ers at Atlanta Falcons",
+      "league": "NFL",
+      "venue": "Mercedes-Benz Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "107.7",
+        "104.5",
+        "680"
+      ],
+      "confidence": "official",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "49ers.com schedule, Week 7, radio line as printed",
+          "url": "https://www.49ers.com/schedule/"
+        }
+      ],
+      "notes": "Week 7. TV on the schedule page: FOX. Times are the PT clock printed by 49ers.com.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "niners-2026-11-08",
+      "date": "2026-11-08",
+      "start_pt": "13:05",
+      "title": "Las Vegas Raiders at San Francisco 49ers",
+      "league": "NFL",
+      "venue": "Levi's Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "107.7",
+        "104.5",
+        "680"
+      ],
+      "confidence": "official",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "49ers.com schedule, Week 9, radio line as printed",
+          "url": "https://www.49ers.com/schedule/"
+        }
+      ],
+      "notes": "Week 9. TV on the schedule page: CBS. Times are the PT clock printed by 49ers.com.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "niners-2026-11-15",
+      "date": "2026-11-15",
+      "start_pt": "13:25",
+      "title": "San Francisco 49ers at Dallas Cowboys",
+      "league": "NFL",
+      "venue": "AT&T Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "107.7",
+        "104.5",
+        "680"
+      ],
+      "confidence": "official",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "49ers.com schedule, Week 10, radio line as printed",
+          "url": "https://www.49ers.com/schedule/"
+        }
+      ],
+      "notes": "Week 10. TV on the schedule page: FOX. Times are the PT clock printed by 49ers.com.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "niners-2026-11-22",
+      "date": "2026-11-22",
+      "start_pt": "17:20",
+      "title": "Minnesota Vikings vs San Francisco 49ers",
+      "league": "NFL",
+      "venue": "Estadio Banorte (49ers.com); Estadio Azteca (Westwood One)",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "107.7",
+        "104.5",
+        "680"
+      ],
+      "confidence": "official",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "49ers.com schedule, Week 11, radio line as printed",
+          "url": "https://www.49ers.com/schedule/"
+        }
+      ],
+      "notes": "Week 11. TV on the schedule page: NBC. Times are the PT clock printed by 49ers.com. Westwood One event 548491 prints 7:30 PM ET (4:30 PM PT) and Estadio Azteca. Club kickoff is 5:20 PM PT at Estadio Banorte.",
+      "flag_ids": [
+        "MEXICO_VENUE_NAMES",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "niners-2026-11-29",
+      "date": "2026-11-29",
+      "start_pt": "13:25",
+      "title": "Seattle Seahawks at San Francisco 49ers",
+      "league": "NFL",
+      "venue": "Levi's Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "107.7",
+        "104.5",
+        "680"
+      ],
+      "confidence": "official",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "49ers.com schedule, Week 12, radio line as printed",
+          "url": "https://www.49ers.com/schedule/"
+        }
+      ],
+      "notes": "Week 12. TV on the schedule page: FOX. Times are the PT clock printed by 49ers.com.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "niners-2026-12-06",
+      "date": "2026-12-06",
+      "start_pt": "10:00",
+      "title": "San Francisco 49ers at New York Giants",
+      "league": "NFL",
+      "venue": "MetLife Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "107.7",
+        "104.5",
+        "680"
+      ],
+      "confidence": "official",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "49ers.com schedule, Week 13, radio line as printed",
+          "url": "https://www.49ers.com/schedule/"
+        }
+      ],
+      "notes": "Week 13. TV on the schedule page: FOX. Times are the PT clock printed by 49ers.com.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "niners-2026-12-13",
+      "date": "2026-12-13",
+      "start_pt": "13:25",
+      "title": "Los Angeles Rams at San Francisco 49ers",
+      "league": "NFL",
+      "venue": "Levi's Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "107.7",
+        "104.5",
+        "680"
+      ],
+      "confidence": "official",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "49ers.com schedule, Week 14, radio line as printed",
+          "url": "https://www.49ers.com/schedule/"
+        }
+      ],
+      "notes": "Week 14. TV on the schedule page: FOX. Times are the PT clock printed by 49ers.com.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "niners-2026-12-17",
+      "date": "2026-12-17",
+      "start_pt": "17:15",
+      "title": "San Francisco 49ers at Los Angeles Chargers",
+      "league": "NFL",
+      "venue": "SoFi Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "107.7",
+        "104.5",
+        "680"
+      ],
+      "confidence": "official",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "49ers.com schedule, Week 15, radio line as printed",
+          "url": "https://www.49ers.com/schedule/"
+        }
+      ],
+      "notes": "Week 15. TV on the schedule page: Prime Video. Times are the PT clock printed by 49ers.com. Westwood One event 548568 prints 7:30 PM ET (4:30 PM PT). Club kickoff is 5:15 PM PT.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "niners-2026-12-27",
+      "date": "2026-12-27",
+      "start_pt": "13:25",
+      "title": "San Francisco 49ers at Kansas City Chiefs",
+      "league": "NFL",
+      "venue": "Arrowhead Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "107.7",
+        "104.5",
+        "680"
+      ],
+      "confidence": "official",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "49ers.com schedule, Week 16, radio line as printed",
+          "url": "https://www.49ers.com/schedule/"
+        }
+      ],
+      "notes": "Week 16. TV on the schedule page: CBS. Times are the PT clock printed by 49ers.com.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "niners-2027-01-03",
+      "date": "2027-01-03",
+      "start_pt": "17:20",
+      "title": "Philadelphia Eagles at San Francisco 49ers",
+      "league": "NFL",
+      "venue": "Levi's Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "107.7",
+        "104.5",
+        "680"
+      ],
+      "confidence": "official",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "49ers.com schedule, Week 17, radio line as printed",
+          "url": "https://www.49ers.com/schedule/"
+        }
+      ],
+      "notes": "Week 17. TV on the schedule page: NBC. Times are the PT clock printed by 49ers.com. Westwood One event 548509 prints 7:30 PM ET (4:30 PM PT). Club kickoff is 5:20 PM PT.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "niners-week-18",
+      "date": null,
+      "start_pt": null,
+      "title": "San Francisco 49ers at Arizona Cardinals (Week 18)",
+      "league": "NFL",
+      "venue": "State Farm Stadium",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "107.7",
+        "104.5",
+        "680"
+      ],
+      "confidence": "official",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "49ers.com schedule, Week 18, date TBD, radio line printed",
+          "url": "https://www.49ers.com/schedule/"
+        }
+      ],
+      "notes": "Date and kickoff are TBD on the club page. Not placed on a guessed day.",
+      "flag_ids": [
+        "WEEK18_UNPLACED"
+      ]
+    },
+    {
+      "id": "stanford-2026-09-26",
+      "date": "2026-09-26",
+      "start_pt": "19:30",
+      "title": "Georgia Tech at Stanford",
+      "league": "NCAAF",
+      "venue": "Stanford Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "official",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "ESPN Stanford schedule, 10:30 PM ET = 7:30 PM PT",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
+        },
+        {
+          "label": "2026 dates, Georgia Tech on Sep 26",
+          "url": "https://gostanford.com/news/2026/1/26/complete-2026-schedule-unveiled"
+        },
+        {
+          "label": "Radio team on KNBR/KTCT 1050 AM",
+          "url": "https://gostanford.com/news/2026/07/30/2026-football-radio-broadcast-team-announced"
+        }
+      ],
+      "notes": "7:30 PM PDT on the rendered gostanford schedule index; ESPN prints 10:30 PM ET. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "stanford-2026-10-03",
+      "date": "2026-10-03",
+      "start_pt": "09:00",
+      "title": "Stanford at Wake Forest",
+      "league": "NCAAF",
+      "venue": "Winston-Salem",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "official",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "ESPN Stanford schedule, 12:00 PM ET = 9:00 AM PT",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
+        },
+        {
+          "label": "Radio team on KNBR/KTCT 1050 AM",
+          "url": "https://gostanford.com/news/2026/07/30/2026-football-radio-broadcast-team-announced"
+        }
+      ],
+      "notes": "9:00 AM PDT on the rendered schedule index; ESPN prints 12:00 PM ET. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "stanford-2026-10-10",
+      "date": "2026-10-10",
+      "start_pt": "12:30",
+      "title": "Stanford at Notre Dame",
+      "league": "NCAAF",
+      "venue": "Notre Dame Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "official",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "ESPN Stanford schedule, 3:30 PM ET = 12:30 PM PT",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
+        },
+        {
+          "label": "2026 dates, at Notre Dame on Oct 10",
+          "url": "https://gostanford.com/news/2026/1/26/complete-2026-schedule-unveiled"
+        },
+        {
+          "label": "Radio team on KNBR/KTCT 1050 AM",
+          "url": "https://gostanford.com/news/2026/07/30/2026-football-radio-broadcast-team-announced"
+        }
+      ],
+      "notes": "12:30 PM on the rendered schedule index; ESPN prints 3:30 PM ET on NBC. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "stanford-2026-10-17",
+      "date": "2026-10-17",
+      "start_pt": "16:30",
+      "title": "Elon at Stanford",
+      "league": "NCAAF",
+      "venue": "Stanford Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "review",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "ESPN Stanford schedule, Oct 17, 7:30 PM",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
+        },
+        {
+          "label": "School release lists Elon on Oct 17, no kickoff",
+          "url": "https://gostanford.com/news/2026/1/26/complete-2026-schedule-unveiled"
+        },
+        {
+          "label": "Radio team on KNBR/KTCT 1050 AM",
+          "url": "https://gostanford.com/news/2026/07/30/2026-football-radio-broadcast-team-announced"
+        }
+      ],
+      "notes": "Kickoff is ESPN's 7:30 PM ET converted to 4:30 PM PT. School excerpt did not include this kickoff. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680.",
+      "flag_ids": [
+        "STANFORD_OCT17_TIME",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "stanford-2026-10-23",
+      "date": "2026-10-23",
+      "start_pt": "19:30",
+      "title": "NC State at Stanford",
+      "league": "NCAAF",
+      "venue": "Stanford Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "official",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "ESPN Stanford schedule, 10:30 PM ET = 7:30 PM PT",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
+        },
+        {
+          "label": "Radio team on KNBR/KTCT 1050 AM",
+          "url": "https://gostanford.com/news/2026/07/30/2026-football-radio-broadcast-team-announced"
+        }
+      ],
+      "notes": "Friday 7:30 PM PDT on the rendered schedule index; ESPN prints 10:30 PM ET. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "stanford-2026-10-31",
+      "date": "2026-10-31",
+      "start_pt": null,
+      "title": "Stanford at Louisville",
+      "league": "NCAAF",
+      "venue": "Louisville",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "official",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "ESPN Stanford schedule, Oct 31 TBD",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
+        },
+        {
+          "label": "School release, at Louisville Oct 31",
+          "url": "https://gostanford.com/news/2026/1/26/complete-2026-schedule-unveiled"
+        },
+        {
+          "label": "Radio team on KNBR/KTCT 1050 AM",
+          "url": "https://gostanford.com/news/2026/07/30/2026-football-radio-broadcast-team-announced"
+        }
+      ],
+      "notes": "Date is on the school release and ESPN. Kickoff TBD on ESPN. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "stanford-2026-11-14",
+      "date": "2026-11-14",
+      "start_pt": null,
+      "title": "Stanford at Virginia Tech",
+      "league": "NCAAF",
+      "venue": "Blacksburg",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "official",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "ESPN Stanford schedule, Nov 14 TBD",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
+        },
+        {
+          "label": "School release, at Virginia Tech Nov 14",
+          "url": "https://gostanford.com/news/2026/1/26/complete-2026-schedule-unveiled"
+        },
+        {
+          "label": "Radio team on KNBR/KTCT 1050 AM",
+          "url": "https://gostanford.com/news/2026/07/30/2026-football-radio-broadcast-team-announced"
+        }
+      ],
+      "notes": "Date is on the school release and ESPN. Kickoff TBD. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "stanford-2026-11-28",
+      "date": "2026-11-28",
+      "start_pt": null,
+      "title": "SMU at Stanford",
+      "league": "NCAAF",
+      "venue": "Stanford Stadium",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "official",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "ESPN Stanford schedule, Nov 28 TBD",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
+        },
+        {
+          "label": "School release, SMU on Nov 28",
+          "url": "https://gostanford.com/news/2026/1/26/complete-2026-schedule-unveiled"
+        },
+        {
+          "label": "Radio team on KNBR/KTCT 1050 AM",
+          "url": "https://gostanford.com/news/2026/07/30/2026-football-radio-broadcast-team-announced"
+        }
+      ],
+      "notes": "Date is on the school release and ESPN. Kickoff TBD. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "big-game-2026-11-21",
+      "date": "2026-11-21",
+      "start_pt": null,
+      "title": "Stanford at California (129th Big Game)",
+      "league": "NCAAF",
+      "venue": "California Memorial Stadium, Berkeley",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "1050",
+        "680",
+        "104.5"
+      ],
+      "confidence": "review",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Cal schedule index: Radio KNBR 104.5 FM / 680 AM on the Nov 21 row",
+          "url": "https://calbears.com/sports/football/schedule"
+        },
+        {
+          "label": "Stanford radio release: KNBR/KTCT 1050 AM for the football season",
+          "url": "https://gostanford.com/news/2026/07/30/2026-football-radio-broadcast-team-announced"
+        },
+        {
+          "label": "Both schools list Nov 21; ESPN kickoff TBD",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
+        }
+      ],
+      "notes": "One game, two station claims. 810 AM is not printed on the Cal Big Game row in the captured index. Kickoff TBD.",
+      "flag_ids": [
+        "BIG_GAME_STATIONS",
+        "CAL_RADIO_INDEX",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "cal-2026-10-03",
+      "date": "2026-10-03",
+      "start_pt": "12:30",
+      "title": "California at UNLV",
+      "league": "NCAAF",
+      "venue": "Allegiant Stadium, Las Vegas",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "810"
+      ],
+      "confidence": "official",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Cal football schedule, radio column in the rendered index",
+          "url": "https://calbears.com/sports/football/schedule"
+        },
+        {
+          "label": "ESPN Cal schedule, time cross-check",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
+        }
+      ],
+      "notes": "Scoreboard fetch prints Oct 3, 12:30 PM at UNLV. ESPN prints 3:30 PM ET on CBSSN, which is 12:30 PM PT. Radio KSFO quoted in the rendered index.",
+      "flag_ids": [
+        "CAL_RADIO_INDEX",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "cal-2026-10-10",
+      "date": "2026-10-10",
+      "start_pt": null,
+      "title": "Virginia Tech at California",
+      "league": "NCAAF",
+      "venue": "California Memorial Stadium",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "810"
+      ],
+      "confidence": "official",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Cal football schedule, radio column in the rendered index",
+          "url": "https://calbears.com/sports/football/schedule"
+        },
+        {
+          "label": "ESPN Cal schedule, time cross-check",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
+        }
+      ],
+      "notes": "Radio KSFO quoted in the rendered index. Kickoff not on the scoreboard fetch. ESPN TBD.",
+      "flag_ids": [
+        "CAL_RADIO_INDEX",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "cal-2026-10-24",
+      "date": "2026-10-24",
+      "start_pt": null,
+      "title": "California at SMU",
+      "league": "NCAAF",
+      "venue": "Gerald J. Ford Stadium, Dallas",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "810"
+      ],
+      "confidence": "official",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Cal football schedule, radio column in the rendered index",
+          "url": "https://calbears.com/sports/football/schedule"
+        },
+        {
+          "label": "ESPN Cal schedule, time cross-check",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
+        }
+      ],
+      "notes": "Radio KSFO quoted in the rendered index. Kickoff TBD on ESPN.",
+      "flag_ids": [
+        "CAL_RADIO_INDEX",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "cal-2026-10-31",
+      "date": "2026-10-31",
+      "start_pt": null,
+      "title": "California at NC State",
+      "league": "NCAAF",
+      "venue": "Carter-Finley Stadium, Raleigh",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "810"
+      ],
+      "confidence": "official",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Cal football schedule, radio column in the rendered index",
+          "url": "https://calbears.com/sports/football/schedule"
+        },
+        {
+          "label": "ESPN Cal schedule, time cross-check",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
+        }
+      ],
+      "notes": "Radio KSFO quoted in the rendered index. Kickoff TBD on ESPN.",
+      "flag_ids": [
+        "CAL_RADIO_INDEX",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "cal-2026-11-14",
+      "date": "2026-11-14",
+      "start_pt": null,
+      "title": "California at Virginia",
+      "league": "NCAAF",
+      "venue": "Scott Stadium, Charlottesville",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "810"
+      ],
+      "confidence": "official",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Cal football schedule, radio column in the rendered index",
+          "url": "https://calbears.com/sports/football/schedule"
+        },
+        {
+          "label": "ESPN Cal schedule, time cross-check",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
+        }
+      ],
+      "notes": "Radio KSFO quoted in the rendered index. Kickoff TBD on ESPN.",
+      "flag_ids": [
+        "CAL_RADIO_INDEX",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "cal-2026-11-28",
+      "date": "2026-11-28",
+      "start_pt": null,
+      "title": "Pittsburgh at California",
+      "league": "NCAAF",
+      "venue": "California Memorial Stadium",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "810"
+      ],
+      "confidence": "official",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Cal football schedule, radio column in the rendered index",
+          "url": "https://calbears.com/sports/football/schedule"
+        },
+        {
+          "label": "ESPN Cal schedule, time cross-check",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
+        }
+      ],
+      "notes": "Radio KSFO quoted in the rendered index. Kickoff TBD on ESPN.",
+      "flag_ids": [
+        "CAL_RADIO_INDEX",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "cal-2026-10-17",
+      "date": "2026-10-17",
+      "start_pt": null,
+      "title": "Wake Forest at California",
+      "league": "NCAAF",
+      "venue": "California Memorial Stadium",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "810"
+      ],
+      "confidence": "review",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Cal scoreboard fetch: Oct 17 vs Wake Forest, Berkeley, no time",
+          "url": "https://calbears.com/sports/football/schedule"
+        },
+        {
+          "label": "ESPN Cal schedule: Oct 17, kickoff TBD",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
+        }
+      ],
+      "notes": "Date is official. 810 AM is the pattern of the other quoted rows, not a quoted Wake Forest row. Review the Radio column.",
+      "flag_ids": [
+        "CAL_WAKE_ROW",
+        "CAL_RADIO_INDEX",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "quakes-2026-09-26",
+      "date": "2026-09-26",
+      "start_pt": "19:30",
+      "title": "Portland Timbers at San Jose Earthquakes",
+      "league": "MLS",
+      "venue": "PayPal Park",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "810"
+      ],
+      "confidence": "official",
+      "duration_est_min": 120,
+      "sources": [
+        {
+          "label": "Club radio release 2026-02-16, Home, 810 / 1370",
+          "url": "https://www.sjearthquakes.com/news/news-earthquakes-announce-radio-stations-for-2026-mls-season"
+        }
+      ],
+      "notes": "English station in the table is 810. Spanish 1370 is not one of the six stations. Release says times can change. No playoff radio table was published in that release.",
+      "flag_ids": [
+        "QUAKES_SUBJECT_TO_CHANGE",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "quakes-2026-10-10",
+      "date": "2026-10-10",
+      "start_pt": "18:30",
+      "title": "San Jose Earthquakes at Colorado Rapids",
+      "league": "MLS",
+      "venue": "",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "810"
+      ],
+      "confidence": "official",
+      "duration_est_min": 120,
+      "sources": [
+        {
+          "label": "Club radio release 2026-02-16, Away, 810 / 1370",
+          "url": "https://www.sjearthquakes.com/news/news-earthquakes-announce-radio-stations-for-2026-mls-season"
+        }
+      ],
+      "notes": "English station in the table is 810. Spanish 1370 is not one of the six stations. Release says times can change. No playoff radio table was published in that release.",
+      "flag_ids": [
+        "QUAKES_SUBJECT_TO_CHANGE",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "quakes-2026-10-14",
+      "date": "2026-10-14",
+      "start_pt": "18:30",
+      "title": "San Jose Earthquakes at Real Salt Lake",
+      "league": "MLS",
+      "venue": "",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "810"
+      ],
+      "confidence": "official",
+      "duration_est_min": 120,
+      "sources": [
+        {
+          "label": "Club radio release 2026-02-16, Away, 810 / 1370",
+          "url": "https://www.sjearthquakes.com/news/news-earthquakes-announce-radio-stations-for-2026-mls-season"
+        }
+      ],
+      "notes": "English station in the table is 810. Spanish 1370 is not one of the six stations. Release says times can change. No playoff radio table was published in that release.",
+      "flag_ids": [
+        "QUAKES_SUBJECT_TO_CHANGE",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "quakes-2026-10-17",
+      "date": "2026-10-17",
+      "start_pt": "19:30",
+      "title": "Nashville SC at San Jose Earthquakes",
+      "league": "MLS",
+      "venue": "PayPal Park",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "810"
+      ],
+      "confidence": "official",
+      "duration_est_min": 120,
+      "sources": [
+        {
+          "label": "Club radio release 2026-02-16, Home, 810 / 1370",
+          "url": "https://www.sjearthquakes.com/news/news-earthquakes-announce-radio-stations-for-2026-mls-season"
+        }
+      ],
+      "notes": "English station in the table is 810. Spanish 1370 is not one of the six stations. Release says times can change. No playoff radio table was published in that release.",
+      "flag_ids": [
+        "QUAKES_SUBJECT_TO_CHANGE",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "quakes-2026-10-24",
+      "date": "2026-10-24",
+      "start_pt": "17:30",
+      "title": "San Jose Earthquakes at FC Dallas",
+      "league": "MLS",
+      "venue": "",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "810"
+      ],
+      "confidence": "official",
+      "duration_est_min": 120,
+      "sources": [
+        {
+          "label": "Club radio release 2026-02-16, Away, 810 / 1370",
+          "url": "https://www.sjearthquakes.com/news/news-earthquakes-announce-radio-stations-for-2026-mls-season"
+        }
+      ],
+      "notes": "English station in the table is 810. Spanish 1370 is not one of the six stations. Release says times can change. No playoff radio table was published in that release.",
+      "flag_ids": [
+        "QUAKES_SUBJECT_TO_CHANGE",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "quakes-2026-10-28",
+      "date": "2026-10-28",
+      "start_pt": "19:30",
+      "title": "Colorado Rapids at San Jose Earthquakes",
+      "league": "MLS",
+      "venue": "PayPal Park",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "810"
+      ],
+      "confidence": "official",
+      "duration_est_min": 120,
+      "sources": [
+        {
+          "label": "Club radio release 2026-02-16, Home, 810 / 1370",
+          "url": "https://www.sjearthquakes.com/news/news-earthquakes-announce-radio-stations-for-2026-mls-season"
+        }
+      ],
+      "notes": "English station in the table is 810. Spanish 1370 is not one of the six stations. Release says times can change. No playoff radio table was published in that release.",
+      "flag_ids": [
+        "QUAKES_SUBJECT_TO_CHANGE",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "quakes-2026-10-31",
+      "date": "2026-10-31",
+      "start_pt": "14:00",
+      "title": "Real Salt Lake at San Jose Earthquakes",
+      "league": "MLS",
+      "venue": "PayPal Park",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "810"
+      ],
+      "confidence": "official",
+      "duration_est_min": 120,
+      "sources": [
+        {
+          "label": "Club radio release 2026-02-16, Home, 810 / 1370",
+          "url": "https://www.sjearthquakes.com/news/news-earthquakes-announce-radio-stations-for-2026-mls-season"
+        }
+      ],
+      "notes": "English station in the table is 810. Spanish 1370 is not one of the six stations. Release says times can change. No playoff radio table was published in that release.",
+      "flag_ids": [
+        "QUAKES_SUBJECT_TO_CHANGE",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "quakes-2026-11-07",
+      "date": "2026-11-07",
+      "start_pt": "16:00",
+      "title": "San Jose Earthquakes at Minnesota United FC",
+      "league": "MLS",
+      "venue": "",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "810"
+      ],
+      "confidence": "official",
+      "duration_est_min": 120,
+      "sources": [
+        {
+          "label": "Club radio release 2026-02-16, Away, 810 / 1370",
+          "url": "https://www.sjearthquakes.com/news/news-earthquakes-announce-radio-stations-for-2026-mls-season"
+        }
+      ],
+      "notes": "English station in the table is 810. Spanish 1370 is not one of the six stations. Release says times can change. No playoff radio table was published in that release.",
+      "flag_ids": [
+        "QUAKES_SUBJECT_TO_CHANGE",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "super-bowl-lxi",
+      "date": "2027-02-14",
+      "start_pt": null,
+      "title": "Super Bowl LXI \u2014 teams not announced on the Westwood One schedule page",
+      "league": "NFL",
+      "venue": "SoFi Stadium, Inglewood",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Cumulus release 2026-09-09: Super Bowl LXI, February 14, 2027, SoFi Stadium",
+          "url": "https://www.globenewswire.com/news-release/2026/09/09/3358684/9032/en/cumulus-media-s-westwood-one-official-network-audio-partner-of-the-nfl-celebrates-40th-consecutive-season-and-reveals-2026-nfl-lineup-and-programming-highlights-from-nfl-kickoff-to.html"
+        },
+        {
+          "label": "NFL affiliate row: KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Date and stadium are from the release. Kickoff is not on the schedule page. Teams are not announced there. Not a confirmed clock time.",
+      "flag_ids": [
+        "WWO_POSTSEASON_UNDATED",
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548494",
+      "date": "2026-09-27",
+      "start_pt": "16:30",
+      "title": "Westwood One: Los Angeles Rams at Denver Broncos",
+      "league": "NFL",
+      "venue": "Empower Field at Mile High",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548494",
+          "url": "https://www.westwoodonesports.com/events/548494"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Sunday Night Football. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548532",
+      "date": "2026-09-28",
+      "start_pt": "16:00",
+      "title": "Westwood One: Philadelphia Eagles at Chicago Bears",
+      "league": "NFL",
+      "venue": "Soldier Field",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548532",
+          "url": "https://www.westwoodonesports.com/events/548532"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Monday Night Football. Listed start 16:00 PT, converted from 19:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548485",
+      "date": "2026-10-04",
+      "start_pt": "06:15",
+      "title": "Westwood One: Indianapolis Colts vs Washington Commanders",
+      "league": "NFL",
+      "venue": "Tottenham Hotspur Stadium, London",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548485",
+          "url": "https://www.westwoodonesports.com/events/548485"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "International. Listed start 06:15 PT, converted from 09:15 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548535",
+      "date": "2026-10-05",
+      "start_pt": "16:00",
+      "title": "Westwood One: Atlanta Falcons at New Orleans Saints",
+      "league": "NFL",
+      "venue": "Caesars Superdome",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548535",
+          "url": "https://www.westwoodonesports.com/events/548535"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Monday Night Football. Listed start 16:00 PT, converted from 19:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548486",
+      "date": "2026-10-11",
+      "start_pt": "06:15",
+      "title": "Westwood One: Philadelphia Eagles vs Jacksonville Jaguars",
+      "league": "NFL",
+      "venue": "Tottenham Hotspur Stadium, London",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548486",
+          "url": "https://www.westwoodonesports.com/events/548486"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "International. Listed start 06:15 PT, converted from 09:15 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548537",
+      "date": "2026-10-12",
+      "start_pt": "16:00",
+      "title": "Westwood One: Buffalo Bills at Los Angeles Rams",
+      "league": "NFL",
+      "venue": "SoFi Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548537",
+          "url": "https://www.westwoodonesports.com/events/548537"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Monday Night Football. Listed start 16:00 PT, converted from 19:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548487",
+      "date": "2026-10-18",
+      "start_pt": "06:15",
+      "title": "Westwood One: Houston Texans vs Jacksonville Jaguars",
+      "league": "NFL",
+      "venue": "Wembley Stadium, London",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548487",
+          "url": "https://www.westwoodonesports.com/events/548487"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "International. Listed start 06:15 PT, converted from 09:15 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548488",
+      "date": "2026-10-25",
+      "start_pt": "06:15",
+      "title": "Westwood One: Pittsburgh Steelers vs New Orleans Saints",
+      "league": "NFL",
+      "venue": "Stade de France, Paris",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548488",
+          "url": "https://www.westwoodonesports.com/events/548488"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "International. Listed start 06:15 PT, converted from 09:15 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548539",
+      "date": "2026-10-26",
+      "start_pt": "16:00",
+      "title": "Westwood One: Dallas Cowboys at Philadelphia Eagles",
+      "league": "NFL",
+      "venue": "Lincoln Financial Field",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "review",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548539",
+          "url": "https://www.westwoodonesports.com/events/548539"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Monday Night Football. Listed start 16:00 PT, converted from 19:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation. This line was split across two fetches: chunk 1 ended on Dallas at Philadelphia, Oct 26, 7:00 PM ET, and the next chunk opened on this event URL. Re-check the schedule page.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START",
+        "WWO_SPLIT_LINE"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548499",
+      "date": "2026-11-01",
+      "start_pt": "16:30",
+      "title": "Westwood One: Philadelphia Eagles at Washington Commanders",
+      "league": "NFL",
+      "venue": "Northwest Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548499",
+          "url": "https://www.westwoodonesports.com/events/548499"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Sunday Night Football. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548561",
+      "date": "2026-11-05",
+      "start_pt": "16:30",
+      "title": "Westwood One: Jacksonville Jaguars at Baltimore Ravens",
+      "league": "NFL",
+      "venue": "M&T Bank Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548561",
+          "url": "https://www.westwoodonesports.com/events/548561"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Thursday Night Football. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548500",
+      "date": "2026-11-08",
+      "start_pt": "16:30",
+      "title": "Westwood One: Tampa Bay Buccaneers at Chicago Bears",
+      "league": "NFL",
+      "venue": "Soldier Field",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548500",
+          "url": "https://www.westwoodonesports.com/events/548500"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Sunday Night Football. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548562",
+      "date": "2026-11-12",
+      "start_pt": "16:30",
+      "title": "Westwood One: Washington Commanders at New York Giants",
+      "league": "NFL",
+      "venue": "MetLife Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548562",
+          "url": "https://www.westwoodonesports.com/events/548562"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Thursday Night Football. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548501",
+      "date": "2026-11-15",
+      "start_pt": "16:30",
+      "title": "Westwood One: Pittsburgh Steelers at Cincinnati Bengals",
+      "league": "NFL",
+      "venue": "Paycor Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548501",
+          "url": "https://www.westwoodonesports.com/events/548501"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Sunday Night Football. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548564",
+      "date": "2026-11-19",
+      "start_pt": "16:30",
+      "title": "Westwood One: Indianapolis Colts at Houston Texans",
+      "league": "NFL",
+      "venue": "NRG Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548564",
+          "url": "https://www.westwoodonesports.com/events/548564"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Thursday Night Football. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548543",
+      "date": "2026-11-23",
+      "start_pt": "16:00",
+      "title": "Westwood One: Cincinnati Bengals at Washington Commanders",
+      "league": "NFL",
+      "venue": "Northwest Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548543",
+          "url": "https://www.westwoodonesports.com/events/548543"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Monday Night Football. Listed start 16:00 PT, converted from 19:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548512",
+      "date": "2026-11-26",
+      "start_pt": "09:30",
+      "title": "Westwood One: Chicago Bears at Detroit Lions",
+      "league": "NFL",
+      "venue": "Ford Field",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548512",
+          "url": "https://www.westwoodonesports.com/events/548512"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Thanksgiving. Listed start 09:30 PT, converted from 12:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548514",
+      "date": "2026-11-26",
+      "start_pt": "17:00",
+      "title": "Westwood One: Kansas City Chiefs at Buffalo Bills",
+      "league": "NFL",
+      "venue": "New Highmark Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548514",
+          "url": "https://www.westwoodonesports.com/events/548514"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Thanksgiving. Listed start 17:00 PT, converted from 20:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548515",
+      "date": "2026-11-27",
+      "start_pt": "11:30",
+      "title": "Westwood One: Denver Broncos at Pittsburgh Steelers",
+      "league": "NFL",
+      "venue": "Acrisure Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548515",
+          "url": "https://www.westwoodonesports.com/events/548515"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Black Friday. Listed start 11:30 PT, converted from 14:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548502",
+      "date": "2026-11-29",
+      "start_pt": "16:30",
+      "title": "Westwood One: New England Patriots at Los Angeles Chargers",
+      "league": "NFL",
+      "venue": "SoFi Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548502",
+          "url": "https://www.westwoodonesports.com/events/548502"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Sunday Night Football. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548544",
+      "date": "2026-11-30",
+      "start_pt": "16:00",
+      "title": "Westwood One: Carolina Panthers at Tampa Bay Buccaneers",
+      "league": "NFL",
+      "venue": "Raymond James Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548544",
+          "url": "https://www.westwoodonesports.com/events/548544"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Monday Night Football. Listed start 16:00 PT, converted from 19:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548566",
+      "date": "2026-12-03",
+      "start_pt": "16:30",
+      "title": "Westwood One: Kansas City Chiefs at Los Angeles Rams",
+      "league": "NFL",
+      "venue": "SoFi Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548566",
+          "url": "https://www.westwoodonesports.com/events/548566"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Thursday Night Football. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548503",
+      "date": "2026-12-06",
+      "start_pt": "16:30",
+      "title": "Westwood One: Houston Texans at Pittsburgh Steelers",
+      "league": "NFL",
+      "venue": "Acrisure Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548503",
+          "url": "https://www.westwoodonesports.com/events/548503"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Sunday Night Football. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548545",
+      "date": "2026-12-07",
+      "start_pt": "16:00",
+      "title": "Westwood One: Dallas Cowboys at Seattle Seahawks",
+      "league": "NFL",
+      "venue": "Lumen Field",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548545",
+          "url": "https://www.westwoodonesports.com/events/548545"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Monday Night Football. Listed start 16:00 PT, converted from 19:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548567",
+      "date": "2026-12-10",
+      "start_pt": "16:30",
+      "title": "Westwood One: Minnesota Vikings at New England Patriots",
+      "league": "NFL",
+      "venue": "Gillette Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548567",
+          "url": "https://www.westwoodonesports.com/events/548567"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Thursday Night Football. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548505",
+      "date": "2026-12-13",
+      "start_pt": "16:30",
+      "title": "Westwood One: Buffalo Bills at Green Bay Packers",
+      "league": "NFL",
+      "venue": "Lambeau Field",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548505",
+          "url": "https://www.westwoodonesports.com/events/548505"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Sunday Night Football. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548546",
+      "date": "2026-12-14",
+      "start_pt": "16:00",
+      "title": "Westwood One: Pittsburgh Steelers at Jacksonville Jaguars",
+      "league": "NFL",
+      "venue": "EverBank Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548546",
+          "url": "https://www.westwoodonesports.com/events/548546"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Monday Night Football. Listed start 16:00 PT, converted from 19:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548517",
+      "date": "2026-12-19",
+      "start_pt": "13:30",
+      "title": "Westwood One: Seattle Seahawks at Philadelphia Eagles",
+      "league": "NFL",
+      "venue": "Lincoln Financial Field",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548517",
+          "url": "https://www.westwoodonesports.com/events/548517"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Week 15 Saturday. Listed start 13:30 PT, converted from 16:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548518",
+      "date": "2026-12-19",
+      "start_pt": "17:00",
+      "title": "Westwood One: Chicago Bears at Buffalo Bills",
+      "league": "NFL",
+      "venue": "New Highmark Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548518",
+          "url": "https://www.westwoodonesports.com/events/548518"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Week 15 Saturday. Listed start 17:00 PT, converted from 20:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548506",
+      "date": "2026-12-20",
+      "start_pt": "16:30",
+      "title": "Westwood One: Detroit Lions at Minnesota Vikings",
+      "league": "NFL",
+      "venue": "U.S. Bank Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548506",
+          "url": "https://www.westwoodonesports.com/events/548506"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Sunday Night Football. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548548",
+      "date": "2026-12-21",
+      "start_pt": "16:00",
+      "title": "Westwood One: New England Patriots at Kansas City Chiefs",
+      "league": "NFL",
+      "venue": "GEHA Field at Arrowhead Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548548",
+          "url": "https://www.westwoodonesports.com/events/548548"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Monday Night Football. Listed start 16:00 PT, converted from 19:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548569",
+      "date": "2026-12-24",
+      "start_pt": "16:30",
+      "title": "Westwood One: Houston Texans at Philadelphia Eagles",
+      "league": "NFL",
+      "venue": "Lincoln Financial Field",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548569",
+          "url": "https://www.westwoodonesports.com/events/548569"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Thursday Night Football. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548528",
+      "date": "2026-12-25",
+      "start_pt": "09:30",
+      "title": "Westwood One: Green Bay Packers at Chicago Bears",
+      "league": "NFL",
+      "venue": "Soldier Field",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548528",
+          "url": "https://www.westwoodonesports.com/events/548528"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Christmas. Listed start 09:30 PT, converted from 12:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548531",
+      "date": "2026-12-25",
+      "start_pt": "13:15",
+      "title": "Westwood One: Buffalo Bills at Denver Broncos",
+      "league": "NFL",
+      "venue": "Empower Field at Mile High",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548531",
+          "url": "https://www.westwoodonesports.com/events/548531"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Christmas. Listed start 13:15 PT, converted from 16:15 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548534",
+      "date": "2026-12-25",
+      "start_pt": "17:00",
+      "title": "Westwood One: Los Angeles Rams at Seattle Seahawks",
+      "league": "NFL",
+      "venue": "Lumen Field",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548534",
+          "url": "https://www.westwoodonesports.com/events/548534"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Christmas. Listed start 17:00 PT, converted from 20:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548519",
+      "date": "2026-12-26",
+      "start_pt": "13:00",
+      "title": "Westwood One: Week 16 Saturday game \u2014 teams TBA",
+      "league": "NFL",
+      "venue": "",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548519",
+          "url": "https://www.westwoodonesports.com/events/548519"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Teams TBA. Listed start 13:00 PT, converted from 16:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548520",
+      "date": "2026-12-26",
+      "start_pt": "17:00",
+      "title": "Westwood One: Week 16 Saturday game \u2014 teams TBA",
+      "league": "NFL",
+      "venue": "",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548520",
+          "url": "https://www.westwoodonesports.com/events/548520"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Teams TBA. Listed start 17:00 PT, converted from 20:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548507",
+      "date": "2026-12-27",
+      "start_pt": "16:30",
+      "title": "Westwood One: Jacksonville Jaguars at Dallas Cowboys",
+      "league": "NFL",
+      "venue": "AT&T Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548507",
+          "url": "https://www.westwoodonesports.com/events/548507"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Sunday Night Football. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548550",
+      "date": "2026-12-28",
+      "start_pt": "16:00",
+      "title": "Westwood One: New York Giants at Detroit Lions",
+      "league": "NFL",
+      "venue": "Ford Field",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548550",
+          "url": "https://www.westwoodonesports.com/events/548550"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Monday Night Football. Listed start 16:00 PT, converted from 19:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548570",
+      "date": "2026-12-31",
+      "start_pt": "16:30",
+      "title": "Westwood One: Baltimore Ravens at Cincinnati Bengals",
+      "league": "NFL",
+      "venue": "Paycor Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548570",
+          "url": "https://www.westwoodonesports.com/events/548570"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Thursday Night Football. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548521",
+      "date": "2027-01-02",
+      "start_pt": "13:00",
+      "title": "Westwood One: Week 17 Saturday game \u2014 teams TBA",
+      "league": "NFL",
+      "venue": "",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548521",
+          "url": "https://www.westwoodonesports.com/events/548521"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Teams TBA. Listed start 13:00 PT, converted from 16:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548522",
+      "date": "2027-01-02",
+      "start_pt": "17:00",
+      "title": "Westwood One: Week 17 Saturday game \u2014 teams TBA",
+      "league": "NFL",
+      "venue": "",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548522",
+          "url": "https://www.westwoodonesports.com/events/548522"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Teams TBA. Listed start 17:00 PT, converted from 20:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548552",
+      "date": "2027-01-04",
+      "start_pt": "16:00",
+      "title": "Westwood One: Houston Texans at Green Bay Packers",
+      "league": "NFL",
+      "venue": "Lambeau Field",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548552",
+          "url": "https://www.westwoodonesports.com/events/548552"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Monday Night Football. Listed start 16:00 PT, converted from 19:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548523",
+      "date": "2027-01-09",
+      "start_pt": "09:30",
+      "title": "Westwood One: Week 18 Saturday game \u2014 teams TBA",
+      "league": "NFL",
+      "venue": "",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548523",
+          "url": "https://www.westwoodonesports.com/events/548523"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Teams TBA. Listed start 09:30 PT, converted from 12:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548524",
+      "date": "2027-01-09",
+      "start_pt": "13:15",
+      "title": "Westwood One: Week 18 Saturday game \u2014 teams TBA",
+      "league": "NFL",
+      "venue": "",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548524",
+          "url": "https://www.westwoodonesports.com/events/548524"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Teams TBA. Listed start 13:15 PT, converted from 16:15 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548526",
+      "date": "2027-01-09",
+      "start_pt": "17:00",
+      "title": "Westwood One: Week 18 Saturday game \u2014 teams TBA",
+      "league": "NFL",
+      "venue": "",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548526",
+          "url": "https://www.westwoodonesports.com/events/548526"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Teams TBA. Listed start 17:00 PT, converted from 20:00 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-nfl-548510",
+      "date": "2027-01-10",
+      "start_pt": "16:30",
+      "title": "Westwood One: Week 18 Sunday Night Football \u2014 teams TBA",
+      "league": "NFL",
+      "venue": "",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "Westwood One event 548510",
+          "url": "https://www.westwoodonesports.com/events/548510"
+        },
+        {
+          "label": "Westwood One NFL schedule",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        },
+        {
+          "label": "Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        }
+      ],
+      "notes": "Teams TBA. Listed start 16:30 PT, converted from 19:30 ET printed on the schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START"
+      ]
+    },
+    {
+      "id": "wwo-ncaaf-557136",
+      "date": "2026-09-26",
+      "start_pt": "12:00",
+      "title": "Westwood One: Oklahoma at Georgia",
+      "league": "NCAAF",
+      "venue": "Sanford Stadium, Athens",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Westwood One event 557136",
+          "url": "https://www.westwoodonesports.com/events/557136"
+        },
+        {
+          "label": "NCAA football grid, including the More endpoint (ends \"No more events\")",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=0&limit=20&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        }
+      ],
+      "notes": "Listed start 12:00 PT from 15:00 ET on the grid. NCAA station-finder tab was not separately extracted; stations are the confirmed NFL affiliate row. ScheduleFreeTime's public table showed 12:30 PM PT on 2026-09-26, which matches the 3:30 PM ET kickoff, not this 3:00 PM ET listed start.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START",
+        "NCAAF_FINDER_TAB",
+        "SFT_RADIO_DIFF"
+      ]
+    },
+    {
+      "id": "wwo-ncaaf-557137",
+      "date": "2026-10-03",
+      "start_pt": null,
+      "title": "Westwood One: Notre Dame at North Carolina",
+      "league": "NCAAF",
+      "venue": "Kenan Stadium, Chapel Hill",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Westwood One event 557137",
+          "url": "https://www.westwoodonesports.com/events/557137"
+        },
+        {
+          "label": "NCAA football grid, including the More endpoint (ends \"No more events\")",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=0&limit=20&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        }
+      ],
+      "notes": "Air time TBD on the Westwood One grid.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START",
+        "NCAAF_FINDER_TAB"
+      ]
+    },
+    {
+      "id": "wwo-ncaaf-557139",
+      "date": "2026-10-10",
+      "start_pt": null,
+      "title": "Westwood One: Indiana at Nebraska",
+      "league": "NCAAF",
+      "venue": "Memorial Stadium, Lincoln",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Westwood One event 557139",
+          "url": "https://www.westwoodonesports.com/events/557139"
+        },
+        {
+          "label": "NCAA football grid, including the More endpoint (ends \"No more events\")",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=0&limit=20&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        }
+      ],
+      "notes": "Air time TBD on the Westwood One grid.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START",
+        "NCAAF_FINDER_TAB"
+      ]
+    },
+    {
+      "id": "wwo-ncaaf-557140",
+      "date": "2026-10-17",
+      "start_pt": null,
+      "title": "Westwood One: Penn State at Michigan",
+      "league": "NCAAF",
+      "venue": "Michigan Stadium, Ann Arbor",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Westwood One event 557140",
+          "url": "https://www.westwoodonesports.com/events/557140"
+        },
+        {
+          "label": "NCAA football grid, including the More endpoint (ends \"No more events\")",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=0&limit=20&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        }
+      ],
+      "notes": "Air time TBD on the Westwood One grid.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START",
+        "NCAAF_FINDER_TAB"
+      ]
+    },
+    {
+      "id": "wwo-ncaaf-557141",
+      "date": "2026-10-24",
+      "start_pt": null,
+      "title": "Westwood One: Ole Miss at Texas",
+      "league": "NCAAF",
+      "venue": "Darrell K Royal\u2013Texas Memorial Stadium, Austin",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Westwood One event 557141",
+          "url": "https://www.westwoodonesports.com/events/557141"
+        },
+        {
+          "label": "NCAA football grid, including the More endpoint (ends \"No more events\")",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=0&limit=20&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        }
+      ],
+      "notes": "Air time TBD on the Westwood One grid.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START",
+        "NCAAF_FINDER_TAB"
+      ]
+    },
+    {
+      "id": "wwo-ncaaf-557129",
+      "date": "2026-10-31",
+      "start_pt": "12:00",
+      "title": "Westwood One: Florida at Georgia",
+      "league": "NCAAF",
+      "venue": "Mercedes-Benz Stadium, Atlanta",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Westwood One event 557129",
+          "url": "https://www.westwoodonesports.com/events/557129"
+        },
+        {
+          "label": "NCAA football grid, including the More endpoint (ends \"No more events\")",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=0&limit=20&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        }
+      ],
+      "notes": "Listed start 12:00 PT from 15:00 ET on the grid. NCAA station-finder tab was not separately extracted; stations are the confirmed NFL affiliate row.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START",
+        "NCAAF_FINDER_TAB"
+      ]
+    },
+    {
+      "id": "wwo-ncaaf-557143",
+      "date": "2026-11-07",
+      "start_pt": null,
+      "title": "Westwood One: Oregon at Ohio State",
+      "league": "NCAAF",
+      "venue": "Ohio Stadium, Columbus",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Westwood One event 557143",
+          "url": "https://www.westwoodonesports.com/events/557143"
+        },
+        {
+          "label": "NCAA football grid, including the More endpoint (ends \"No more events\")",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=0&limit=20&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        }
+      ],
+      "notes": "Air time TBD on the Westwood One grid.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START",
+        "NCAAF_FINDER_TAB"
+      ]
+    },
+    {
+      "id": "wwo-ncaaf-557144",
+      "date": "2026-11-14",
+      "start_pt": null,
+      "title": "Westwood One: Michigan at Oregon",
+      "league": "NCAAF",
+      "venue": "Autzen Stadium, Eugene",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Westwood One event 557144",
+          "url": "https://www.westwoodonesports.com/events/557144"
+        },
+        {
+          "label": "NCAA football grid, including the More endpoint (ends \"No more events\")",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=0&limit=20&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        }
+      ],
+      "notes": "Air time TBD on the Westwood One grid.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START",
+        "NCAAF_FINDER_TAB"
+      ]
+    },
+    {
+      "id": "wwo-ncaaf-557145",
+      "date": "2026-11-21",
+      "start_pt": null,
+      "title": "Westwood One: LSU at Tennessee",
+      "league": "NCAAF",
+      "venue": "Neyland Stadium, Knoxville",
+      "status": "tba",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Westwood One event 557145",
+          "url": "https://www.westwoodonesports.com/events/557145"
+        },
+        {
+          "label": "NCAA football grid, including the More endpoint (ends \"No more events\")",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=0&limit=20&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        }
+      ],
+      "notes": "Air time TBD on the Westwood One grid.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START",
+        "NCAAF_FINDER_TAB"
+      ]
+    },
+    {
+      "id": "wwo-ncaaf-557131",
+      "date": "2026-11-28",
+      "start_pt": "08:30",
+      "title": "Westwood One: Michigan at Ohio State",
+      "league": "NCAAF",
+      "venue": "Ohio Stadium, Columbus",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Westwood One event 557131",
+          "url": "https://www.westwoodonesports.com/events/557131"
+        },
+        {
+          "label": "NCAA football grid, including the More endpoint (ends \"No more events\")",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=0&limit=20&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        }
+      ],
+      "notes": "Listed start 08:30 PT from 11:30 ET on the grid. NCAA station-finder tab was not separately extracted; stations are the confirmed NFL affiliate row.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START",
+        "NCAAF_FINDER_TAB"
+      ]
+    },
+    {
+      "id": "wwo-ncaaf-557146",
+      "date": "2026-12-05",
+      "start_pt": "12:30",
+      "title": "Westwood One: SEC Championship Game",
+      "league": "NCAAF",
+      "venue": "Mercedes-Benz Stadium, Atlanta",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Westwood One event 557146",
+          "url": "https://www.westwoodonesports.com/events/557146"
+        },
+        {
+          "label": "NCAA football grid, including the More endpoint (ends \"No more events\")",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=0&limit=20&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        }
+      ],
+      "notes": "Listed start 12:30 PT from 15:30 ET on the grid. NCAA station-finder tab was not separately extracted; stations are the confirmed NFL affiliate row.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START",
+        "NCAAF_FINDER_TAB"
+      ]
+    },
+    {
+      "id": "wwo-ncaaf-557132",
+      "date": "2026-12-12",
+      "start_pt": "11:00",
+      "title": "Westwood One: Army vs Navy",
+      "league": "NCAAF",
+      "venue": "MetLife Stadium",
+      "status": "scheduled",
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Westwood One event 557132",
+          "url": "https://www.westwoodonesports.com/events/557132"
+        },
+        {
+          "label": "NCAA football grid, including the More endpoint (ends \"No more events\")",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=0&limit=20&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        }
+      ],
+      "notes": "Listed start 11:00 PT from 14:00 ET on the grid. NCAA station-finder tab was not separately extracted; stations are the confirmed NFL affiliate row.",
+      "flag_ids": [
+        "WWO_PREEMPTION",
+        "WWO_LISTED_START",
+        "NCAAF_FINDER_TAB"
+      ]
+    }
+  ]
+}
