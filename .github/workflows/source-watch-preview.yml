@@ -1,0 +1,30 @@
+name: source watch preview
+# Runs the three read-only monitors live on every pull request so a reviewer can
+# see, before merging, whether the sources still match the snapshot. It is
+# informational: it never fails the check, never opens an issue, never edits the
+# feed. The daily "source watch" workflow remains the one that files issues.
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run every monitor against the live sources
+        run: |
+          set +e
+          python3 scripts/source_watch.py --report "$RUNNER_TEMP/mlb.md"; mlb=$?
+          python3 scripts/wwo_watch.py --report "$RUNNER_TEMP/wwo.md"; wwo=$?
+          python3 scripts/page_watch.py --report "$RUNNER_TEMP/pages.md"; pages=$?
+          for r in mlb wwo pages; do
+            cat "$RUNNER_TEMP/$r.md"
+            cat "$RUNNER_TEMP/$r.md" >> "$GITHUB_STEP_SUMMARY"
+            printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+          done
+          echo "exit codes (0 clear, 2 changed, 3 unavailable): mlb=$mlb wwo=$wwo pages=$pages"
+          exit 0

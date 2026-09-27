@@ -104,7 +104,11 @@ def observed_schedule(document: dict[str, Any], today: str) -> dict[str, dict[st
             description = game.get("description")
             if not isinstance(description, str) or not description.strip():
                 raise MonitorError(f"The MLB Stats API returned no description for {game_date}.")
-            if not isinstance(game.get("startTimeTBD"), bool):
+            # The live API nests startTimeTBD inside "status" (verified against the
+            # real response on 2026-09-27). A top-level value is accepted as a fallback.
+            status_block = game.get("status") if isinstance(game.get("status"), dict) else {}
+            start_time_tbd = status_block.get("startTimeTBD", game.get("startTimeTBD"))
+            if not isinstance(start_time_tbd, bool):
                 raise MonitorError(f"The MLB Stats API returned no boolean startTimeTBD for {game_date}.")
             item = observed.setdefault(game_date, {
                 "count": 0,
@@ -113,7 +117,7 @@ def observed_schedule(document: dict[str, Any], today: str) -> dict[str, dict[st
             })
             item["count"] += 1
             item["descriptions"][description.strip()] += 1
-            item["start_time_tbd"].append(game["startTimeTBD"])
+            item["start_time_tbd"].append(start_time_tbd)
     return observed
 
 
