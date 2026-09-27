@@ -111,15 +111,55 @@
       }
     ],
     "counts": {
-      "broadcasts": 147,
+      "broadcasts": 153,
       "conditional": 11,
       "conditional_games": 21,
-      "placed": 146,
+      "placed": 152,
       "unplaced": 1,
       "official": 37,
-      "indicated": 108,
+      "indicated": 114,
       "review": 2,
-      "flags": 30
+      "flags": 31
+    },
+    "wwo_watch": {
+      "endpoint": "https://www.westwoodonesports.com/more/eventGrid",
+      "widgets": [
+        {
+          "widget": "47029",
+          "prefix": "wwo-nfl-",
+          "sport": "NFL",
+          "page": "https://www.westwoodonesports.com/nfl-schedule/",
+          "title": "Upcoming+NFL+Broadcasts"
+        },
+        {
+          "widget": "47030",
+          "prefix": "wwo-ncaaf-",
+          "sport": "NCAA Football",
+          "page": "https://www.westwoodonesports.com/ncaa-football/",
+          "title": "Upcoming+NCAA+Football+Broadcasts"
+        },
+        {
+          "widget": "47031",
+          "prefix": "wwo-ncaab-",
+          "sport": "NCAA Basketball",
+          "page": "https://www.westwoodonesports.com/ncaa-basketball/",
+          "title": "Upcoming+NCAA+Basketball+Broadcasts"
+        },
+        {
+          "widget": "47032",
+          "prefix": "wwo-soccer-",
+          "sport": "U.S. Soccer",
+          "page": "https://www.westwoodonesports.com/us-soccer/",
+          "title": "Upcoming+U.S.+Soccer+Broadcasts"
+        }
+      ],
+      "merged_nfl_event_ids": [
+        "548491",
+        "548509",
+        "548538",
+        "548568"
+      ],
+      "note": "Read-only. A widget that returns no events at all is reported as a failed check, never as no drift."
     }
   },
   "flags": [
@@ -166,22 +206,26 @@
       "url": "https://www.globenewswire.com/news-release/2026/09/09/3358684/9032/en/cumulus-media-s-westwood-one-official-network-audio-partner-of-the-nfl-celebrates-40th-consecutive-season-and-reveals-2026-nfl-lineup-and-programming-highlights-from-nfl-kickoff-to.html"
     },
     {
-      "id": "WWO_POSTSEASON_UNDATED",
-      "severity": "limitation",
-      "title": "NFL postseason rounds are promised but not dated by an official source",
-      "detail": "The Cumulus release says Westwood One carries every NFL postseason game through Super Bowl LXI on February 14, 2027 at SoFi Stadium. The Westwood One schedule page ends at the Week 18 TBA windows, and nfl.com/schedules/2026/POST redirected to the regular-season page when fetched on 2026-09-27, so the league has not published a postseason grid yet. Secondary write-ups say Wild Card Jan 16\u201318, Divisional Jan 23\u201324 and Conference Championships Jan 31, 2027; those are not official and are not placed on this calendar. Only Super Bowl LXI is placed, and only as date and stadium, time TBD.",
-      "url": "https://www.nfl.com/schedules/",
+      "id": "NFL_POSTSEASON_WINDOWS",
+      "severity": "review",
+      "title": "NFL playoff rounds are officially dated, but not per game",
+      "detail": "The league's own 2026-2027 important-dates announcement names the rounds: Week 18 January 9-10, Wild Card Weekend January 16-18, Divisional Playoffs January 23-24, the AFC and NFC Championship Games January 31, and Super Bowl LXI February 14, 2027 at SoFi Stadium. The Cumulus release of September 9, 2026 says Westwood One carries every postseason game, and the station finder puts Westwood One on KNBR-AM, KNBR-FM and KTCT-AM in San Francisco. So the rounds are dated and the network is known, but no official source says which game falls on which day, how many games each day carries, who plays, or when it kicks off \u2014 nfl.com/schedules/2026/POST still redirected to the regular season when fetched on 2026-09-27, and the Westwood One grid ends at the Week 18 TBA windows. Each day of an officially named window therefore carries one row, with no game count and no clock time, rather than leaving those five days blank. An earlier version of this flag called these dates unofficial; they are the league's own announcement and that was wrong. What is still missing is the per-game detail. If the 49ers reach the postseason their games would also be expected on the club flagship, but no source publishes a postseason 49ers radio line, so 107.7 FM is not claimed on any playoff row.",
+      "url": "https://www.seahawks.com/news/nfl-announces-important-dates-for-2026-2027",
       "sources": [
         {
-          "label": "NFL.com schedules \u2014 the official page; the 2026 POST tab still redirects",
-          "url": "https://www.nfl.com/schedules/"
+          "label": "League important dates for 2026-2027, republished by an NFL club \u2014 the round dates",
+          "url": "https://www.seahawks.com/news/nfl-announces-important-dates-for-2026-2027"
         },
         {
-          "label": "Cumulus release: every playoff game and Super Bowl LXI on Westwood One",
+          "label": "Cumulus release: Westwood One carries every playoff game and Super Bowl LXI",
           "url": "https://www.globenewswire.com/news-release/2026/09/09/3358684/9032/en/cumulus-media-s-westwood-one-official-network-audio-partner-of-the-nfl-celebrates-40th-consecutive-season-and-reveals-2026-nfl-lineup-and-programming-highlights-from-nfl-kickoff-to.html"
         },
         {
-          "label": "Secondary write-up of the round dates \u2014 not official, not used here",
+          "label": "NFL.com schedules \u2014 the 2026 POST tab still redirects and prints no round dates",
+          "url": "https://www.nfl.com/schedules/"
+        },
+        {
+          "label": "Secondary write-up \u2014 agrees on the dates, not official and not relied on",
           "url": "https://en.wikipedia.org/wiki/2026_NFL_season"
         }
       ]
@@ -283,6 +327,23 @@
       "title": "Westwood One prints the same stadium two different ways",
       "detail": "Venues on the NFL grid are copied character for character, so the inconsistencies on the source page survive into this feed. Denver is \u201cEmpower Field at Mile High, Denver, CO\u201d on Sep 27 and Dec 25 but \u201cMile High Stadium, Denver, CO\u201d on Oct 15. Detroit is \u201cFord Field, Detroit, MI, USA\u201d on Nov 26 and \u201cFord Field, Detroit, Michigan\u201d on Dec 28. Charlotte carries a trailing \u201c, USA\u201d that no other domestic row has. The four Saturday and Sunday \u201cTBA\u201d placeholders print no venue at all, so their venue is empty here rather than guessed. Nothing was normalised, because normalising is how a wrong venue would get laundered into a confident one.",
       "url": "https://www.westwoodonesports.com/nfl-schedule/"
+    },
+    {
+      "id": "NCAAF_VENUE_REREAD",
+      "severity": "note",
+      "title": "College football venues were re-read and now carry the full printed string",
+      "detail": "The second pass re-read the Westwood One NFL grid and restored every venue to the exact printed string, but the eleven college football rows were not re-read at the same time and kept a shortened venue: the state suffix had been dropped from all eleven, and Army vs Navy printed only \u201cMetLife Stadium\u201d where the grid says \u201cMetLife Stadium, East Rutherford, NJ\u201d. A shortened venue is not a wrong venue, which is why it survived review \u2014 it reads as tidy rather than as unverified. The NCAA Football grid was read end to end again on 2026-09-27, including the offset 10 page that carries Army vs Navy, and all eleven venues are now the exact printed strings. No other field on those rows changed: every date, event id, listed start time and title still matches.",
+      "url": "https://www.westwoodonesports.com/ncaa-football/",
+      "sources": [
+        {
+          "label": "Westwood One NCAA football grid, read end to end 2026-09-27",
+          "url": "https://www.westwoodonesports.com/ncaa-football/"
+        },
+        {
+          "label": "Offset 10 page carrying Army vs Navy and its full venue",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=10&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        }
+      ]
     },
     {
       "id": "NINERS_BOILERPLATE",
@@ -936,7 +997,7 @@
       "title": "Westwood One: Notre Dame at North Carolina",
       "league": "NCAAF",
       "network": "Westwood One",
-      "venue": "Kenan Stadium, Chapel Hill",
+      "venue": "Kenan Stadium, Chapel Hill, NC",
       "status": "tba",
       "conditional": false,
       "result": null,
@@ -958,8 +1019,12 @@
           "url": "https://www.westwoodonesports.com/ncaa-football/"
         },
         {
-          "label": "More endpoint, offset 10 (returns \"No more events\")",
+          "label": "More endpoint, offset 10 \u2014 carries the eleventh row, Army vs Navy",
           "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=10&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        },
+        {
+          "label": "More endpoint, offset 20 \u2014 returns \"No more events\", so the grid is exhausted",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=20&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
         },
         {
           "label": "Station finder, NCAA Football tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
@@ -970,7 +1035,8 @@
       "flag_ids": [
         "WWO_PREEMPTION",
         "WWO_LISTED_START",
-        "FINDER_2025_LABEL"
+        "FINDER_2025_LABEL",
+        "NCAAF_VENUE_REREAD"
       ]
     },
     {
@@ -1672,7 +1738,7 @@
       "title": "Westwood One: Indiana at Nebraska",
       "league": "NCAAF",
       "network": "Westwood One",
-      "venue": "Memorial Stadium, Lincoln",
+      "venue": "Memorial Stadium, Lincoln, NE",
       "status": "tba",
       "conditional": false,
       "result": null,
@@ -1694,8 +1760,12 @@
           "url": "https://www.westwoodonesports.com/ncaa-football/"
         },
         {
-          "label": "More endpoint, offset 10 (returns \"No more events\")",
+          "label": "More endpoint, offset 10 \u2014 carries the eleventh row, Army vs Navy",
           "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=10&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        },
+        {
+          "label": "More endpoint, offset 20 \u2014 returns \"No more events\", so the grid is exhausted",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=20&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
         },
         {
           "label": "Station finder, NCAA Football tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
@@ -1706,7 +1776,8 @@
       "flag_ids": [
         "WWO_PREEMPTION",
         "WWO_LISTED_START",
-        "FINDER_2025_LABEL"
+        "FINDER_2025_LABEL",
+        "NCAAF_VENUE_REREAD"
       ]
     },
     {
@@ -2399,7 +2470,7 @@
       "title": "Westwood One: Penn State at Michigan",
       "league": "NCAAF",
       "network": "Westwood One",
-      "venue": "Michigan Stadium, Ann Arbor",
+      "venue": "Michigan Stadium, Ann Arbor, MI",
       "status": "tba",
       "conditional": false,
       "result": null,
@@ -2421,8 +2492,12 @@
           "url": "https://www.westwoodonesports.com/ncaa-football/"
         },
         {
-          "label": "More endpoint, offset 10 (returns \"No more events\")",
+          "label": "More endpoint, offset 10 \u2014 carries the eleventh row, Army vs Navy",
           "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=10&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        },
+        {
+          "label": "More endpoint, offset 20 \u2014 returns \"No more events\", so the grid is exhausted",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=20&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
         },
         {
           "label": "Station finder, NCAA Football tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
@@ -2433,7 +2508,8 @@
       "flag_ids": [
         "WWO_PREEMPTION",
         "WWO_LISTED_START",
-        "FINDER_2025_LABEL"
+        "FINDER_2025_LABEL",
+        "NCAAF_VENUE_REREAD"
       ]
     },
     {
@@ -2929,7 +3005,7 @@
       "title": "Westwood One: Ole Miss at Texas",
       "league": "NCAAF",
       "network": "Westwood One",
-      "venue": "Darrell K Royal\u2013Texas Memorial Stadium, Austin",
+      "venue": "Darrell K Royal\u2013Texas Memorial Stadium, Austin, TX",
       "status": "tba",
       "conditional": false,
       "result": null,
@@ -2951,8 +3027,12 @@
           "url": "https://www.westwoodonesports.com/ncaa-football/"
         },
         {
-          "label": "More endpoint, offset 10 (returns \"No more events\")",
+          "label": "More endpoint, offset 10 \u2014 carries the eleventh row, Army vs Navy",
           "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=10&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        },
+        {
+          "label": "More endpoint, offset 20 \u2014 returns \"No more events\", so the grid is exhausted",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=20&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
         },
         {
           "label": "Station finder, NCAA Football tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
@@ -2963,7 +3043,8 @@
       "flag_ids": [
         "WWO_PREEMPTION",
         "WWO_LISTED_START",
-        "FINDER_2025_LABEL"
+        "FINDER_2025_LABEL",
+        "NCAAF_VENUE_REREAD"
       ]
     },
     {
@@ -3378,7 +3459,7 @@
       "title": "Westwood One: Florida at Georgia",
       "league": "NCAAF",
       "network": "Westwood One",
-      "venue": "Mercedes-Benz Stadium, Atlanta",
+      "venue": "Mercedes-Benz Stadium, Atlanta, GA",
       "status": "scheduled",
       "conditional": false,
       "result": null,
@@ -3400,8 +3481,12 @@
           "url": "https://www.westwoodonesports.com/ncaa-football/"
         },
         {
-          "label": "More endpoint, offset 10 (returns \"No more events\")",
+          "label": "More endpoint, offset 10 \u2014 carries the eleventh row, Army vs Navy",
           "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=10&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        },
+        {
+          "label": "More endpoint, offset 20 \u2014 returns \"No more events\", so the grid is exhausted",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=20&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
         },
         {
           "label": "Station finder, NCAA Football tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
@@ -3412,7 +3497,8 @@
       "flag_ids": [
         "WWO_PREEMPTION",
         "WWO_LISTED_START",
-        "FINDER_2025_LABEL"
+        "FINDER_2025_LABEL",
+        "NCAAF_VENUE_REREAD"
       ]
     },
     {
@@ -3730,7 +3816,7 @@
       "title": "Westwood One: Oregon at Ohio State",
       "league": "NCAAF",
       "network": "Westwood One",
-      "venue": "Ohio Stadium, Columbus",
+      "venue": "Ohio Stadium, Columbus, OH",
       "status": "tba",
       "conditional": false,
       "result": null,
@@ -3752,8 +3838,12 @@
           "url": "https://www.westwoodonesports.com/ncaa-football/"
         },
         {
-          "label": "More endpoint, offset 10 (returns \"No more events\")",
+          "label": "More endpoint, offset 10 \u2014 carries the eleventh row, Army vs Navy",
           "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=10&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        },
+        {
+          "label": "More endpoint, offset 20 \u2014 returns \"No more events\", so the grid is exhausted",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=20&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
         },
         {
           "label": "Station finder, NCAA Football tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
@@ -3764,7 +3854,8 @@
       "flag_ids": [
         "WWO_PREEMPTION",
         "WWO_LISTED_START",
-        "FINDER_2025_LABEL"
+        "FINDER_2025_LABEL",
+        "NCAAF_VENUE_REREAD"
       ]
     },
     {
@@ -4041,7 +4132,7 @@
       "title": "Westwood One: Michigan at Oregon",
       "league": "NCAAF",
       "network": "Westwood One",
-      "venue": "Autzen Stadium, Eugene",
+      "venue": "Autzen Stadium, Eugene, OR",
       "status": "tba",
       "conditional": false,
       "result": null,
@@ -4063,8 +4154,12 @@
           "url": "https://www.westwoodonesports.com/ncaa-football/"
         },
         {
-          "label": "More endpoint, offset 10 (returns \"No more events\")",
+          "label": "More endpoint, offset 10 \u2014 carries the eleventh row, Army vs Navy",
           "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=10&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        },
+        {
+          "label": "More endpoint, offset 20 \u2014 returns \"No more events\", so the grid is exhausted",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=20&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
         },
         {
           "label": "Station finder, NCAA Football tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
@@ -4075,7 +4170,8 @@
       "flag_ids": [
         "WWO_PREEMPTION",
         "WWO_LISTED_START",
-        "FINDER_2025_LABEL"
+        "FINDER_2025_LABEL",
+        "NCAAF_VENUE_REREAD"
       ]
     },
     {
@@ -4318,7 +4414,7 @@
       "title": "Westwood One: LSU at Tennessee",
       "league": "NCAAF",
       "network": "Westwood One",
-      "venue": "Neyland Stadium, Knoxville",
+      "venue": "Neyland Stadium, Knoxville, TN",
       "status": "tba",
       "conditional": false,
       "result": null,
@@ -4340,8 +4436,12 @@
           "url": "https://www.westwoodonesports.com/ncaa-football/"
         },
         {
-          "label": "More endpoint, offset 10 (returns \"No more events\")",
+          "label": "More endpoint, offset 10 \u2014 carries the eleventh row, Army vs Navy",
           "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=10&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        },
+        {
+          "label": "More endpoint, offset 20 \u2014 returns \"No more events\", so the grid is exhausted",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=20&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
         },
         {
           "label": "Station finder, NCAA Football tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
@@ -4352,7 +4452,8 @@
       "flag_ids": [
         "WWO_PREEMPTION",
         "WWO_LISTED_START",
-        "FINDER_2025_LABEL"
+        "FINDER_2025_LABEL",
+        "NCAAF_VENUE_REREAD"
       ]
     },
     {
@@ -4643,7 +4744,7 @@
       "title": "Westwood One: Michigan at Ohio State",
       "league": "NCAAF",
       "network": "Westwood One",
-      "venue": "Ohio Stadium, Columbus",
+      "venue": "Ohio Stadium, Columbus, OH",
       "status": "scheduled",
       "conditional": false,
       "result": null,
@@ -4665,8 +4766,12 @@
           "url": "https://www.westwoodonesports.com/ncaa-football/"
         },
         {
-          "label": "More endpoint, offset 10 (returns \"No more events\")",
+          "label": "More endpoint, offset 10 \u2014 carries the eleventh row, Army vs Navy",
           "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=10&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        },
+        {
+          "label": "More endpoint, offset 20 \u2014 returns \"No more events\", so the grid is exhausted",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=20&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
         },
         {
           "label": "Station finder, NCAA Football tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
@@ -4677,7 +4782,8 @@
       "flag_ids": [
         "WWO_PREEMPTION",
         "WWO_LISTED_START",
-        "FINDER_2025_LABEL"
+        "FINDER_2025_LABEL",
+        "NCAAF_VENUE_REREAD"
       ]
     },
     {
@@ -4913,7 +5019,7 @@
       "title": "Westwood One: SEC Championship Game",
       "league": "NCAAF",
       "network": "Westwood One",
-      "venue": "Mercedes-Benz Stadium, Atlanta",
+      "venue": "Mercedes-Benz Stadium, Atlanta, GA",
       "status": "scheduled",
       "conditional": false,
       "result": null,
@@ -4935,8 +5041,12 @@
           "url": "https://www.westwoodonesports.com/ncaa-football/"
         },
         {
-          "label": "More endpoint, offset 10 (returns \"No more events\")",
+          "label": "More endpoint, offset 10 \u2014 carries the eleventh row, Army vs Navy",
           "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=10&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        },
+        {
+          "label": "More endpoint, offset 20 \u2014 returns \"No more events\", so the grid is exhausted",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=20&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
         },
         {
           "label": "Station finder, NCAA Football tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
@@ -4947,7 +5057,8 @@
       "flag_ids": [
         "WWO_PREEMPTION",
         "WWO_LISTED_START",
-        "FINDER_2025_LABEL"
+        "FINDER_2025_LABEL",
+        "NCAAF_VENUE_REREAD"
       ]
     },
     {
@@ -5110,7 +5221,7 @@
       "title": "Westwood One: Army vs Navy",
       "league": "NCAAF",
       "network": "Westwood One",
-      "venue": "MetLife Stadium",
+      "venue": "MetLife Stadium, East Rutherford, NJ",
       "status": "scheduled",
       "conditional": false,
       "result": null,
@@ -5132,8 +5243,12 @@
           "url": "https://www.westwoodonesports.com/ncaa-football/"
         },
         {
-          "label": "More endpoint, offset 10 (returns \"No more events\")",
+          "label": "More endpoint, offset 10 \u2014 carries the eleventh row, Army vs Navy",
           "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=10&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+        },
+        {
+          "label": "More endpoint, offset 20 \u2014 returns \"No more events\", so the grid is exhausted",
+          "url": "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=20&limit=10&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
         },
         {
           "label": "Station finder, NCAA Football tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
@@ -5144,7 +5259,8 @@
       "flag_ids": [
         "WWO_PREEMPTION",
         "WWO_LISTED_START",
-        "FINDER_2025_LABEL"
+        "FINDER_2025_LABEL",
+        "NCAAF_VENUE_REREAD"
       ]
     },
     {
@@ -6178,6 +6294,276 @@
       ]
     },
     {
+      "id": "nfl-post-wild-card-1",
+      "date": "2027-01-16",
+      "start_pt": null,
+      "title": "NFL Wild Card Weekend on Westwood One \u2014 day 1 of the official January 16\u201318 window",
+      "league": "NFL",
+      "network": "Westwood One",
+      "venue": "",
+      "status": "tba",
+      "conditional": false,
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_key": "NFL",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "League important dates for 2026-2027: the round windows as announced",
+          "url": "https://www.seahawks.com/news/nfl-announces-important-dates-for-2026-2027"
+        },
+        {
+          "label": "Cumulus release 2026-09-09: Westwood One carries every NFL postseason game",
+          "url": "https://www.globenewswire.com/news-release/2026/09/09/3358684/9032/en/cumulus-media-s-westwood-one-official-network-audio-partner-of-the-nfl-celebrates-40th-consecutive-season-and-reveals-2026-nfl-lineup-and-programming-highlights-from-nfl-kickoff-to.html"
+        },
+        {
+          "label": "Station finder, NFL tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        },
+        {
+          "label": "Westwood One NFL grid \u2014 ends at the Week 18 TBA windows, no playoff rows",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        }
+      ],
+      "notes": "The league dates this round as a window, not game by game, so which games fall on this particular day is not published. The row asserts only that the round is being played across these dates and that Westwood One carries it. No game count, kickoff time, matchup or venue is asserted, because no official source publishes one for this date; nfl.com/schedules/2026/POST still redirected to the regular season when fetched on 2026-09-27. With no clock time this row contributes zero estimated minutes to the 10 AM\u201310 PM band maths, so it does not inflate the coverage figures. If the 49ers reach the postseason their games would also be expected on the club flagship, but no source publishes a postseason 49ers radio line, so 107.7 FM is not claimed here.",
+      "flag_ids": [
+        "NFL_POSTSEASON_WINDOWS",
+        "WWO_PREEMPTION",
+        "FINDER_2025_LABEL",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "nfl-post-wild-card-2",
+      "date": "2027-01-17",
+      "start_pt": null,
+      "title": "NFL Wild Card Weekend on Westwood One \u2014 day 2 of the official January 16\u201318 window",
+      "league": "NFL",
+      "network": "Westwood One",
+      "venue": "",
+      "status": "tba",
+      "conditional": false,
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_key": "NFL",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "League important dates for 2026-2027: the round windows as announced",
+          "url": "https://www.seahawks.com/news/nfl-announces-important-dates-for-2026-2027"
+        },
+        {
+          "label": "Cumulus release 2026-09-09: Westwood One carries every NFL postseason game",
+          "url": "https://www.globenewswire.com/news-release/2026/09/09/3358684/9032/en/cumulus-media-s-westwood-one-official-network-audio-partner-of-the-nfl-celebrates-40th-consecutive-season-and-reveals-2026-nfl-lineup-and-programming-highlights-from-nfl-kickoff-to.html"
+        },
+        {
+          "label": "Station finder, NFL tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        },
+        {
+          "label": "Westwood One NFL grid \u2014 ends at the Week 18 TBA windows, no playoff rows",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        }
+      ],
+      "notes": "The league dates this round as a window, not game by game, so which games fall on this particular day is not published. The row asserts only that the round is being played across these dates and that Westwood One carries it. No game count, kickoff time, matchup or venue is asserted, because no official source publishes one for this date; nfl.com/schedules/2026/POST still redirected to the regular season when fetched on 2026-09-27. With no clock time this row contributes zero estimated minutes to the 10 AM\u201310 PM band maths, so it does not inflate the coverage figures. If the 49ers reach the postseason their games would also be expected on the club flagship, but no source publishes a postseason 49ers radio line, so 107.7 FM is not claimed here.",
+      "flag_ids": [
+        "NFL_POSTSEASON_WINDOWS",
+        "WWO_PREEMPTION",
+        "FINDER_2025_LABEL",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "nfl-post-wild-card-3",
+      "date": "2027-01-18",
+      "start_pt": null,
+      "title": "NFL Wild Card Weekend on Westwood One \u2014 day 3 of the official January 16\u201318 window",
+      "league": "NFL",
+      "network": "Westwood One",
+      "venue": "",
+      "status": "tba",
+      "conditional": false,
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_key": "NFL",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "League important dates for 2026-2027: the round windows as announced",
+          "url": "https://www.seahawks.com/news/nfl-announces-important-dates-for-2026-2027"
+        },
+        {
+          "label": "Cumulus release 2026-09-09: Westwood One carries every NFL postseason game",
+          "url": "https://www.globenewswire.com/news-release/2026/09/09/3358684/9032/en/cumulus-media-s-westwood-one-official-network-audio-partner-of-the-nfl-celebrates-40th-consecutive-season-and-reveals-2026-nfl-lineup-and-programming-highlights-from-nfl-kickoff-to.html"
+        },
+        {
+          "label": "Station finder, NFL tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        },
+        {
+          "label": "Westwood One NFL grid \u2014 ends at the Week 18 TBA windows, no playoff rows",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        }
+      ],
+      "notes": "The league dates this round as a window, not game by game, so which games fall on this particular day is not published. The row asserts only that the round is being played across these dates and that Westwood One carries it. No game count, kickoff time, matchup or venue is asserted, because no official source publishes one for this date; nfl.com/schedules/2026/POST still redirected to the regular season when fetched on 2026-09-27. With no clock time this row contributes zero estimated minutes to the 10 AM\u201310 PM band maths, so it does not inflate the coverage figures. If the 49ers reach the postseason their games would also be expected on the club flagship, but no source publishes a postseason 49ers radio line, so 107.7 FM is not claimed here.",
+      "flag_ids": [
+        "NFL_POSTSEASON_WINDOWS",
+        "WWO_PREEMPTION",
+        "FINDER_2025_LABEL",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "nfl-post-divisional-1",
+      "date": "2027-01-23",
+      "start_pt": null,
+      "title": "NFL Divisional Playoffs on Westwood One \u2014 day 1 of the official January 23\u201324 window",
+      "league": "NFL",
+      "network": "Westwood One",
+      "venue": "",
+      "status": "tba",
+      "conditional": false,
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_key": "NFL",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "League important dates for 2026-2027: the round windows as announced",
+          "url": "https://www.seahawks.com/news/nfl-announces-important-dates-for-2026-2027"
+        },
+        {
+          "label": "Cumulus release 2026-09-09: Westwood One carries every NFL postseason game",
+          "url": "https://www.globenewswire.com/news-release/2026/09/09/3358684/9032/en/cumulus-media-s-westwood-one-official-network-audio-partner-of-the-nfl-celebrates-40th-consecutive-season-and-reveals-2026-nfl-lineup-and-programming-highlights-from-nfl-kickoff-to.html"
+        },
+        {
+          "label": "Station finder, NFL tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        },
+        {
+          "label": "Westwood One NFL grid \u2014 ends at the Week 18 TBA windows, no playoff rows",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        }
+      ],
+      "notes": "The league dates this round as a window, not game by game, so which games fall on this particular day is not published. The row asserts only that the round is being played across these dates and that Westwood One carries it. No game count, kickoff time, matchup or venue is asserted, because no official source publishes one for this date; nfl.com/schedules/2026/POST still redirected to the regular season when fetched on 2026-09-27. With no clock time this row contributes zero estimated minutes to the 10 AM\u201310 PM band maths, so it does not inflate the coverage figures. If the 49ers reach the postseason their games would also be expected on the club flagship, but no source publishes a postseason 49ers radio line, so 107.7 FM is not claimed here.",
+      "flag_ids": [
+        "NFL_POSTSEASON_WINDOWS",
+        "WWO_PREEMPTION",
+        "FINDER_2025_LABEL",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "nfl-post-divisional-2",
+      "date": "2027-01-24",
+      "start_pt": null,
+      "title": "NFL Divisional Playoffs on Westwood One \u2014 day 2 of the official January 23\u201324 window",
+      "league": "NFL",
+      "network": "Westwood One",
+      "venue": "",
+      "status": "tba",
+      "conditional": false,
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_key": "NFL",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "League important dates for 2026-2027: the round windows as announced",
+          "url": "https://www.seahawks.com/news/nfl-announces-important-dates-for-2026-2027"
+        },
+        {
+          "label": "Cumulus release 2026-09-09: Westwood One carries every NFL postseason game",
+          "url": "https://www.globenewswire.com/news-release/2026/09/09/3358684/9032/en/cumulus-media-s-westwood-one-official-network-audio-partner-of-the-nfl-celebrates-40th-consecutive-season-and-reveals-2026-nfl-lineup-and-programming-highlights-from-nfl-kickoff-to.html"
+        },
+        {
+          "label": "Station finder, NFL tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        },
+        {
+          "label": "Westwood One NFL grid \u2014 ends at the Week 18 TBA windows, no playoff rows",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        }
+      ],
+      "notes": "The league dates this round as a window, not game by game, so which games fall on this particular day is not published. The row asserts only that the round is being played across these dates and that Westwood One carries it. No game count, kickoff time, matchup or venue is asserted, because no official source publishes one for this date; nfl.com/schedules/2026/POST still redirected to the regular season when fetched on 2026-09-27. With no clock time this row contributes zero estimated minutes to the 10 AM\u201310 PM band maths, so it does not inflate the coverage figures. If the 49ers reach the postseason their games would also be expected on the club flagship, but no source publishes a postseason 49ers radio line, so 107.7 FM is not claimed here.",
+      "flag_ids": [
+        "NFL_POSTSEASON_WINDOWS",
+        "WWO_PREEMPTION",
+        "FINDER_2025_LABEL",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
+      "id": "nfl-post-championships",
+      "date": "2027-01-31",
+      "start_pt": null,
+      "title": "AFC and NFC Championship Games on Westwood One \u2014 both games officially dated January 31",
+      "league": "NFL",
+      "network": "Westwood One",
+      "venue": "",
+      "status": "tba",
+      "conditional": false,
+      "result": null,
+      "stations": [
+        "680",
+        "104.5",
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_key": "NFL",
+      "duration_est_min": 195,
+      "sources": [
+        {
+          "label": "League important dates for 2026-2027: the round windows as announced",
+          "url": "https://www.seahawks.com/news/nfl-announces-important-dates-for-2026-2027"
+        },
+        {
+          "label": "Cumulus release 2026-09-09: Westwood One carries every NFL postseason game",
+          "url": "https://www.globenewswire.com/news-release/2026/09/09/3358684/9032/en/cumulus-media-s-westwood-one-official-network-audio-partner-of-the-nfl-celebrates-40th-consecutive-season-and-reveals-2026-nfl-lineup-and-programming-highlights-from-nfl-kickoff-to.html"
+        },
+        {
+          "label": "Station finder, NFL tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM",
+          "url": "https://www.westwoodonesports.com/station-finder/"
+        },
+        {
+          "label": "Westwood One NFL grid \u2014 ends at the Week 18 TBA windows, no playoff rows",
+          "url": "https://www.westwoodonesports.com/nfl-schedule/"
+        }
+      ],
+      "notes": "The league names January 31 as the single day for both the AFC and NFC Championship Games, so this is not a window day: both games are dated here. No game count, kickoff time, matchup or venue is asserted, because no official source publishes one for this date; nfl.com/schedules/2026/POST still redirected to the regular season when fetched on 2026-09-27. With no clock time this row contributes zero estimated minutes to the 10 AM\u201310 PM band maths, so it does not inflate the coverage figures. If the 49ers reach the postseason their games would also be expected on the club flagship, but no source publishes a postseason 49ers radio line, so 107.7 FM is not claimed here.",
+      "flag_ids": [
+        "NFL_POSTSEASON_WINDOWS",
+        "WWO_PREEMPTION",
+        "FINDER_2025_LABEL",
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
       "id": "super-bowl-lxi",
       "date": "2027-02-14",
       "start_pt": null,
@@ -6202,13 +6588,17 @@
           "url": "https://www.globenewswire.com/news-release/2026/09/09/3358684/9032/en/cumulus-media-s-westwood-one-official-network-audio-partner-of-the-nfl-celebrates-40th-consecutive-season-and-reveals-2026-nfl-lineup-and-programming-highlights-from-nfl-kickoff-to.html"
         },
         {
+          "label": "League important dates: \u201cFebruary 14 - Super Bowl LXI at SoFi Stadium (Inglewood, California)\u201d",
+          "url": "https://www.seahawks.com/news/nfl-announces-important-dates-for-2026-2027"
+        },
+        {
           "label": "Station finder, NFL tab: KNBR-AM, KNBR-FM, KTCT-AM",
           "url": "https://www.westwoodonesports.com/station-finder/"
         }
       ],
-      "notes": "Date and stadium are from the rights-holder release. Kickoff is not on the schedule page and the teams are not known. The wild card, divisional and conference-championship rounds are promised by the same release but carry no official date yet, so they are not placed.",
+      "notes": "Date and stadium are from the rights-holder release, and the league's important-dates announcement independently names February 14 at SoFi Stadium. Kickoff is not published and the teams are not known, so this row carries no clock time. Unlike the earlier rounds, this is a single officially named day for a single game.",
       "flag_ids": [
-        "WWO_POSTSEASON_UNDATED",
+        "NFL_POSTSEASON_WINDOWS",
         "WWO_PREEMPTION",
         "WWO_LISTED_START"
       ]

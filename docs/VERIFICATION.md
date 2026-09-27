@@ -4,7 +4,23 @@ No broadcast was added from memory. Every row in `data/broadcasts.json` was tran
 
 Window: **2026-09-27 through 2027-02-28**, America/Los_Angeles. Days before Sep 27 are labelled "before this snapshot", never "quiet".
 
-Result: **147 date-level schedule entries**: 136 rows with at least one non-conditional listing (2 are mixed) and 11 entirely if-necessary rows. 146 entries have a date; 1 is deliberately unplaced. 37 official, 108 indicated, 2 review. 30 flags. The two mixed postseason rows also contain three if-necessary games; the feed records **21 possible games across 13 dates**. Three dates have only if-necessary possibilities and no non-conditional listing.
+Result: **153 date-level schedule entries**: 142 rows with at least one non-conditional listing (2 are mixed) and 11 entirely if-necessary rows. 152 entries have a date; 1 is deliberately unplaced. 37 official, 114 indicated, 2 review. 31 flags. The two mixed postseason rows also contain three if-necessary games; the feed records **21 possible games across 13 dates**. Three dates have only if-necessary possibilities and no non-conditional listing.
+
+## Re-verified in the fourth pass, same snapshot date
+
+Every source below was fetched again on 2026-09-27 after the third pass shipped. Nothing in this
+list was checked from memory or from the previous session's notes.
+
+| Source re-fetched | Result |
+| --- | --- |
+| `49ers.com/schedule/` | All fifteen rows match on date, Pacific kickoff, radio line, venue, the Week 8 bye and the Week 18 TBD. Week 3 still prints "KSFO 810 AM / KSAN 107.7 FM"; Week 4 onward still prints "KSAN 107.7 FM / KNBR 104.5 FM / 680 AM". No change. |
+| `westwoodonesports.com/nfl/` | The first ten events match on id, title, venue string and Eastern start time. Event 548538 is still merged into the club row. No change. |
+| `westwoodonesports.com/ncaa-football/` + offsets 10 and 20 | Eleven events, grid exhausted at offset 20. Dates, ids, times and titles unchanged; **all eleven venue strings were short and are corrected**. |
+| `westwoodonesports.com/us-soccer/` | All five events match on id, title, venue and Eastern start time, including both "TNT Sports Broadcast - Audio Only Simulcast" notes. No change. |
+| `westwoodonesports.com/ncaa-basketball/` | Still "No upcoming events". Limitation stands, and is now watched automatically. |
+| `nfl.com/schedules/2026/POST/` | Still redirects to the regular season, now showing Week 3. No postseason grid. |
+| `seahawks.com` league important-dates announcement | **New source.** Supplies the official round dates behind the six new playoff window rows, and independently confirms Estadio Banorte for Nov 22. |
+| `thesportsleader.com/shows/` and `/knbr1050shows/` | Both still frozen on the week of Monday 8-31 to Monday 9-7. Flag `KNBR_GRID_STALE` stands. |
 
 ## Stations, and only these
 
@@ -36,13 +52,16 @@ Because KTCT 1050 is a full-time ESPN Radio affiliate, the 28 postseason date-ro
 - **https://www.westwoodonesports.com/nfl-schedule/** — read **end to end in four chunks** this time, which closes last pass's missing-chunk gap. 67 upcoming national games; 4 of them are 49ers games and are merged into the club rows rather than duplicated, leaving **63 standalone rows**.
 - **https://www.westwoodonesports.com/station-finder/** — chunks 0–3 and 5. NFL tab, San Francisco: KNBR-AM, KNBR-F2, KNBR-FM, KTCT-AM. NCAA Football tab: the same four. Soccer tab: **KTCT-AM only**. Every table's footer is labelled "(2025)" — see flag `FINDER_2025_LABEL`. Disclaimer quoted verbatim in `WWO_PREEMPTION`.
 - **Cumulus / GlobeNewswire release, Sep 9, 2026** — eight internationals for the full season, every postseason game, Super Bowl LXI on Feb 14, 2027 at SoFi. Seven internationals are still ahead of this snapshot; the eighth was played in September.
-- **https://www.nfl.com/schedules/2026/POST/** — redirects to the regular-season page. The league has **not** published a postseason grid, so no playoff round is placed.
+- **https://www.nfl.com/schedules/2026/POST/** — re-fetched this pass; still redirects to the regular-season page, which is on Week 3. The league has **not** published a postseason *grid*, so no playoff matchup, kickoff or per-day game count is placed.
+- **https://www.seahawks.com/news/nfl-announces-important-dates-for-2026-2027** — the league's own 2026-2027 important-dates announcement, republished verbatim by an NFL club on Jul 07, 2026. Read in chunks 0–2. It prints **“January 9-10 - Week 18”, “January 16-18 - Wild Card Weekend powered by Verizon”, “January 23-24 - Divisional Playoffs presented by Intuit TurboTax”, “January 31 - AFC and NFC Championship Games presented by Intuit TurboTax” and “February 14 - Super Bowl LXI at SoFi Stadium (Inglewood, California)”**. These are the round dates behind the six new `nfl-post-` window rows. The same page independently confirms **“November 22 - NFL International Game at Estadio Banorte (Mexico City, Mexico): Minnesota Vikings vs. San Francisco 49ers”**, which is the venue 49ers.com prints and Westwood One does not — see flag `MEXICO_VENUE_NAMES`.
 
 ### College football
 - **https://calbears.com/sports/football/schedule** — chunks 0, 4 and 5. The full Radio column was read this time, which retires last pass's `CAL_RADIO_INDEX` and `CAL_WAKE_ROW` flags. KSFO 810 on Oct 3, Oct 10, **Oct 17 (the row that was missing before)**, Oct 24, Oct 31, Nov 14, Nov 28; **KNBR 104.5 FM / 680 AM** on the Nov 21 Big Game. Only Oct 3 has a kickoff (12:30 PM at UNLV). Bye Nov 7.
 - **https://gostanford.com/sports/football/schedule** — **serves 2025 rows**; `/schedule/2026` returns 404. Recorded as flag `GOSTANFORD_2025`. Stanford dates and kickoffs therefore come from ESPN.
 - **https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal** — the 2026 Stanford schedule in Eastern time. Oct 3 12:00 ET; Oct 10 3:30 ET (NBC); Oct 17 7:30 ET; Fri Oct 23 10:30 ET; Oct 31, Nov 14, Nov 21 and Nov 28 TBD. Pacific is Eastern minus three hours all year, because both zones change clocks together.
-- **https://www.westwoodonesports.com/ncaa-football/** plus the `eventGrid` More endpoint at offset 10, which answers "No more events" — **11** upcoming national games. Sep 26 Oklahoma at Georgia has dropped off the list and was removed.
+- **https://www.westwoodonesports.com/ncaa-football/** re-read end to end this pass, plus the `eventGrid` More endpoint at **offset 10, which carries the eleventh game, Army vs Navy**, and **offset 20, which is where the grid answers “No more events”** — **11** upcoming national games, and the list is exhausted. An earlier pass cited offset 10 as the “No more events” page, which understated the grid by one page; both labels are corrected in the row sources. Every venue is now the exact printed string, including the state suffix that eleven rows had lost and the full “MetLife Stadium, East Rutherford, NJ” — see flag `NCAAF_VENUE_REREAD`. All eleven dates, event ids, listed start times and titles were unchanged by the re-read.
+- **https://www.westwoodonesports.com/nfl/** and **/us-soccer/** re-read this pass. The first ten NFL events and all five U.S. Soccer events match the snapshot on event id, printed title, venue string and listed Eastern start time, including “Energizer Park, St. Louis, MO” and the two “TNT Sports Broadcast - Audio Only Simulcast” notes. The NFL grid also still lists event **548538, Washington Commanders at San Francisco 49ers, “Levi's Stadium, Santa Clara, CA”, 7pm ET**, which stays merged into the official club row rather than duplicated.
+- **https://www.westwoodonesports.com/ncaa-basketball/** re-fetched this pass — still **“No upcoming events”**, and the news strip below it is all April 2026. There is still no 2026-27 national college basketball grid to transcribe, which is why the automated watcher treats any event appearing there as drift.
 
 ### Soccer
 - **https://www.sjearthquakes.com/news/news-earthquakes-announce-radio-stations-for-2026-mls-season** — the club's full 34-match English/Spanish radio table, dated Feb 16, 2026, "All times and dates are subject to change." KSFO 810 English, KZSF 1370 Spanish. Seven matches remain.
@@ -51,7 +70,7 @@ Because KTCT 1050 is a full-time ESPN Radio affiliate, the 28 postseason date-ro
 - **https://www.westwoodonesports.com/us-soccer/** plus `eventGrid` offset 5 ("No more events") — five upcoming national-team broadcasts with times and announcers, all inside the window. Bay Area affiliate is KTCT-AM from the Soccer tab of the station finder.
 
 ### Station programming
-- **https://www.thesportsleader.com/shows/** (KNBR 680) and **https://www.thesportsleader.com/knbr1050shows/** (KNBR 1050) — **both still print the week of Monday 8-31 through Monday 9-7**, about four weeks stale. Used only as evidence of format, never as a clearance log. What they show: 680 is local talk 6 AM–6 PM with one game block most days; 1050 is the ESPN Radio network plus Jim Rome, with game blocks on Friday, Saturday and Sunday, including "STANFORD FOOTBALL", "CFB … (WW1 CFB Format A)" and "SAN JOSE EARTHQUAKES @ AUSTIN FC". The last of those is why `QUAKES_ALT_STATION` exists.
+- **https://www.thesportsleader.com/shows/** (KNBR 680) and **https://www.thesportsleader.com/knbr1050shows/** (KNBR 1050) — both re-fetched this pass and **both still print the week of Monday 8-31 through Monday 9-7**, about four weeks stale. Used only as evidence of format, never as a clearance log. What they show: 680 is local talk 6 AM–6 PM with one game block most days; 1050 is the ESPN Radio network plus Jim Rome, with game blocks on Friday, Saturday and Sunday, including "STANFORD FOOTBALL", "CFB … (WW1 CFB Format A)" and "SAN JOSE EARTHQUAKES @ AUSTIN FC". The last of those is why `QUAKES_ALT_STATION` exists.
 
 ### Checked and deliberately not added
 - **https://www.westwoodonesports.com/ncaa-basketball/** — "No upcoming events". There is no 2026-27 national college basketball grid to transcribe.
@@ -60,9 +79,21 @@ Because KTCT 1050 is a full-time ESPN Radio affiliate, the 28 postseason date-ro
 
 ## Automated monitoring boundary
 
-`.github/workflows/source-watch.yml` runs daily and can also be dispatched manually. It reads only the future portion of the official MLB postseason Stats API, compares dates, game descriptions and start-time TBD status with the checked-in snapshot, and opens or refreshes a GitHub issue on detected drift or an unavailable source. It is read-only: it does not edit the snapshot, publish a new Pages build, verify affiliate clearances, or monitor the station, school, club and network pages above. Other source changes still require a fresh review before the curated feed is rebuilt.
+`.github/workflows/source-watch.yml` runs daily and can also be dispatched manually. It now runs **two** read-only monitors and opens or refreshes **one** combined review issue.
 
-A direct live run of `scripts/source_watch.py` in this development sandbox on 2026-09-27 could not complete: the MLB host closed the TLS connection (`EOF`). The monitor correctly reported **unavailable**, not “no drift.” Its comparison behavior is covered by the offline tests; this sandbox attempt is not a fresh confirmation of the endpoint contents.
+| Monitor | Source | Compares | Rows |
+| --- | --- | --- | ---: |
+| `scripts/source_watch.py` | MLB postseason Stats API | future dates, game counts, descriptions and start-time TBD status | 28 |
+| `scripts/wwo_watch.py` | Westwood One NFL grid (widget 47029) | event ids and printed titles | 63 |
+| `scripts/wwo_watch.py` | Westwood One college football grid (47030) | event ids and printed titles | 11 |
+| `scripts/wwo_watch.py` | Westwood One college basketball grid (47031) | event ids — the snapshot expects none, so any event is drift | 0 |
+| `scripts/wwo_watch.py` | Westwood One U.S. Soccer grid (47032) | event ids and printed titles | 5 |
+
+That is **107 of the 153 rows** under automated watch. The widget ids, the row-id prefixes and the four merged 49ers event ids are read from `meta.wwo_watch` in the feed itself, so the watcher and the snapshot cannot disagree about which grid belongs to which rows.
+
+Both monitors are read-only: neither edits the snapshot, publishes a new Pages build, verifies affiliate clearances, nor monitors the club, school or station pages. The 46 rows built from 49ers.com, mlb.com, calbears.com, ESPN, sjearthquakes.com and the KNBR grids still need a human re-read. A monitor that cannot complete reports **unavailable** and never “no drift”: for the Westwood One watcher that includes a grid which returns no events at all when the snapshot has rows built from it, and a page whose expected heading cannot be found, because a parser that silently matched nothing would otherwise be indistinguishable from a source that had not changed. Where one widget fails and another shows real drift, the combined status is **changed**, so a failure cannot bury a difference.
+
+Direct live runs of both scripts in this development sandbox on 2026-09-27 could not complete: outbound TLS from the sandbox is closed (`EOF`) for `statsapi.mlb.com` and `westwoodonesports.com` alike. Each monitor correctly reported **unavailable** with a per-widget line, not “no drift”, and exited 3. Their comparison and failure behavior is covered by the offline suites. **The Westwood One HTML parser has therefore not yet been confirmed against a live fetch from this sandbox**; it is tested against fixtures built from the exact event ids, titles and venues printed on the grids when they were read through the fetch tool today, and its first scheduled run in CI is the live confirmation. If the markup differs enough that no heading can be located, the watcher reports unavailable and opens an issue rather than passing silently.
 
 ## Transcription rule, and where it was broken
 
@@ -72,7 +103,10 @@ session that wrote it. Not remembered, not reconstructed, not tidied.
 The second pass caught a violation. Sixteen newly added Westwood One NFL rows, three Stanford
 away rows and four Earthquakes away rows had venue strings that were written from recall. None of
 them were obviously wrong — that is precisely the problem, because a recalled stadium name renders
-identically to a verified one. The Westwood One NFL grid was re-read end to end and every venue is
+identically to a verified one. The fourth pass caught the milder cousin of the same fault: eleven college football venues
+that had been transcribed correctly and then shortened, losing the state suffix the source
+prints. A recalled venue looks confident and a truncated one looks tidy, and only a re-read
+catches either. The Westwood One NFL grid was re-read end to end and every venue is
 now the exact printed string; the Stanford away rows are back to the bare city the earlier pass had
 verified; the Earthquakes away rows carry no venue at all, because the club's radio release prints
 none.
@@ -100,14 +134,14 @@ their venue field is empty.
 
 ## What the builder enforces
 
-`python3 scripts/build_feed.py` rewrites the JSON from the transcribed lists and exits non-zero on: a duplicate id, a station outside the six, a row with no source, an https-less source, a date outside the window, a time without a date, a Week 3 49ers game on 680, a Week 4+ 49ers game without 680, a 49ers game missing 107.7, a Stanford game on anything but 1050, a Cal game on anything but 810, 810 on the Big Game, a postseason row that acquired a clock time, a Westwood One event id that belongs to a merged 49ers row, a row pointing at a flag that does not exist, an unexpected per-source row count, and any two **official** rows that collide on the same station at the same time.
+`python3 scripts/build_feed.py` rewrites the JSON from the transcribed lists and exits non-zero on: a duplicate id, a station outside the six, a row with no source, an https-less source, a date outside the window, a time without a date, a Week 3 49ers game on 680, a Week 4+ 49ers game without 680, a 49ers game missing 107.7, a Stanford game on anything but 1050, a Cal game on anything but 810, 810 on the Big Game, a postseason row that acquired a clock time, a Westwood One event id that belongs to a merged 49ers row, a row pointing at a flag that does not exist, an unexpected per-source row count, any two **official** rows that collide on the same station at the same time, and — new this pass — an NFL playoff window row that acquired a clock time, a venue, a per-day game count, a confidence above `indicated`, or a station outside the three Westwood One affiliates.
 
 `validate_flags()` additionally rejects a duplicate flag id, a bad severity, a flag link that is not https, and a flag whose primary `url` is not the first entry of its `sources` list. Every row is also required to carry a known duration bucket whose minutes equal the bucket default, so that resetting the on-page duration controls always restores the shipped numbers.
 
 `node scripts/ui_logic_test.js` checks the Pacific conversion, twelve-hour labels, ISO dates, past/elapsed status wording, conditional and mixed-row exclusion from estimated time and conflict calculations, Sunday-start calendar grids, the band maths, and the shipped JSON invariants — including conditional game counts and feed ordering.
 
-`python3 scripts/source_watch_test.py` tests the read-only MLB monitor against synthetic API responses without network access. `node scripts/render_smoke_test.js` extracts the real inline script from `index.html`, runs it against the real feed in a DOM shim, walks **all 155 days**, exercises the filters, navigation, date picker, search and duration controls, and fails if the page asks for an element id that is not in the markup. Regression cases cover out-of-range and invalid dates, mixed/fully conditional postseason rows, and duration reset.
+`python3 scripts/source_watch_test.py` tests the read-only MLB monitor against synthetic API responses without network access. `python3 scripts/wwo_watch_test.py` does the same for the Westwood One grid monitor with 29 cases: it checks that the three anchors sharing one event href yield the printed title rather than the artwork or the “Full Details” chrome, that the generic “Upcoming Broadcasts” strip below a grid cannot inject another sport's events into it, that a missing heading or an empty grid where rows exist is a failure and not a clean result, that a past row dropping off the grid is not drift while a future or undated one is, that the four merged 49ers events are not reported as missing, that a populated college basketball grid is reported as drift, and that the exit codes are 0 clear / 2 changed / 3 unavailable. `node scripts/render_smoke_test.js` extracts the real inline script from `index.html`, runs it against the real feed in a DOM shim, walks **all 155 days**, exercises the filters, navigation, date picker, search and duration controls, and fails if the page asks for an element id that is not in the markup. Regression cases cover out-of-range and invalid dates, mixed/fully conditional postseason rows, and duration reset.
 
 ## What was deliberately left out
 
-Warriors and Valkyries (95.7). Sharks (98.5). Spanish-language calls. NBA, NHL, golf and NASCAR on ESPN Radio or Fox Sports Radio, because no affiliate-level game list was found. All basketball, for the same reason. NFL playoff rounds, because the league has published no dates. MLS Cup Playoff matches, because the club published no playoff radio plan. Anything before Sep 27, 2026.
+Warriors and Valkyries (95.7). Sharks (98.5). Spanish-language calls. NBA, NHL and NASCAR on ESPN Radio or Fox Sports Radio, because no affiliate-level game list was found. All basketball, for the same reason. Golf: Westwood One's radio golf rights are the Masters, the PGA Championship and the Ryder Cup, and the Ryder Cup is biennial in odd years, so the 2026 edition was September 26-28, **2025** and there is no golf broadcast inside this window. NFL playoff matchups, kickoffs and per-day game counts, because the league has published round dates only. MLS Cup Playoff matches, because the club published no playoff radio plan. Anything before Sep 27, 2026.

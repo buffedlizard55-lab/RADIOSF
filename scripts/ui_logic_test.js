@@ -256,13 +256,13 @@ feed.broadcasts.forEach(function (row) {
 
 /* the band claim in the README must match what the data actually says */
 var real = L.bandSummary(feed.broadcasts, feed.meta.window_start, feed.meta.window_end, 10 * 60, 22 * 60);
-assert.strictEqual(real.daysWithListings, 74, "non-conditional listing-day count");
+assert.strictEqual(real.daysWithListings, 80, "non-conditional listing-day count");
 assert.strictEqual(real.daysWithPossibilities, 13, "conditional possibility-day count, including mixed postseason rows");
 assert.strictEqual(real.conditionalGames, 21, "conditional game count");
 assert.strictEqual(real.daysConditionalOnly, 3, "conditional-only date count");
 assert.strictEqual(real.daysMajority, 18, "non-conditional estimated-window majority count");
 assert.strictEqual(L.formatDuration(real.meanCovered), "1h 47m");
-assert.strictEqual(L.formatDuration(real.meanCoveredOnListingDays), "3h 45m");
+assert.strictEqual(L.formatDuration(real.meanCoveredOnListingDays), "3h 28m");
 assert.deepStrictEqual(real.byWeekday.map(function (day) {
   return day.days ? L.formatDuration(Math.round(day.covered / day.days)) : "0m";
 }), ["3h 40m", "2h 13m", "16m", "20m", "2h 20m", "41m", "2h 56m"],
@@ -287,12 +287,34 @@ var sensitivity = [
 assert.deepStrictEqual(sensitivity.map(function (s) {
   return [s.daysWithListings, s.daysMajority, L.formatDuration(s.meanCovered), L.formatDuration(s.meanCoveredOnListingDays)];
 }), [
-  [74, 0, "52m", "1h 49m"],
-  [74, 5, "1h 31m", "3h 10m"],
-  [74, 18, "1h 47m", "3h 45m"],
-  [74, 18, "2h 17m", "4h 47m"],
-  [74, 18, "2h 13m", "4h 39m"]
+  [80, 0, "52m", "1h 41m"],
+  [80, 5, "1h 31m", "2h 56m"],
+  [80, 18, "1h 47m", "3h 28m"],
+  [80, 18, "2h 17m", "4h 26m"],
+  [80, 18, "2h 13m", "4h 18m"]
 ], "README sensitivity figures match the logic");
+/* NFL playoff rows are round windows, not games. They must never grow a time, a
+   venue, a game count or the 49ers FM flagship, because no source publishes one. */
+var playoffs = feed.broadcasts.filter(function (row) { return row.id.indexOf("nfl-post-") === 0; });
+assert.deepStrictEqual(playoffs.map(function (row) { return row.date; }),
+  ["2027-01-16", "2027-01-17", "2027-01-18", "2027-01-23", "2027-01-24", "2027-01-31"],
+  "every day of the officially dated Wild Card, Divisional and Championship windows carries a row");
+playoffs.forEach(function (row) {
+  assert.strictEqual(row.start_pt, null, row.id + " has no published kickoff time");
+  assert.strictEqual(row.venue, "", row.id + " has no published venue");
+  assert.strictEqual(row.game_count, undefined, row.id + " has no published per-day game count");
+  assert.strictEqual(row.confidence, "indicated", row.id + " is a network guarantee plus an affiliate list");
+  assert.deepStrictEqual(row.stations, ["680", "104.5", "1050"],
+    row.id + " is Westwood One only; no source puts 107.7 on a playoff game");
+  assert.ok(row.flag_ids.indexOf("NFL_POSTSEASON_WINDOWS") !== -1,
+    row.id + " must carry the window flag so the reader sees what is not known");
+  assert.ok(row.sources.length >= 3, row.id + " needs the league dates, the network guarantee and the affiliate list");
+});
+assert.ok(feed.flags.some(function (f) { return f.id === "NFL_POSTSEASON_WINDOWS"; }),
+  "the corrected postseason flag is shipped");
+assert.ok(!feed.flags.some(function (f) { return f.id === "WWO_POSTSEASON_UNDATED"; }),
+  "the flag that called the official round dates unofficial is gone");
+
 assert.ok(real.daysMajority < real.dayCount / 2,
   "if most days ever do fill 10-10, update the README finding instead of this assertion");
 
