@@ -59,7 +59,7 @@ On the page you can:
 - **download the selected day as a calendar file** (`.ics`) that carries each row's source link and confidence;
 - **open a source for every row** and inspect its confidence and irregularity notes.
 
-Snapshot date: **2026-09-27**. Window: **2026-09-27 through 2027-02-28**, America/Los_Angeles (155 calendar days). The snapshot contains **173 date-level schedule entries**: 162 rows include at least one non-conditional listing and 11 rows are entirely if-necessary, plus 33 flags. Two of the 162 rows are mixed postseason rows and also carry three if-necessary game possibilities. In total, 21 possible postseason games are represented across 13 dates. 172 entries have a date; one 49ers Week 18 row remains deliberately unplaced. The snapshot is not a live station log; see [docs/VERIFICATION.md](docs/VERIFICATION.md).
+Snapshot date: **2026-09-27**. Window: **2026-09-27 through 2027-02-28**, America/Los_Angeles (155 calendar days). The snapshot contains **173 date-level schedule entries**: 162 rows include at least one non-conditional listing and 11 rows are entirely if-necessary, plus 34 flags. Two of the 162 rows are mixed postseason rows and also carry three if-necessary game possibilities. In total, 21 possible postseason games are represented across 13 dates. 172 entries have a date; one 49ers Week 18 row remains deliberately unplaced. The snapshot is not a live station log; see [docs/VERIFICATION.md](docs/VERIFICATION.md).
 
 | Confidence | Meaning | Entries |
 | --- | --- | ---: |
@@ -160,7 +160,7 @@ Even assigning a generous four-hour estimate to every timed non-conditional list
 
 ## Monitoring, rebuild and tests
 
-A scheduled, read-only GitHub Action (`source watch`, daily) runs **four** monitors and opens or refreshes one review issue when anything moves:
+A scheduled, read-only GitHub Action (`source watch`, daily) runs **five** monitors and opens or refreshes one review issue when anything moves:
 
 | Monitor | Source | What it watches | Rows covered |
 | --- | --- | --- | ---: |
@@ -173,8 +173,9 @@ A scheduled, read-only GitHub Action (`source watch`, daily) runs **four** monit
 | `page_watch.py` | 49ers.com, calbears.com, ESPN's Stanford feed, KNBR's Stanford page, the Earthquakes radio release | the exact radio/venue/opponent strings the rows were transcribed from | 37 |
 | `page_watch.py` | NFL important-dates article and the nfl.com POST schedule URL | round-date text; alert when a postseason grid is published | 7 |
 | `page_watch.py` | KNBR 1050 weekly grid, USF 2026-27 basketball schedule | alert when the frozen grid refreshes or a station name appears on the USF schedule | 0 (gap watch) |
+| `espn_radio_week_watch.py` | espn.com/espnradio/schedule weekly grid | dates the undated week from ESPN's scoreboard, then reports any future in-window game the snapshot does not name | 0 (gap watch) |
 
-That is **171 of the 173 rows** under a daily watch, up from 151. The other two are the Giants and Athletics finales on the snapshot date itself. **Confirmed live on 2026-09-27** from GitHub's runners (the development sandbox cannot reach these hosts): MLB clear, all four Westwood One grids clear, all nine pages clear. The ESPN Radio monitor is new this pass, and its first live run is the check on the PDF text parser: it needs a PDF text extractor, which the workflow installs, and a run that cannot parse the document reports `unavailable`, never `clear`. Every pull request also runs the `source watch preview` workflow, which runs all four monitors live and keeps one sticky PR comment with the reports, so a reviewer sees the current source state before merging.
+That is **171 of the 173 rows** under a daily watch, plus one gap-watch on the weekly ESPN Radio grid — a source of games the snapshot does not yet list, not extra coverage of existing rows. The other two rows are the Giants and Athletics finales on the snapshot date itself. **Confirmed live on 2026-09-27** from GitHub's runners (the development sandbox cannot reach these hosts): MLB clear, all four Westwood One grids clear, all nine pages clear, NBA PDF clear. The weekly-grid monitor is new this pass; its first live run is the source-watch preview on this pull request. A week it cannot date reports `unavailable`, never `clear`, and never produces a date. Every pull request also runs the `source watch preview` workflow, which runs all five monitors live and keeps one sticky PR comment with the reports, so a reviewer sees the current source state before merging.
 
 **Monitor fixes:** the MLB monitor first read `startTimeTBD` from the top level of each game, but the API nests it inside `status`; that was fixed and covered by a real-response regression fixture. This pass found another blind spot: the monitor compared dates/counts/descriptions/time-TBD but not opponent labels or `ifNecessary`, so it could report clear while the matchups changed. The monitor now validates and compares all four game identity/status fields: description, away team, home team and conditional status. The feed and UI expose the verified API matchup labels while preserving unresolved seed placeholders and TBD starts. Regression tests cover matchup and conditional drift.
 
@@ -188,17 +189,19 @@ The monitors **never** edit `data/broadcasts.json` or publish a new GitHub Pages
 python3 scripts/build_feed.py        # regenerates data/broadcasts.json + docs/LINE_BY_LINE.md
 python3 scripts/source_watch_test.py # offline tests for the MLB monitor (incl. real-response fixture)
 python3 scripts/espn_watch_test.py   # offline tests for the NBA ESPN Radio monitor (incl. real-PDF text fixture)
+python3 scripts/espn_radio_week_watch_test.py  # offline tests for the weekly ESPN Radio grid monitor
 python3 scripts/wwo_watch_test.py    # offline tests for the Westwood One grid monitor
 python3 scripts/page_watch_test.py   # offline tests for the page watcher
 node scripts/ui_logic_test.js        # date, conditional, band-math and feed invariants
 node scripts/render_smoke_test.js    # real inline page script over all 155 dates
 python3 scripts/source_watch.py      # live MLB check; exit 0=clear, 2=drift, 3=unavailable
 python3 scripts/espn_watch.py        # live NBA PDF check; same exit codes (needs pypdf)
+python3 scripts/espn_radio_week_watch.py  # live weekly-grid check; same exit codes
 python3 scripts/wwo_watch.py         # live grid check; same exit codes
 python3 scripts/page_watch.py        # live page check; same exit codes
 ```
 
-All four watchers take `--input` so they can run against saved responses without a network. Do not add a row to the JSON by hand: add it in `scripts/build_feed.py` after a fresh source check, then rebuild. The `verify` Action regenerates the feed, rejects drift, and runs all offline suites plus the UI and page-render tests.
+All five watchers take `--input` so they can run against saved responses without a network. Do not add a row to the JSON by hand: add it in `scripts/build_feed.py` after a fresh source check, then rebuild. The `verify` Action regenerates the feed, rejects drift, and runs all offline suites plus the UI and page-render tests.
 
 ## Docs
 

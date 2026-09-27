@@ -124,7 +124,7 @@
       "official": 37,
       "indicated": 134,
       "review": 2,
-      "flags": 33
+      "flags": 34
     },
     "espn_watch": {
       "pdf": "https://ak-static.cms.nba.com/wp-content/uploads/sites/46/2026/08/2026-27-ESPN-Radio-Schedule.pdf",
@@ -134,6 +134,43 @@
       "in_window_dated_rows": 17,
       "cup_tbd_rows": 3,
       "note": "Read-only. The PDF prints nine further games from 2027-03-06 onward that are outside this window; the watcher reports them as out-of-window, never as missing. A PDF that cannot be fetched or parsed is reported as a failed check, never as no drift."
+    },
+    "espn_week_watch": {
+      "grid": "https://www.espn.com/espnradio/schedule",
+      "today_zone": "America/New_York",
+      "scoreboard": "https://site.api.espn.com/apis/site/v2/sports/{league_path}/scoreboard?dates={dates}",
+      "human_scoreboard": "https://www.espn.com/{section}/scoreboard/_/date/{dates}",
+      "sports": {
+        "MLB": {
+          "league_path": "baseball/mlb",
+          "section": "mlb"
+        },
+        "NBA": {
+          "league_path": "basketball/nba",
+          "section": "nba"
+        },
+        "NFL": {
+          "league_path": "football/nfl",
+          "section": "nfl"
+        },
+        "CFB": {
+          "league_path": "football/college-football",
+          "section": "college-football"
+        },
+        "NCAAF": {
+          "league_path": "football/college-football",
+          "section": "college-football"
+        },
+        "NCAAB": {
+          "league_path": "basketball/mens-college-basketball",
+          "section": "mens-college-basketball"
+        },
+        "WNBA": {
+          "league_path": "basketball/wnba",
+          "section": "wnba"
+        }
+      },
+      "note": "The weekly grid covers exactly one Monday-to-Sunday week and prints no dates. The monitor derives the week from ESPN's dated scoreboard before trusting any line, and fails closed: a week it cannot date reports unavailable, and a grid-printed game never becomes a snapshot row by itself."
     },
     "wwo_watch": {
       "endpoint": "https://www.westwoodonesports.com/more/eventGrid",
@@ -489,6 +526,13 @@
       "title": "End times are estimates",
       "detail": "No source publishes a per-game radio sign-off. The timeline uses typical lengths \u2014 MLB 2:45, MLB postseason 3:30, NFL 3:15, college football 3:24, soccer 2:00 \u2014 and labels them estimates. They are not official endings. Pregame length is not added, even though the KNBR grids show a one-hour pregame before Giants and Stanford blocks.",
       "url": "https://www.thesportsleader.com/shows/"
+    },
+    {
+      "id": "ESPN_WEEK_GRID",
+      "severity": "note",
+      "title": "The ESPN Radio weekly grid carries games with no dates on them",
+      "detail": "espn.com/espnradio/schedule prints real games as show slots \u2014 read again 2026-09-27: \u201cMLB: Mets @ Rangers\u201d Wednesday 7:30 p.m. ET, \u201cMLB: Guardians @ Royals\u201d Friday 7:00 p.m., and Saturday \u201cCFB: Wisconsin @ Penn State\u201d at 4:30 p.m. plus \u201cCFB: Texas A&M @ LSU\u201d at 8:00 p.m. \u2014 and the page carries no date anywhere. Not one date on this site is taken from it: if the page has not rolled over, its weekday labels belong to the previous week. scripts/espn_radio_week_watch.py derives the week from ESPN's own dated scoreboard every day and reports any grid-printed future game this snapshot does not list. That is a review signal \u2014 never a clearance, never an automatic row.",
+      "url": "https://www.espn.com/espnradio/schedule"
     }
   ],
   "broadcasts": [

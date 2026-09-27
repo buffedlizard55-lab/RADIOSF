@@ -1,8 +1,8 @@
 name: source watch preview
-# Runs the four read-only monitors live on every pull request so a reviewer can
+# Runs the five read-only monitors live on every pull request so a reviewer can
 # see, before merging, whether the sources still match the snapshot. It is
 # informational: it never fails the check, never opens an issue, never edits the
-# feed. It keeps one sticky PR comment up to date with the four reports. The
+# feed. It keeps one sticky PR comment up to date with the five reports. The
 # daily "source watch" workflow remains the one that files issues.
 on:
   pull_request:
@@ -25,12 +25,13 @@ jobs:
           python3 scripts/page_watch.py --report "$RUNNER_TEMP/pages.md"; pages=$?
           python3 -m pip install --quiet --disable-pip-version-check pypdf
           python3 scripts/espn_watch.py --report "$RUNNER_TEMP/espn.md"; espn=$?
-          for r in mlb wwo pages espn; do
+          python3 scripts/espn_radio_week_watch.py --report "$RUNNER_TEMP/espnweek.md"; espnweek=$?
+          for r in mlb wwo pages espn espnweek; do
             cat "$RUNNER_TEMP/$r.md"
             cat "$RUNNER_TEMP/$r.md" >> "$GITHUB_STEP_SUMMARY"
             printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
           done
-          echo "exit codes (0 clear, 2 changed, 3 unavailable): mlb=$mlb wwo=$wwo pages=$pages espn=$espn"
+          echo "exit codes (0 clear, 2 changed, 3 unavailable): mlb=$mlb wwo=$wwo pages=$pages espn=$espn espnweek=$espnweek"
           exit 0
       - name: Keep one sticky PR comment with the live reports
         if: always() && github.event.pull_request.head.repo.full_name == github.repository
@@ -47,7 +48,7 @@ jobs:
               return fs.existsSync(path) ? fs.readFileSync(path, 'utf8') : `_${name} report missing_`;
             };
             const body = `${marker}\n**Live source-watch preview** for ${context.sha.slice(0, 7)} ` +
-              `(informational, read-only)\n\n` + ['mlb', 'wwo', 'pages', 'espn'].map(read).join('\n\n---\n\n');
+              `(informational, read-only)\n\n` + ['mlb', 'wwo', 'pages', 'espn', 'espnweek'].map(read).join('\n\n---\n\n');
             const { owner, repo } = context.repo;
             const issue_number = context.payload.pull_request.number;
             const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number });

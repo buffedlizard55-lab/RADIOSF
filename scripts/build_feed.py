@@ -89,6 +89,11 @@ USF_MBB_TEXT = "https://usfdons.com/sports/mens-basketball/schedule/text"
 USF_MBB_2026_PREVIEW = "https://usfdons.com/news/2026/1/27/mens-basketball-san-francisco-heads-to-santa-clara-for-late-night-showdown"
 KNBR_SHOWS = "https://www.thesportsleader.com/shows/"
 KNBR_1050_SHOWS = "https://www.thesportsleader.com/knbr1050shows/"
+# ESPN Radio's own weekly format grid. It carries live games on sports days but
+# prints no dates, so no snapshot row is ever built from it; scripts/
+# espn_radio_week_watch.py reads it only to flag future games it cannot date
+# for human review.
+ESPN_RADIO_GRID = "https://www.espn.com/espnradio/schedule"
 KTCT_WIKI = "https://en.wikipedia.org/wiki/KTCT"
 KNEW_WIKI = "https://en.wikipedia.org/wiki/KNEW_(AM)"
 NFL_SEASON_WIKI = "https://en.wikipedia.org/wiki/2026_NFL_season"
@@ -719,6 +724,23 @@ FLAGS = [
             "the KNBR grids show a one-hour pregame before Giants and Stanford blocks."
         ),
         "url": KNBR_SHOWS,
+    },
+    {
+        "id": "ESPN_WEEK_GRID",
+        "severity": "note",
+        "title": "The ESPN Radio weekly grid carries games with no dates on them",
+        "detail": (
+            "espn.com/espnradio/schedule prints real games as show slots — read again 2026-09-27: "
+            "\u201cMLB: Mets @ Rangers\u201d Wednesday 7:30 p.m. ET, \u201cMLB: Guardians @ Royals\u201d "
+            "Friday 7:00 p.m., and Saturday \u201cCFB: Wisconsin @ Penn State\u201d at 4:30 p.m. plus "
+            "\u201cCFB: Texas A&M @ LSU\u201d at 8:00 p.m. \u2014 and the page carries no date anywhere. "
+            "Not one date on this site is taken from it: if the page has not rolled over, its "
+            "weekday labels belong to the previous week. scripts/espn_radio_week_watch.py derives "
+            "the week from ESPN's own dated scoreboard every day and reports any grid-printed "
+            "future game this snapshot does not list. That is a review signal \u2014 never a "
+            "clearance, never an automatic row."
+        ),
+        "url": ESPN_RADIO_GRID,
     },
 ]
 
@@ -1841,6 +1863,31 @@ def main() -> None:
                     "outside this window; the watcher reports them as out-of-window, never as missing. "
                     "A PDF that cannot be fetched or parsed is reported as a failed check, never as "
                     "no drift."
+                ),
+            },
+            # Single source of truth for scripts/espn_radio_week_watch.py: the
+            # weekly grid URL, the sports it may date, and the dated scoreboard
+            # it must validate against before any grid row gets a date.
+            "espn_week_watch": {
+                "grid": ESPN_RADIO_GRID,
+                "today_zone": "America/New_York",
+                "scoreboard": "https://site.api.espn.com/apis/site/v2/sports/{league_path}/scoreboard?dates={dates}",
+                "human_scoreboard": "https://www.espn.com/{section}/scoreboard/_/date/{dates}",
+                "sports": {
+                    "MLB": {"league_path": "baseball/mlb", "section": "mlb"},
+                    "NBA": {"league_path": "basketball/nba", "section": "nba"},
+                    "NFL": {"league_path": "football/nfl", "section": "nfl"},
+                    "CFB": {"league_path": "football/college-football", "section": "college-football"},
+                    "NCAAF": {"league_path": "football/college-football", "section": "college-football"},
+                    "NCAAB": {"league_path": "basketball/mens-college-basketball",
+                              "section": "mens-college-basketball"},
+                    "WNBA": {"league_path": "basketball/wnba", "section": "wnba"},
+                },
+                "note": (
+                    "The weekly grid covers exactly one Monday-to-Sunday week and prints no dates. "
+                    "The monitor derives the week from ESPN's dated scoreboard before trusting any "
+                    "line, and fails closed: a week it cannot date reports unavailable, and a "
+                    "grid-printed game never becomes a snapshot row by itself."
                 ),
             },
             "wwo_watch": {
