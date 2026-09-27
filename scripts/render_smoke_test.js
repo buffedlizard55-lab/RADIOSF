@@ -164,7 +164,7 @@ Promise.resolve().then(function () {
     assert.ok(els["day-title"].textContent.indexOf(String(L.parseISO(iso).y)) !== -1, "day title for " + iso);
     if (els.log.innerHTML.indexOf("<table") !== -1) withTable++;
   });
-  assert.strictEqual(withTable, 77, "every day with a listing or conditional possibility shows a table");
+  assert.strictEqual(withTable, 83, "every day with a listing or conditional possibility shows a table");
 
   /* Conditional-only postseason dates stay visible, but neither get counted as
      scheduled days nor contribute estimated broadcast minutes. */

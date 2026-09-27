@@ -14,45 +14,98 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
       - name: Compare future MLB postseason schedule with the checked-in snapshot
-        id: watch
+        id: mlb
         continue-on-error: true
         run: |
           python3 scripts/source_watch.py \
             --report "$RUNNER_TEMP/mlb-source-watch.md" \
             --github-output "$GITHUB_OUTPUT"
-      - name: Add source-watch report to the run summary
+
+      - name: Compare the Westwood One grids with the checked-in snapshot
+        id: wwo
+        continue-on-error: true
+        run: |
+          python3 scripts/wwo_watch.py \
+            --report "$RUNNER_TEMP/wwo-source-watch.md" \
+            --github-output "$GITHUB_OUTPUT"
+
+      # A monitor that could not run is never allowed to read as "no drift", so an
+      # empty output defaults to unavailable rather than clear.
+      - name: Combine both monitors into one status
+        id: combined
+        if: always()
+        env:
+          MLB_STATUS: ${{ steps.mlb.outputs.status }}
+          WWO_STATUS: ${{ steps.wwo.outputs.wwo_status }}
+        run: |
+          mlb="${MLB_STATUS:-unavailable}"
+          wwo="${WWO_STATUS:-unavailable}"
+          if [ "$mlb" = "changed" ] || [ "$wwo" = "changed" ]; then
+            overall="changed"
+          elif [ "$mlb" = "unavailable" ] || [ "$wwo" = "unavailable" ]; then
+            overall="unavailable"
+          else
+            overall="clear"
+          fi
+          {
+            echo "status=$overall"
+            echo "mlb=$mlb"
+            echo "wwo=$wwo"
+          } >> "$GITHUB_OUTPUT"
+          echo "MLB postseason: $mlb / Westwood One grids: $wwo / overall: $overall"
+
+      - name: Add both source-watch reports to the run summary
         if: always()
         run: |
-          if [ -f "$RUNNER_TEMP/mlb-source-watch.md" ]; then
-            cat "$RUNNER_TEMP/mlb-source-watch.md" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "The source-watch script did not produce a report." >> "$GITHUB_STEP_SUMMARY"
-          fi
-      - name: Open or refresh a review issue when the monitor needs attention
-        if: always() && steps.watch.outputs.status != 'clear'
+          for report in mlb-source-watch.md wwo-source-watch.md; do
+            if [ -f "$RUNNER_TEMP/$report" ]; then
+              cat "$RUNNER_TEMP/$report" >> "$GITHUB_STEP_SUMMARY"
+              printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "The $report monitor did not produce a report." >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+      - name: Open or refresh a review issue when a monitor needs attention
+        if: always() && steps.combined.outputs.status != 'clear'
         uses: actions/github-script@v7
         env:
-          SOURCE_WATCH_STATUS: ${{ steps.watch.outputs.status }}
-          SOURCE_WATCH_REPORT: ${{ runner.temp }}/mlb-source-watch.md
+          SOURCE_WATCH_STATUS: ${{ steps.combined.outputs.status }}
+          MLB_STATUS: ${{ steps.combined.outputs.mlb }}
+          WWO_STATUS: ${{ steps.combined.outputs.wwo }}
+          MLB_REPORT: ${{ runner.temp }}/mlb-source-watch.md
+          WWO_REPORT: ${{ runner.temp }}/wwo-source-watch.md
         with:
           script: |
             const fs = require('fs');
-            const status = process.env.SOURCE_WATCH_STATUS || 'unavailable';
-            const report = fs.existsSync(process.env.SOURCE_WATCH_REPORT)
-              ? fs.readFileSync(process.env.SOURCE_WATCH_REPORT, 'utf8')
-              : 'The monitor did not produce a report. Check the failed workflow run; the feed status is unknown.';
-            const title = '[Automated source watch] MLB postseason schedule needs review';
+            const read = (path, fallback) =>
+              fs.existsSync(path) ? fs.readFileSync(path, 'utf8') : fallback;
+            const overall = process.env.SOURCE_WATCH_STATUS || 'unavailable';
+            const mlb = process.env.MLB_STATUS || 'unavailable';
+            const wwo = process.env.WWO_STATUS || 'unavailable';
+            const sections = [
+              read(process.env.MLB_REPORT,
+                'The MLB monitor did not produce a report. Check the failed workflow run; that source is unknown.'),
+              read(process.env.WWO_REPORT,
+                'The Westwood One monitor did not produce a report. Check the failed workflow run; those rows are unknown.'),
+            ];
+            const title = '[Automated source watch] Schedule sources need review';
             const { owner, repo } = context.repo;
             const { data: openIssues } = await github.rest.issues.listForRepo({
               owner, repo, state: 'open', per_page: 100
             });
             const existing = openIssues.find(issue => !issue.pull_request && issue.title === title);
-            const body = `${report}\n\nMonitor status: **${status}**. This automation never edits or publishes the static feed.`;
+            const body = `${sections.join('\n\n---\n\n')}\n\nOverall monitor status: **${overall}** ` +
+              `(MLB postseason: **${mlb}**, Westwood One grids: **${wwo}**). ` +
+              `This automation never edits or publishes the static feed.`;
+            // Ignore the timestamp and comparison-date lines, which differ on every
+            // run and would otherwise rewrite the issue daily with no new information.
+            const stable = value => value
+              .replace(/^- Checked:.*\n/m, '')
+              .replace(/^- Pacific date used for comparison:.*\n/m, '');
             if (existing) {
-              const stable = value => value
-                .replace(/^- Checked:.*\n/m, '')
-                .replace(/^- Pacific date used for comparison:.*\n/m, '');
               if (stable(existing.body || '') !== stable(body)) {
                 await github.rest.issues.update({ owner, repo, issue_number: existing.number, body });
                 core.info(`Updated existing review issue #${existing.number}`);

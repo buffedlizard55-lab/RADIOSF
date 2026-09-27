@@ -35,6 +35,34 @@ WWO_NCAAF_URL = "https://www.westwoodonesports.com/ncaa-football/"
 WWO_NCAAB_URL = "https://www.westwoodonesports.com/ncaa-basketball/"
 WWO_SOCCER_URL = "https://www.westwoodonesports.com/us-soccer/"
 WWO_FINDER = "https://www.westwoodonesports.com/station-finder/"
+# Westwood One serves every sport's upcoming grid from one widget id. These are
+# the machine-readable pages the automated watcher polls. The four ids were read
+# off the live "More" links on each sport page on 2026-09-27.
+WWO_GRID_ENDPOINT = "https://www.westwoodonesports.com/more/eventGrid"
+WWO_WIDGETS = [
+    {"widget": "47029", "prefix": "wwo-nfl-", "sport": "NFL",
+     "page": WWO_NFL_URL, "title": "Upcoming+NFL+Broadcasts"},
+    {"widget": "47030", "prefix": "wwo-ncaaf-", "sport": "NCAA Football",
+     "page": WWO_NCAAF_URL, "title": "Upcoming+NCAA+Football+Broadcasts"},
+    {"widget": "47031", "prefix": "wwo-ncaab-", "sport": "NCAA Basketball",
+     "page": WWO_NCAAB_URL, "title": "Upcoming+NCAA+Basketball+Broadcasts"},
+    {"widget": "47032", "prefix": "wwo-soccer-", "sport": "U.S. Soccer",
+     "page": WWO_SOCCER_URL, "title": "Upcoming+U.S.+Soccer+Broadcasts"},
+]
+# Westwood One NFL listings folded into an official 49ers club row instead of being
+# duplicated. validate() refuses to let them reappear as separate rows, and the
+# watcher must not report them as missing from the snapshot.
+WWO_MERGED_NFL_EVENTS = {"548538", "548491", "548568", "548509"}
+# Paging endpoint that carries the eleventh college football row (Army vs Navy).
+WWO_NCAAF_MORE = (
+    "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=10&limit=10"
+    "&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+)
+# The page after it, which is where the grid actually says "No more events".
+WWO_NCAAF_MORE_END = (
+    "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=20&limit=10"
+    "&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
+)
 PRESS = (
     "https://www.globenewswire.com/news-release/2026/09/09/3358684/9032/en/"
     "cumulus-media-s-westwood-one-official-network-audio-partner-of-the-nfl-"
@@ -64,6 +92,10 @@ KTCT_WIKI = "https://en.wikipedia.org/wiki/KTCT"
 KNEW_WIKI = "https://en.wikipedia.org/wiki/KNEW_(AM)"
 NFL_SEASON_WIKI = "https://en.wikipedia.org/wiki/2026_NFL_season"
 NFL_SCHEDULES = "https://www.nfl.com/schedules/"
+# The league's own 2026-2027 important-dates announcement, republished verbatim by
+# an NFL club. This is where the postseason round dates come from; nfl.com/schedules/2026/POST
+# still redirects to the regular season and prints no round dates.
+NFL_IMPORTANT_DATES = "https://www.seahawks.com/news/nfl-announces-important-dates-for-2026-2027"
 
 # Every row belongs to a duration bucket. The minutes are estimates, not measured
 # broadcast lengths, so the page lets the reader change them and recompute; these
@@ -249,23 +281,33 @@ FLAGS = [
         "url": PRESS,
     },
     {
-        "id": "WWO_POSTSEASON_UNDATED",
-        "severity": "limitation",
-        "title": "NFL postseason rounds are promised but not dated by an official source",
+        "id": "NFL_POSTSEASON_WINDOWS",
+        "severity": "review",
+        "title": "NFL playoff rounds are officially dated, but not per game",
         "detail": (
-            "The Cumulus release says Westwood One carries every NFL postseason game through "
-            "Super Bowl LXI on February 14, 2027 at SoFi Stadium. The Westwood One schedule page ends "
-            "at the Week 18 TBA windows, and nfl.com/schedules/2026/POST redirected to the "
-            "regular-season page when fetched on 2026-09-27, so the league has not published a "
-            "postseason grid yet. Secondary write-ups say Wild Card Jan 16–18, Divisional Jan 23–24 "
-            "and Conference Championships Jan 31, 2027; those are not official and are not placed on "
-            "this calendar. Only Super Bowl LXI is placed, and only as date and stadium, time TBD."
+            "The league's own 2026-2027 important-dates announcement names the rounds: "
+            "Week 18 January 9-10, Wild Card Weekend January 16-18, Divisional Playoffs "
+            "January 23-24, the AFC and NFC Championship Games January 31, and Super Bowl LXI "
+            "February 14, 2027 at SoFi Stadium. The Cumulus release of September 9, 2026 says "
+            "Westwood One carries every postseason game, and the station finder puts Westwood One "
+            "on KNBR-AM, KNBR-FM and KTCT-AM in San Francisco. So the rounds are dated and the "
+            "network is known, but no official source says which game falls on which day, how many "
+            "games each day carries, who plays, or when it kicks off \u2014 nfl.com/schedules/2026/POST "
+            "still redirected to the regular season when fetched on 2026-09-27, and the Westwood One "
+            "grid ends at the Week 18 TBA windows. Each day of an officially named window therefore "
+            "carries one row, with no game count and no clock time, rather than leaving those five "
+            "days blank. An earlier version of this flag called these dates unofficial; they are the "
+            "league's own announcement and that was wrong. What is still missing is the per-game "
+            "detail. If the 49ers reach the postseason their games would also be expected on the club "
+            "flagship, but no source publishes a postseason 49ers radio line, so 107.7 FM is not "
+            "claimed on any playoff row."
         ),
-        "url": NFL_SCHEDULES,
+        "url": NFL_IMPORTANT_DATES,
         "sources": [
-            src("NFL.com schedules \u2014 the official page; the 2026 POST tab still redirects", NFL_SCHEDULES),
-            src("Cumulus release: every playoff game and Super Bowl LXI on Westwood One", PRESS),
-            src("Secondary write-up of the round dates \u2014 not official, not used here", NFL_SEASON_WIKI),
+            src("League important dates for 2026-2027, republished by an NFL club \u2014 the round dates", NFL_IMPORTANT_DATES),
+            src("Cumulus release: Westwood One carries every playoff game and Super Bowl LXI", PRESS),
+            src("NFL.com schedules \u2014 the 2026 POST tab still redirects and prints no round dates", NFL_SCHEDULES),
+            src("Secondary write-up \u2014 agrees on the dates, not official and not relied on", NFL_SEASON_WIKI),
         ],
     },
     {
@@ -452,6 +494,27 @@ FLAGS = [
             "normalising is how a wrong venue would get laundered into a confident one."
         ),
         "url": WWO_NFL_URL,
+    },
+    {
+        "id": "NCAAF_VENUE_REREAD",
+        "severity": "note",
+        "title": "College football venues were re-read and now carry the full printed string",
+        "detail": (
+            "The second pass re-read the Westwood One NFL grid and restored every venue to the exact "
+            "printed string, but the eleven college football rows were not re-read at the same time and "
+            "kept a shortened venue: the state suffix had been dropped from all eleven, and Army vs Navy "
+            "printed only \u201cMetLife Stadium\u201d where the grid says \u201cMetLife Stadium, East Rutherford, "
+            "NJ\u201d. A shortened venue is not a wrong venue, which is why it survived review \u2014 it reads "
+            "as tidy rather than as unverified. The NCAA Football grid was read end to end again on "
+            "2026-09-27, including the offset 10 page that carries Army vs Navy, and all eleven venues "
+            "are now the exact printed strings. No other field on those rows changed: every date, event "
+            "id, listed start time and title still matches."
+        ),
+        "url": WWO_NCAAF_URL,
+        "sources": [
+            {"label": "Westwood One NCAA football grid, read end to end 2026-09-27", "url": WWO_NCAAF_URL},
+            {"label": "Offset 10 page carrying Army vs Navy and its full venue", "url": WWO_NCAAF_MORE},
+        ],
     },
     {
         "id": "NINERS_BOILERPLATE",
@@ -681,22 +744,19 @@ def wwo_nfl_rows() -> list[dict]:
 # --- Westwood One college football -------------------------------------------
 def wwo_ncaaf_rows() -> list[dict]:
     raw = [
-        ("557137", "2026-10-03", None, "Notre Dame at North Carolina", "Kenan Stadium, Chapel Hill"),
-        ("557139", "2026-10-10", None, "Indiana at Nebraska", "Memorial Stadium, Lincoln"),
-        ("557140", "2026-10-17", None, "Penn State at Michigan", "Michigan Stadium, Ann Arbor"),
-        ("557141", "2026-10-24", None, "Ole Miss at Texas", "Darrell K Royal–Texas Memorial Stadium, Austin"),
-        ("557129", "2026-10-31", "15:00", "Florida at Georgia", "Mercedes-Benz Stadium, Atlanta"),
-        ("557143", "2026-11-07", None, "Oregon at Ohio State", "Ohio Stadium, Columbus"),
-        ("557144", "2026-11-14", None, "Michigan at Oregon", "Autzen Stadium, Eugene"),
-        ("557145", "2026-11-21", None, "LSU at Tennessee", "Neyland Stadium, Knoxville"),
-        ("557131", "2026-11-28", "11:30", "Michigan at Ohio State", "Ohio Stadium, Columbus"),
-        ("557146", "2026-12-05", "15:30", "SEC Championship Game", "Mercedes-Benz Stadium, Atlanta"),
-        ("557132", "2026-12-12", "14:00", "Army vs Navy", "MetLife Stadium"),
+        ("557137", "2026-10-03", None, "Notre Dame at North Carolina", "Kenan Stadium, Chapel Hill, NC"),
+        ("557139", "2026-10-10", None, "Indiana at Nebraska", "Memorial Stadium, Lincoln, NE"),
+        ("557140", "2026-10-17", None, "Penn State at Michigan", "Michigan Stadium, Ann Arbor, MI"),
+        ("557141", "2026-10-24", None, "Ole Miss at Texas", "Darrell K Royal–Texas Memorial Stadium, Austin, TX"),
+        ("557129", "2026-10-31", "15:00", "Florida at Georgia", "Mercedes-Benz Stadium, Atlanta, GA"),
+        ("557143", "2026-11-07", None, "Oregon at Ohio State", "Ohio Stadium, Columbus, OH"),
+        ("557144", "2026-11-14", None, "Michigan at Oregon", "Autzen Stadium, Eugene, OR"),
+        ("557145", "2026-11-21", None, "LSU at Tennessee", "Neyland Stadium, Knoxville, TN"),
+        ("557131", "2026-11-28", "11:30", "Michigan at Ohio State", "Ohio Stadium, Columbus, OH"),
+        ("557146", "2026-12-05", "15:30", "SEC Championship Game", "Mercedes-Benz Stadium, Atlanta, GA"),
+        ("557132", "2026-12-12", "14:00", "Army vs Navy", "MetLife Stadium, East Rutherford, NJ"),
     ]
-    more = (
-        "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=10&limit=10"
-        "&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
-    )
+    more = WWO_NCAAF_MORE
     rows = []
     for event_id, date, et, title, venue in raw:
         rows.append(game(
@@ -713,7 +773,8 @@ def wwo_ncaaf_rows() -> list[dict]:
             sources=[
                 src(f"Westwood One event {event_id}", wwo_event(event_id)),
                 src("Westwood One NCAA football schedule", WWO_NCAAF_URL),
-                src("More endpoint, offset 10 (returns \"No more events\")", more),
+                src("More endpoint, offset 10 — carries the eleventh row, Army vs Navy", more),
+                src("More endpoint, offset 20 — returns \"No more events\", so the grid is exhausted", WWO_NCAAF_MORE_END),
                 src("Station finder, NCAA Football tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM", WWO_FINDER),
             ],
             notes=(
@@ -723,7 +784,7 @@ def wwo_ncaaf_rows() -> list[dict]:
                 "same San Francisco affiliates as the NFL tab. The KNBR 1050 weekly grid independently "
                 "shows a \"WW1 CFB\" college football block, which is what this row would occupy."
             ),
-            flag_ids=["WWO_PREEMPTION", "WWO_LISTED_START", "FINDER_2025_LABEL"],
+            flag_ids=["WWO_PREEMPTION", "WWO_LISTED_START", "FINDER_2025_LABEL", "NCAAF_VENUE_REREAD"],
         ))
     return rows
 
@@ -1124,15 +1185,85 @@ def local_rows() -> list[dict]:
         confidence="indicated",
         sources=[
             src("Cumulus release 2026-09-09: Super Bowl LXI, February 14, 2027, SoFi Stadium", PRESS),
+            src("League important dates: \u201cFebruary 14 - Super Bowl LXI at SoFi Stadium (Inglewood, California)\u201d", NFL_IMPORTANT_DATES),
             src("Station finder, NFL tab: KNBR-AM, KNBR-FM, KTCT-AM", WWO_FINDER),
         ],
         notes=(
-            "Date and stadium are from the rights-holder release. Kickoff is not on the schedule page "
-            "and the teams are not known. The wild card, divisional and conference-championship rounds "
-            "are promised by the same release but carry no official date yet, so they are not placed."
+            "Date and stadium are from the rights-holder release, and the league's important-dates "
+            "announcement independently names February 14 at SoFi Stadium. Kickoff is not published "
+            "and the teams are not known, so this row carries no clock time. Unlike the earlier "
+            "rounds, this is a single officially named day for a single game."
         ),
-        flag_ids=["WWO_POSTSEASON_UNDATED", "WWO_PREEMPTION", "WWO_LISTED_START"],
+        flag_ids=["NFL_POSTSEASON_WINDOWS", "WWO_PREEMPTION", "WWO_LISTED_START"],
     ))
+    return rows
+
+
+# --- NFL postseason round windows ---------------------------------------------
+def nfl_postseason_rows() -> list[dict]:
+    """One row per day of an officially named playoff window.
+
+    The league's important-dates announcement names the round windows, and the
+    Cumulus release puts every postseason game on Westwood One, whose San
+    Francisco affiliates are already established for the 63 regular-season rows.
+    Nothing publishes which game falls on which day, how many games a day
+    carries, the matchups or the kickoffs, so these rows assert a date and a
+    network and nothing else: no game_count, no clock time, no venue.
+
+    Every day of a multi-day window carries a row. Leaving January 17, 18, 23 and
+    24 blank would read as "no live sports radio", which is the one wrong answer
+    this page must not give on the busiest radio weekends of the year.
+    """
+    windows = [
+        ("2027-01-16", "wild-card-1", "NFL Wild Card Weekend on Westwood One — day 1 of the official January 16–18 window"),
+        ("2027-01-17", "wild-card-2", "NFL Wild Card Weekend on Westwood One — day 2 of the official January 16–18 window"),
+        ("2027-01-18", "wild-card-3", "NFL Wild Card Weekend on Westwood One — day 3 of the official January 16–18 window"),
+        ("2027-01-23", "divisional-1", "NFL Divisional Playoffs on Westwood One — day 1 of the official January 23–24 window"),
+        ("2027-01-24", "divisional-2", "NFL Divisional Playoffs on Westwood One — day 2 of the official January 23–24 window"),
+        ("2027-01-31", "championships", "AFC and NFC Championship Games on Westwood One — both games officially dated January 31"),
+    ]
+    rows = []
+    for date, slug, title in windows:
+        if slug == "championships":
+            dated = (
+                "The league names January 31 as the single day for both the AFC and NFC "
+                "Championship Games, so this is not a window day: both games are dated here."
+            )
+        else:
+            dated = (
+                "The league dates this round as a window, not game by game, so which games fall on "
+                "this particular day is not published. The row asserts only that the round is being "
+                "played across these dates and that Westwood One carries it."
+            )
+        rows.append(game(
+            id=f"nfl-post-{slug}",
+            date=date,
+            start_pt=None,
+            title=title,
+            league="NFL",
+            network="Westwood One",
+            venue="",
+            status="tba",
+            stations=WWO_NFL_STATIONS[:],
+            confidence="indicated",
+            sources=[
+                src("League important dates for 2026-2027: the round windows as announced", NFL_IMPORTANT_DATES),
+                src("Cumulus release 2026-09-09: Westwood One carries every NFL postseason game", PRESS),
+                src("Station finder, NFL tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM", WWO_FINDER),
+                src("Westwood One NFL grid — ends at the Week 18 TBA windows, no playoff rows", WWO_NFL_URL),
+            ],
+            notes=(
+                dated
+                + " No game count, kickoff time, matchup or venue is asserted, because no official "
+                "source publishes one for this date; nfl.com/schedules/2026/POST still redirected to "
+                "the regular season when fetched on 2026-09-27. With no clock time this row "
+                "contributes zero estimated minutes to the 10 AM–10 PM band maths, so it does not "
+                "inflate the coverage figures. If the 49ers reach the postseason their games would "
+                "also be expected on the club flagship, but no source publishes a postseason 49ers "
+                "radio line, so 107.7 FM is not claimed here."
+            ),
+            flag_ids=["NFL_POSTSEASON_WINDOWS", "WWO_PREEMPTION", "FINDER_2025_LABEL", "DURATION_ESTIMATE"],
+        ))
     return rows
 
 
@@ -1179,6 +1310,7 @@ def validate(rows: list[dict]) -> None:
         "wwo-nfl-": 63,
         "wwo-ncaaf-": 11,
         "wwo-soccer-": 5,
+        "nfl-post-": 6,
         "mlb-post-": 28,
         "stanford-": 7,
         "cal-": 7,
@@ -1192,7 +1324,7 @@ def validate(rows: list[dict]) -> None:
             raise SystemExit(f"expected {n} rows for {prefix}, got {got}")
 
     # 49ers national duplicates must stay merged into the club row.
-    merged = {"548538", "548491", "548568", "548509"}
+    merged = WWO_MERGED_NFL_EVENTS
     present = {r["id"].split("-")[-1] for r in rows if r["id"].startswith("wwo-nfl-")}
     if present & merged:
         raise SystemExit(f"49ers WWO events duplicated: {present & merged}")
@@ -1229,6 +1361,19 @@ def validate(rows: list[dict]) -> None:
                 raise SystemExit("mlb postseason rows are network-level, not official")
         if rid.startswith("wwo-soccer-") and r["stations"] != ["1050"]:
             raise SystemExit("soccer station is the finder's only Bay Area row")
+        if rid.startswith("nfl-post-"):
+            if r["stations"] != WWO_NFL_STATIONS:
+                raise SystemExit(
+                    f"{rid}: a playoff window row is a Westwood One row; no source puts 107.7 on it"
+                )
+            if r["start_pt"] is not None:
+                raise SystemExit(f"{rid}: no source publishes a playoff kickoff time; do not invent one")
+            if r["venue"]:
+                raise SystemExit(f"{rid}: no source publishes a playoff venue except the Super Bowl")
+            if "game_count" in r:
+                raise SystemExit(f"{rid}: no source publishes a per-day playoff game count")
+            if r["confidence"] != "indicated":
+                raise SystemExit(f"{rid}: a network guarantee plus an affiliate list is indicated, not official")
         if r["confidence"] == "official" and r["network"]:
             # a club/school row may note a national simulcast, but must not claim it as its network
             if r["network"] == "Westwood One":
@@ -1293,6 +1438,7 @@ def main() -> None:
         + wwo_nfl_rows()
         + wwo_ncaaf_rows()
         + wwo_soccer_rows()
+        + nfl_postseason_rows()
         + mlb_postseason_rows()
     )
     validate_flags()
@@ -1349,6 +1495,17 @@ def main() -> None:
                 "indicated": sum(1 for r in rows if r["confidence"] == "indicated"),
                 "review": sum(1 for r in rows if r["confidence"] == "review"),
                 "flags": len(FLAGS),
+            },
+            # Single source of truth for scripts/wwo_watch.py, so the watcher and the
+            # feed can never disagree about which grid belongs to which rows.
+            "wwo_watch": {
+                "endpoint": WWO_GRID_ENDPOINT,
+                "widgets": WWO_WIDGETS,
+                "merged_nfl_event_ids": sorted(WWO_MERGED_NFL_EVENTS),
+                "note": (
+                    "Read-only. A widget that returns no events at all is reported as a failed "
+                    "check, never as no drift."
+                ),
             },
         },
         "flags": FLAGS,
