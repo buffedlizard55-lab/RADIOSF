@@ -23,7 +23,6 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[1]
 FEED_PATH = ROOT / "data" / "broadcasts.json"
 USER_AGENT = "RADIOSF-source-watch/1.0 (+https://github.com/buffedlizard55-lab/RADIOSF)"
-DESCRIPTION_RE = re.compile(r"Stats API descriptions for this date: (.*?)\. First pitch", re.DOTALL)
 COUNT_RE = re.compile(r":\s*(\d+)\s+game\(s\),\s*startTimeTBD\s+(true|false)\b", re.I)
 
 
@@ -58,16 +57,21 @@ def expected_schedule(feed: dict[str, Any], today: str) -> dict[str, dict[str, A
         if not api_source:
             raise MonitorError(f"The snapshot row {row.get('id')} is missing its Stats API source label.")
         count_match = COUNT_RE.search(api_source.get("label", ""))
-        description_match = DESCRIPTION_RE.search(row.get("notes", ""))
-        if not count_match or not description_match:
+        if not count_match:
             raise MonitorError(f"Could not read the recorded MLB baseline for {row.get('id')}.")
-        descriptions = [part.strip() for part in description_match.group(1).split("; ") if part.strip()]
         count = int(count_match.group(1))
-        if len(descriptions) != count:
-            raise MonitorError(f"Recorded game count and descriptions disagree for {row['date']}.")
+        game_details = row.get("game_details")
+        if not isinstance(game_details, list) or len(game_details) != count:
+            raise MonitorError(f"The snapshot row {row.get('id')} has no complete MLB matchup baseline.")
+        descriptions = [item.get("description", "").strip() for item in game_details]
+        if any(not description for description in descriptions):
+            raise MonitorError(f"The snapshot row {row.get('id')} has an empty MLB game description.")
         expected[row["date"]] = {
             "count": count,
             "descriptions": Counter(descriptions),
+            "games": Counter((
+                item.get("description"), item.get("away"), item.get("home"), item.get("conditional")
+            ) for item in game_details),
             "all_start_times_tbd": count_match.group(2).lower() == "true",
             "row_id": row["id"],
         }
@@ -104,19 +108,29 @@ def observed_schedule(document: dict[str, Any], today: str) -> dict[str, dict[st
             description = game.get("description")
             if not isinstance(description, str) or not description.strip():
                 raise MonitorError(f"The MLB Stats API returned no description for {game_date}.")
-            # The live API nests startTimeTBD inside "status" (verified against the
-            # real response on 2026-09-27). A top-level value is accepted as a fallback.
+            # The live API nests startTimeTBD inside "status". A top-level value
+            # remains a fallback for older saved API responses.
             status_block = game.get("status") if isinstance(game.get("status"), dict) else {}
             start_time_tbd = status_block.get("startTimeTBD", game.get("startTimeTBD"))
             if not isinstance(start_time_tbd, bool):
                 raise MonitorError(f"The MLB Stats API returned no boolean startTimeTBD for {game_date}.")
+            teams = game.get("teams")
+            away = teams.get("away", {}).get("team", {}).get("name") if isinstance(teams, dict) else None
+            home = teams.get("home", {}).get("team", {}).get("name") if isinstance(teams, dict) else None
+            if not isinstance(away, str) or not away.strip() or not isinstance(home, str) or not home.strip():
+                raise MonitorError(f"The MLB Stats API returned no away/home team names for {game_date}.")
+            if_necessary = game.get("ifNecessary")
+            if if_necessary not in ("Y", "N"):
+                raise MonitorError(f"The MLB Stats API returned no valid ifNecessary marker for {game_date}.")
             item = observed.setdefault(game_date, {
                 "count": 0,
                 "descriptions": Counter(),
+                "games": Counter(),
                 "start_time_tbd": [],
             })
             item["count"] += 1
             item["descriptions"][description.strip()] += 1
+            item["games"][(description.strip(), away.strip(), home.strip(), if_necessary == "Y")] += 1
             item["start_time_tbd"].append(start_time_tbd)
     return observed
 
@@ -149,6 +163,19 @@ def compare(
                 differences.append(f"  - No longer returned: {'; '.join(removed)}.")
             if added:
                 differences.append(f"  - Newly returned or renamed: {'; '.join(added)}.")
+        if before["games"] != after["games"]:
+            def show_game(item: tuple[Any, ...]) -> str:
+                description, away, home, conditional = item
+                status = " (if necessary)" if conditional else ""
+                return f"{description}: {away} at {home}{status}"
+            removed_games = [show_game(item) for item in
+                             (before["games"] - after["games"]).elements()]
+            added_games = [show_game(item) for item in
+                           (after["games"] - before["games"]).elements()]
+            if removed_games:
+                differences.append(f"  - Matchup or conditional marker no longer returned: {'; '.join(removed_games)}.")
+            if added_games:
+                differences.append(f"  - Matchup or conditional marker now returned: {'; '.join(added_games)}.")
         if before["all_start_times_tbd"] and not all(after["start_time_tbd"]):
             newly_timed = sum(1 for value in after["start_time_tbd"] if not value)
             differences.append(

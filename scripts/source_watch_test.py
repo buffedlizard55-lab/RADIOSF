@@ -25,14 +25,16 @@ class SourceWatchTests(unittest.TestCase):
         dates = []
         for game_date, expected in sorted(self.expected.items()):
             games = []
-            for description, count in expected["descriptions"].items():
-                for _ in range(count):
-                    games.append({
-                        "officialDate": game_date,
-                        "description": description,
-                        # Real API shape: startTimeTBD lives inside "status".
-                        "status": {"detailedState": "Scheduled", "startTimeTBD": True},
-                    })
+            for description, away, home, conditional in expected["games"].elements():
+                games.append({
+                    "officialDate": game_date,
+                    "description": description,
+                    "teams": {"away": {"team": {"name": away}},
+                              "home": {"team": {"name": home}}},
+                    "ifNecessary": "Y" if conditional else "N",
+                    # Real API shape: startTimeTBD lives inside "status".
+                    "status": {"detailedState": "Scheduled", "startTimeTBD": True},
+                })
             dates.append({"date": game_date, "games": games})
         return {"dates": dates}
 
@@ -43,9 +45,9 @@ class SourceWatchTests(unittest.TestCase):
         self.assertEqual(sum(item["count"] for item in self.expected.values()), 53)
 
     def test_real_api_response_shape_matches_snapshot(self):
-        # Regression: the live API nests startTimeTBD under "status". The monitor
-        # once read it from the top level and would have reported every run as
-        # unavailable. The fixture is the real response fetched 2026-09-27.
+        # Regression: the live API nests startTimeTBD under "status". The fixture
+        # is the full response fetched 2026-09-27, enriched with the matchups
+        # transcribed from the API's compact fields response on the same date.
         fixture = Path(__file__).resolve().parent / "fixtures" / "mlb_postseason_2026-09-27.json"
         document = json.loads(fixture.read_text(encoding="utf-8"))
         for block in document["dates"]:
@@ -58,7 +60,9 @@ class SourceWatchTests(unittest.TestCase):
         api = self.api_fixture()
         api["dates"].append({"date": "2026-11-01", "games": [{
             "officialDate": "2026-11-01", "description": "New postseason game",
-            "status": {"startTimeTBD": True},
+            "teams": {"away": {"team": {"name": "Away Team"}},
+                      "home": {"team": {"name": "Home Team"}}},
+            "ifNecessary": "N", "status": {"startTimeTBD": True},
         }]})
         observed = source_watch.observed_schedule(api, self.today)
         self.assertTrue(any("2026-11-01" in item and "no row" in item for item in
@@ -73,6 +77,24 @@ class SourceWatchTests(unittest.TestCase):
         differences = source_watch.compare(self.expected, observed)
         self.assertTrue(any("Newly returned or renamed" in item for item in differences))
         self.assertTrue(any("now supplies a start time" in item for item in differences))
+
+    def test_changed_matchup_or_if_necessary_marker_is_reported(self):
+        api = self.api_fixture()
+        game = api["dates"][0]["games"][0]
+        game["teams"]["away"]["team"]["name"] = "Newly Qualified Team"
+        game["ifNecessary"] = "Y"
+        differences = source_watch.compare(self.expected,
+            source_watch.observed_schedule(api, self.today))
+        self.assertTrue(any("Matchup or conditional marker now returned" in item and
+                            "Newly Qualified Team" in item for item in differences))
+        self.assertTrue(any("Matchup or conditional marker no longer returned" in item and
+                            "Chicago White Sox" in item for item in differences))
+
+    def test_missing_matchup_fields_fail_closed(self):
+        api = self.api_fixture()
+        del api["dates"][0]["games"][0]["teams"]
+        with self.assertRaises(source_watch.MonitorError):
+            source_watch.observed_schedule(api, self.today)
 
     def test_past_dates_are_ignored(self):
         api = {"dates": [{"date": "2026-09-26", "games": [{

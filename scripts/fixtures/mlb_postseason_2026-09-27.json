@@ -11,7 +11,19 @@
       "startTimeTBD": true
      },
      "description": "AL Wild Card 'A' Game 1",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Chicago White Sox"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "HOU/TEX"
+       }
+      }
+     }
     },
     {
      "gamePk": 849851,
@@ -20,7 +32,19 @@
       "startTimeTBD": true
      },
      "description": "AL Wild Card 'B' Game 1",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Boston Red Sox"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "New York Yankees"
+       }
+      }
+     }
     },
     {
      "gamePk": 849845,
@@ -29,7 +53,19 @@
       "startTimeTBD": true
      },
      "description": "NL Wild Card 'A' Game 1",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "NL Wild Card #3"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Atlanta Braves"
+       }
+      }
+     }
     },
     {
      "gamePk": 849843,
@@ -38,7 +74,19 @@
       "startTimeTBD": true
      },
      "description": "NL Wild Card 'B' Game 1",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Chicago Cubs"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "San Diego Padres"
+       }
+      }
+     }
     }
    ]
   },
@@ -52,7 +100,19 @@
       "startTimeTBD": true
      },
      "description": "AL Wild Card 'B' Game 2",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Boston Red Sox"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "New York Yankees"
+       }
+      }
+     }
     },
     {
      "gamePk": 849846,
@@ -61,7 +121,19 @@
       "startTimeTBD": true
      },
      "description": "AL Wild Card 'A' Game 2",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Chicago White Sox"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "HOU/TEX"
+       }
+      }
+     }
     },
     {
      "gamePk": 849841,
@@ -70,7 +142,19 @@
       "startTimeTBD": true
      },
      "description": "NL Wild Card 'A' Game 2",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "NL Wild Card #3"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Atlanta Braves"
+       }
+      }
+     }
     },
     {
      "gamePk": 849842,
@@ -79,7 +163,19 @@
       "startTimeTBD": true
      },
      "description": "NL Wild Card 'B' Game 2",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Chicago Cubs"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "San Diego Padres"
+       }
+      }
+     }
     }
    ]
   },
@@ -93,7 +189,19 @@
       "startTimeTBD": true
      },
      "description": "AL Wild Card 'A' Game 3",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Chicago White Sox"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "HOU/TEX"
+       }
+      }
+     }
     },
     {
      "gamePk": 849844,
@@ -102,7 +210,19 @@
       "startTimeTBD": true
      },
      "description": "NL Wild Card 'A' Game 3",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "NL Wild Card #3"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Atlanta Braves"
+       }
+      }
+     }
     },
     {
      "gamePk": 849847,
@@ -111,7 +231,19 @@
       "startTimeTBD": true
      },
      "description": "AL Wild Card 'B' Game 3",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Boston Red Sox"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "New York Yankees"
+       }
+      }
+     }
     },
     {
      "gamePk": 849840,
@@ -120,7 +252,19 @@
       "startTimeTBD": true
      },
      "description": "NL Wild Card 'B' Game 3",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Chicago Cubs"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "San Diego Padres"
+       }
+      }
+     }
     }
    ]
   },
@@ -134,7 +278,19 @@
       "startTimeTBD": true
      },
      "description": "ALDS 'A' Game 1",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "AL 4/5 Winner"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Tampa Bay Rays"
+       }
+      }
+     }
     },
     {
      "gamePk": 849829,
@@ -143,7 +299,19 @@
       "startTimeTBD": true
      },
      "description": "ALDS 'B' Game 1",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "AL 3/6 Winner"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Cleveland Guardians"
+       }
+      }
+     }
     },
     {
      "gamePk": 849830,
@@ -152,7 +320,19 @@
       "startTimeTBD": true
      },
      "description": "NLDS 'A' Game 1",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "NL 4/5 Winner"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Milwaukee Brewers"
+       }
+      }
+     }
     },
     {
      "gamePk": 849828,
@@ -161,7 +341,19 @@
       "startTimeTBD": true
      },
      "description": "NLDS 'B' Game 1",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "NL 3/6 Winner"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Los Angeles Dodgers"
+       }
+      }
+     }
     }
    ]
   },
@@ -175,7 +367,19 @@
       "startTimeTBD": true
      },
      "description": "NLDS 'A' Game 2",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "NL 4/5 Winner"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Milwaukee Brewers"
+       }
+      }
+     }
     },
     {
      "gamePk": 849823,
@@ -184,7 +388,19 @@
       "startTimeTBD": true
      },
      "description": "NLDS 'B' Game 2",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "NL 3/6 Winner"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Los Angeles Dodgers"
+       }
+      }
+     }
     }
    ]
   },
@@ -198,7 +414,19 @@
       "startTimeTBD": true
      },
      "description": "ALDS 'A' Game 2",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "AL 4/5 Winner"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Tampa Bay Rays"
+       }
+      }
+     }
     },
     {
      "gamePk": 849834,
@@ -207,7 +435,19 @@
       "startTimeTBD": true
      },
      "description": "ALDS 'B' Game 2",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "AL 3/6 Winner"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Cleveland Guardians"
+       }
+      }
+     }
     }
    ]
   },
@@ -221,7 +461,19 @@
       "startTimeTBD": true
      },
      "description": "NLDS 'B' Game 3",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Los Angeles Dodgers"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "NL 3/6 Winner"
+       }
+      }
+     }
     },
     {
      "gamePk": 849826,
@@ -230,7 +482,19 @@
       "startTimeTBD": true
      },
      "description": "NLDS 'A' Game 3",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Milwaukee Brewers"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "NL 4/5 Winner"
+       }
+      }
+     }
     }
    ]
   },
@@ -244,7 +508,19 @@
       "startTimeTBD": true
      },
      "description": "ALDS 'A' Game 3",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Tampa Bay Rays"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "AL 4/5 Winner"
+       }
+      }
+     }
     },
     {
      "gamePk": 849822,
@@ -253,7 +529,19 @@
       "startTimeTBD": true
      },
      "description": "NLDS 'B' Game 4",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Los Angeles Dodgers"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "NL 3/6 Winner"
+       }
+      }
+     }
     },
     {
      "gamePk": 849833,
@@ -262,7 +550,19 @@
       "startTimeTBD": true
      },
      "description": "ALDS 'B' Game 3",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Cleveland Guardians"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "AL 3/6 Winner"
+       }
+      }
+     }
     },
     {
      "gamePk": 849827,
@@ -271,7 +571,19 @@
       "startTimeTBD": true
      },
      "description": "NLDS 'A' Game 4 ",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Milwaukee Brewers"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "NL 4/5 Winner"
+       }
+      }
+     }
     }
    ]
   },
@@ -285,7 +597,19 @@
       "startTimeTBD": true
      },
      "description": "ALDS 'A' Game 4",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Tampa Bay Rays"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "AL 4/5 Winner"
+       }
+      }
+     }
     },
     {
      "gamePk": 849832,
@@ -294,7 +618,19 @@
       "startTimeTBD": true
      },
      "description": "ALDS 'B' Game 4",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Cleveland Guardians"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "AL 3/6 Winner"
+       }
+      }
+     }
     }
    ]
   },
@@ -308,7 +644,19 @@
       "startTimeTBD": true
      },
      "description": "NLDS 'A' Game 5",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "NL 4/5 Winner"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Milwaukee Brewers"
+       }
+      }
+     }
     },
     {
      "gamePk": 849821,
@@ -317,7 +665,19 @@
       "startTimeTBD": true
      },
      "description": "NLDS 'B' Game 5",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "NL 3/6 Winner"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Los Angeles Dodgers"
+       }
+      }
+     }
     }
    ]
   },
@@ -331,7 +691,19 @@
       "startTimeTBD": true
      },
      "description": "ALDS 'A' Game 5",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "AL 4/5 Winner"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Tampa Bay Rays"
+       }
+      }
+     }
     },
     {
      "gamePk": 849831,
@@ -340,7 +712,19 @@
       "startTimeTBD": true
      },
      "description": "ALDS 'B' Game 5",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "AL 3/6 Winner"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Cleveland Guardians"
+       }
+      }
+     }
     }
    ]
   },
@@ -354,7 +738,19 @@
       "startTimeTBD": true
      },
      "description": "NLCS Game 1",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "NL Lower Seed"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "NL Higher Seed"
+       }
+      }
+     }
     }
    ]
   },
@@ -368,7 +764,19 @@
       "startTimeTBD": true
      },
      "description": "ALCS Game 1",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "AL Lower Seed"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "AL Higher Seed"
+       }
+      }
+     }
     },
     {
      "gamePk": 849812,
@@ -377,7 +785,19 @@
       "startTimeTBD": true
      },
      "description": "NLCS Game 2",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "NL Lower Seed"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "NL Higher Seed"
+       }
+      }
+     }
     }
    ]
   },
@@ -391,7 +811,19 @@
       "startTimeTBD": true
      },
      "description": "ALCS Game 2",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "AL Lower Seed"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "AL Higher Seed"
+       }
+      }
+     }
     }
    ]
   },
@@ -405,7 +837,19 @@
       "startTimeTBD": true
      },
      "description": "NLCS Game 3",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "NL Higher Seed"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "NL Lower Seed"
+       }
+      }
+     }
     }
    ]
   },
@@ -419,7 +863,19 @@
       "startTimeTBD": true
      },
      "description": "ALCS Game 3",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "AL Higher Seed"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "AL Lower Seed"
+       }
+      }
+     }
     },
     {
      "gamePk": 849810,
@@ -428,7 +884,19 @@
       "startTimeTBD": true
      },
      "description": "NLCS Game 4",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "NL Higher Seed"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "NL Lower Seed"
+       }
+      }
+     }
     }
    ]
   },
@@ -442,7 +910,19 @@
       "startTimeTBD": true
      },
      "description": "ALCS Game 4",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "AL Higher Seed"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "AL Lower Seed"
+       }
+      }
+     }
     },
     {
      "gamePk": 849808,
@@ -451,7 +931,19 @@
       "startTimeTBD": true
      },
      "description": "NLCS Game 5",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "NL Higher Seed"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "NL Lower Seed"
+       }
+      }
+     }
     }
    ]
   },
@@ -465,7 +957,19 @@
       "startTimeTBD": true
      },
      "description": "ALCS Game 5",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "AL Higher Seed"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "AL Lower Seed"
+       }
+      }
+     }
     }
    ]
   },
@@ -479,7 +983,19 @@
       "startTimeTBD": true
      },
      "description": "NLCS Game 6",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "NL Lower Seed"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "NL Higher Seed"
+       }
+      }
+     }
     }
    ]
   },
@@ -493,7 +1009,19 @@
       "startTimeTBD": true
      },
      "description": "NLCS Game 7",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "NL Lower Seed"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "NL Higher Seed"
+       }
+      }
+     }
     },
     {
      "gamePk": 849815,
@@ -502,7 +1030,19 @@
       "startTimeTBD": true
      },
      "description": "ALCS Game 6",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "AL Lower Seed"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "AL Higher Seed"
+       }
+      }
+     }
     }
    ]
   },
@@ -516,7 +1056,19 @@
       "startTimeTBD": true
      },
      "description": "ALCS Game 7",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "AL Lower Seed"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "AL Higher Seed"
+       }
+      }
+     }
     }
    ]
   },
@@ -530,7 +1082,19 @@
       "startTimeTBD": true
      },
      "description": "World Series Game 1",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Lower Seed League Champion"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Higher Seed League Champion"
+       }
+      }
+     }
     }
    ]
   },
@@ -544,7 +1108,19 @@
       "startTimeTBD": true
      },
      "description": "World Series Game 2",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Lower Seed League Champion"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Higher Seed League Champion"
+       }
+      }
+     }
     }
    ]
   },
@@ -558,7 +1134,19 @@
       "startTimeTBD": true
      },
      "description": "World Series Game 3",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Higher Seed League Champion"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Lower Seed League Champion"
+       }
+      }
+     }
     }
    ]
   },
@@ -572,7 +1160,19 @@
       "startTimeTBD": true
      },
      "description": "World Series Game 4",
-     "ifNecessary": "N"
+     "ifNecessary": "N",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Higher Seed League Champion"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Lower Seed League Champion"
+       }
+      }
+     }
     }
    ]
   },
@@ -586,7 +1186,19 @@
       "startTimeTBD": true
      },
      "description": "World Series Game 5",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Higher Seed League Champion"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Lower Seed League Champion"
+       }
+      }
+     }
     }
    ]
   },
@@ -600,7 +1212,19 @@
       "startTimeTBD": true
      },
      "description": "World Series Game 6",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Lower Seed League Champion"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Higher Seed League Champion"
+       }
+      }
+     }
     }
    ]
   },
@@ -614,9 +1238,22 @@
       "startTimeTBD": true
      },
      "description": "World Series Game 7",
-     "ifNecessary": "Y"
+     "ifNecessary": "Y",
+     "teams": {
+      "away": {
+       "team": {
+        "name": "Lower Seed League Champion"
+       }
+      },
+      "home": {
+       "team": {
+        "name": "Higher Seed League Champion"
+       }
+      }
+     }
     }
    ]
   }
- ]
+ ],
+ "_matchups_source": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1&fields=dates,date,games,officialDate,description,teams,away,team,name,home,status,startTimeTBD,ifNecessary,ifNecessaryDescription (fetched 2026-09-27)"
 }
