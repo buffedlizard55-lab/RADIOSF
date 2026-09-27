@@ -5,9 +5,9 @@
 2. Read [docs/LIMITATIONS.md](docs/LIMITATIONS.md) → "Suggested order of work for the next session".
 3. Check open issues titled `[Automated source watch]` — they are the daily monitors telling you
    which sources moved. Act on those before anything else.
-4. Look at the latest **source watch preview** run on your pull request: it runs all four live
+4. Look at the latest **source watch preview** run on your pull request: it runs all five live
    monitors (MLB postseason API, NBA ESPN Radio PDF, Westwood One grids, club/school/station
-   pages) on GitHub's runners.
+   pages, ESPN Radio weekly grid) on GitHub's runners.
 
 ## Rules that do not bend
 
@@ -26,6 +26,7 @@
 python3 scripts/build_feed.py && git diff --exit-code -- data/broadcasts.json docs/LINE_BY_LINE.md
 python3 scripts/source_watch_test.py
 python3 scripts/espn_watch_test.py
+python3 scripts/espn_radio_week_watch_test.py
 python3 scripts/wwo_watch_test.py
 python3 scripts/page_watch_test.py
 node scripts/ui_logic_test.js

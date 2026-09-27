@@ -1,0 +1,40 @@
+{
+  "_source": "Offline replay fixture for scripts/espn_radio_week_watch_test.py, built 2026-09-27. The grid_html is synthetic markup in the shape espn.com/espnradio/schedule presents — the day blocks, game strings and join times are exactly what the live page printed when it was read through the read-only fetch tool this session (it renders one table per weekday, | show | Time (Eastern) |, with 'MLB: Mets @ Rangers' Wed 7:30 p.m., 'MLB: Guardians @ Royals' Fri 7:00 p.m., 'CFB: Wisconsin @ Penn State' Sat 4:30 p.m. and 'CFB: Texas A&M @ LSU' Sat 8:00 p.m.). The scoreboards are ESPN site.api scoreboard-shaped payloads carrying the dated facts verified this session: the two MLB matchups were confirmed game-for-game against the MLB Stats API on the printed days (gamePk 822841 on 2026-09-23; gamePk 824058 on 2026-09-25) and against the following week (which contains neither); the two Saturday college games were confirmed on ESPN team schedules this session (Wisconsin at Penn State, Sat Sep 26; Texas A&M at LSU, Sat Sep 26). This file is test data, not a saved copy of a live response, and the monitor never reads it in CI.",
+  "today": "2026-09-27",
+  "grid_html": "<html><body><div class='table-wrap'><table class='table'><thead><tr><th>MONDAY</th><th class='col-time'>Time (Eastern)</th></tr></thead><tbody><tr><td class='col-first'><a href='https://www.espn.com/espnradio/show?showId=allnight'>SportsCenter AllNight</a></td><td class='col-last'>1:00 a.m.</td></tr><tr><td class='col-first'><a href='https://www.espn.com/espnradio/show?showId=generic'>The Rich Eisen Show</a></td><td class='col-last'>12:00 p.m.</td></tr></tbody></table><table class='table'><thead><tr><th>TUESDAY</th><th class='col-time'>Time (Eastern)</th></tr></thead><tbody><tr><td class='col-first'><a href='https://www.espn.com/espnradio/show?showId=allnight'>SportsCenter AllNight</a></td><td class='col-last'>1:00 a.m.</td></tr></tbody></table><table class='table'><thead><tr><th>WEDNESDAY</th><th class='col-time'>Time (Eastern)</th></tr></thead><tbody><tr><td class='col-first'><a href='https://www.espn.com/espnradio/show?showId=allnight'>SportsCenter AllNight</a></td><td class='col-last'>1:00 a.m.</td></tr><tr><td class='col-first'><a href='https://www.espn.com/espnradio/show?showId=mlb'>MLB: Mets @ Rangers</a></td><td class='col-last'>7:30 p.m.</td></tr><tr><td class='col-first'><a href='https://www.espn.com/espnradio/show?showId=GameNight'>GameNight</a></td><td class='col-last'>11:00 p.m.</td></tr></tbody></table><table class='table'><thead><tr><th>THURSDAY</th><th class='col-time'>Time (Eastern)</th></tr></thead><tbody><tr><td class='col-first'><a href='https://www.espn.com/espnradio/show?showId=generic'>Freddie and Harry</a></td><td class='col-last'>5:00 p.m.</td></tr></tbody></table><table class='table'><thead><tr><th>FRIDAY</th><th class='col-time'>Time (Eastern)</th></tr></thead><tbody><tr><td class='col-first'><a href='https://www.espn.com/espnradio/show?showId=mlb'>MLB: Guardians @ Royals</a></td><td class='col-last'>7:00 p.m.</td></tr><tr><td class='col-first'><a href='https://www.espn.com/espnradio/show?showId=GameNight'>GameNight</a></td><td class='col-last'>11:00 p.m.</td></tr></tbody></table><table class='table'><thead><tr><th>SATURDAY</th><th class='col-time'>Time (Eastern)</th></tr></thead><tbody><tr><td class='col-first'><a href='https://www.espn.com/espnradio/show?showId=CFB'>College GameDay</a></td><td class='col-last'>10:00 a.m.</td></tr><tr><td class='col-first'><a href='https://www.espn.com/espnradio/show?showId=collegefootball'>CFB: Wisconsin @ Penn State</a></td><td class='col-last'>4:30 p.m.</td></tr><tr><td class='col-first'><a href='https://www.espn.com/espnradio/show?showId=collegefootball'>CFB: Texas A&amp;M @ LSU</a></td><td class='col-last'>8:00 p.m.</td></tr></tbody></table><table class='table'><thead><tr><th>SUNDAY</th><th class='col-time'>Time (Eastern)</th></tr></thead><tbody><tr><td class='col-first'><a href='https://www.espn.com/espnradio/show?showId=generic'>Sunday Morning</a></td><td class='col-last'>10:00 a.m.</td></tr><tr><td class='col-first'><a href='https://www.espn.com/espnradio/show?showId=GameNight'>GameNight</a></td><td class='col-last'>10:00 p.m.</td></tr></tbody></table></div></body></html>",
+  "scoreboards": {
+    "MLB|2026-09-16": {"events": []},
+    "MLB|2026-09-18": {"events": []},
+    "MLB|2026-09-23": {"events": [
+      {"name": "New York Mets at Texas Rangers", "date": "2026-09-24T02:10Z", "competitions": [{"competitors": [
+        {"homeAway": "away", "team": {"location": "New York", "name": "Mets", "abbreviation": "NYM", "displayName": "New York Mets", "shortDisplayName": "NY Mets"}},
+        {"homeAway": "home", "team": {"location": "Texas", "name": "Rangers", "abbreviation": "TEX", "displayName": "Texas Rangers", "shortDisplayName": "TEX"}}
+      ]}]}
+    ]},
+    "MLB|2026-09-25": {"events": [
+      {"name": "Cleveland Guardians at Kansas City Royals", "date": "2026-09-26T02:10Z", "competitions": [{"competitors": [
+        {"homeAway": "away", "team": {"location": "Cleveland", "name": "Guardians", "abbreviation": "CLE", "displayName": "Cleveland Guardians", "shortDisplayName": "CLE"}},
+        {"homeAway": "home", "team": {"location": "Kansas City", "name": "Royals", "abbreviation": "KC", "displayName": "Kansas City Royals", "shortDisplayName": "KC"}}
+      ]}]}
+    ]},
+    "MLB|2026-09-30": {"events": [
+      {"name": "Boston Red Sox at New York Yankees", "date": "2026-10-01T00:07Z", "competitions": [{"competitors": [
+        {"homeAway": "away", "team": {"location": "Boston", "name": "Red Sox", "abbreviation": "BOS", "displayName": "Boston Red Sox", "shortDisplayName": "BOS"}},
+        {"homeAway": "home", "team": {"location": "New York", "name": "Yankees", "abbreviation": "NYY", "displayName": "New York Yankees", "shortDisplayName": "NYY"}}
+      ]}]}
+    ]},
+    "MLB|2026-10-02": {"events": []},
+    "CFB|2026-09-19": {"events": []},
+    "CFB|2026-09-26": {"events": [
+      {"name": "Wisconsin Badgers at Penn State Nittany Lions", "date": "2026-09-26T21:00Z", "competitions": [{"competitors": [
+        {"homeAway": "away", "team": {"location": "Wisconsin", "name": "Badgers", "abbreviation": "WIS", "displayName": "Wisconsin Badgers", "shortDisplayName": "Wisconsin"}},
+        {"homeAway": "home", "team": {"location": "Penn State", "name": "Nittany Lions", "abbreviation": "PSU", "displayName": "Penn State Nittany Lions", "shortDisplayName": "Penn St"}}
+      ]}]},
+      {"name": "Texas A&M Aggies at LSU Tigers", "date": "2026-09-27T00:00Z", "competitions": [{"competitors": [
+        {"homeAway": "away", "team": {"location": "Texas A&M", "name": "Aggies", "abbreviation": "TEXAM", "displayName": "Texas A&M Aggies", "shortDisplayName": "Texas A&M"}},
+        {"homeAway": "home", "team": {"location": "LSU", "name": "Tigers", "abbreviation": "LSU", "displayName": "LSU Tigers", "shortDisplayName": "LSU"}}
+      ]}]}
+    ]},
+    "CFB|2026-10-03": {"events": []}
+  }
+}
