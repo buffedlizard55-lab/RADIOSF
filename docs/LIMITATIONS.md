@@ -27,6 +27,19 @@ for missing games. Five things were wrong.
 | **Wrong DST changeover date.** The timezone label used 2027-03-08; US daylight time in 2027 begins March 14. | Harmless today, because the window ends 2027-02-28. It would have mislabelled the clock the first time anyone extended the window. | Corrected. |
 | **A dead form label.** `index.html` carried a `visually-hidden` label pointing at an input that no longer existed. | Nothing visible, but it is the kind of leftover that makes a later reader distrust the markup. | Removed. |
 
+## Found and fixed during the third pass
+
+The third pass re-read the original request clause by clause and compared the result against the
+site it was asked to copy.
+
+| Finding | Fix |
+| --- | --- |
+| **The site being copied had an interactive control this one lacked.** ScheduleFreeTime lets the reader change each sport's average game length and recomputes every day instantly. RADIOSF baked its estimates into the JSON where nobody could see or challenge them — and the whole 10-to-10 answer is built on them. | Every row now declares a duration bucket, `meta.durations` ships the defaults, and the band section renders an editable box per sport with a reset. Changing one recomputes the day view, the timeline, the calendar dots and the headline statistics. The measured sensitivity is in the README: the conclusion holds even at a flat four hours per broadcast. |
+| **A flag claimed three checks and linked one page.** `MBB_NO_RADIO_ROWS` describes negative results from Westwood One, calbears.com and usfdons.com but offered a single link, so a reader could not repeat two of the three checks. | Flags may now carry a `sources` list; the page renders all of them. The builder rejects a flag whose primary `url` is not the first of its sources, and rejects any non-https flag link. |
+| **A limitation flag cited Wikipedia as its source.** `WWO_POSTSEASON_UNDATED` linked the 2026 NFL season Wikipedia article — in a project whose rule is official links. | It now leads with nfl.com/schedules (the official page whose POST tab still redirects), then the Cumulus release, and keeps the secondary write-up last, explicitly labelled as not official and not used. |
+| **Dead code.** `logic.js` exported three helpers nothing called — `clip`, `filterBroadcasts` and `shareStation`, the last one orphaned by the second pass's own conflict rewrite. `index.html` carried two CSS rules for classes never applied. | Removed. |
+| **49ers rows had not been re-verified this session.** They are the most load-bearing official rows in the feed. | All fifteen re-read against 49ers.com: date, Pacific kickoff, radio line, venue, the Week 8 bye and the Week 18 TBD all match. The only character that differs anywhere in the set is the ® in "Levi's® Stadium", now documented in `VERIFICATION.md` as the single normalisation in the feed. |
+
 ## Open limitations, worst first
 
 1. **No basketball at all, November through February.** Three official pages were checked and none printed a radio row: Westwood One's NCAA Basketball page says "No upcoming events", calbears.com men's basketball has no radio column, usfdons.com men's basketball has no radio column — even though KTCT's station record names the San Francisco Dons as an affiliate and KNBR historically carried Cal and USF. This is the largest hole in the winter half of the window. *Next session: try `usfdons.com` "Listen"/"Watch" links, the WCC network page, `calbears.com` broadcast page, and Stanford's basketball radio release.*
