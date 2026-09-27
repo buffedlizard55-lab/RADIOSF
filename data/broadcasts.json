@@ -52,7 +52,7 @@
       {
         "id": "indicated",
         "label": "Indicated",
-        "detail": "A network lists the game and its station finder lists a Bay Area affiliate. That is a network row, not a per-game clearance."
+        "detail": "A network or rights-holder lists the event, and another source establishes a Bay Area affiliate relationship. This is not per-game clearance."
       },
       {
         "id": "review",
@@ -112,6 +112,8 @@
     ],
     "counts": {
       "broadcasts": 147,
+      "conditional": 11,
+      "conditional_games": 21,
       "placed": 146,
       "unplaced": 1,
       "official": 37,
@@ -307,7 +309,7 @@
       "id": "MBB_NO_RADIO_ROWS",
       "severity": "limitation",
       "title": "No basketball rows could be verified for the 2026-27 season",
-      "detail": "Three checks on 2026-09-27, all negative. Westwood One's NCAA Basketball page says \"No upcoming events\", so there is no national college hoops grid to transcribe. calbears.com men's basketball lists games from Nov 2 with TBD times and no radio column. usfdons.com men's basketball lists TV logos (ESPN+, CBS Sports Network) and no radio column, even though KTCT's station record names the San Francisco Dons as an affiliate. Stanford basketball was not re-verified onto 1050. Basketball is therefore absent from November to February, which is a gap in this feed, not a quiet radio dial.",
+      "detail": "Current-season checks on 2026-09-27 found no 2026-27 radio listing. Westwood One's NCAA Basketball page says \"No upcoming events\", so there is no national college hoops grid to transcribe. calbears.com men's basketball lists games from Nov 2 with TBD times and no radio column. The USF Dons 2026-27 text schedule lists dates, times, opponents, locations, tournament and results but no Radio/Listen field; the live schedule displays TV logos for some games. An official 2025-26 preview did say \"Listen: KNBR 1050\", but that is prior-season evidence, not confirmation of a 2026-27 station assignment. KTCT's station record also names the Dons as an affiliate, which is not a season schedule. Stanford basketball was not re-verified onto 1050. Basketball is therefore absent from November to February, which is a gap in this feed, not a quiet radio dial.",
       "url": "https://www.westwoodonesports.com/ncaa-basketball/",
       "sources": [
         {
@@ -319,8 +321,16 @@
           "url": "https://calbears.com/sports/mens-basketball/schedule"
         },
         {
-          "label": "USF Dons men's basketball schedule: no radio column",
+          "label": "USF Dons 2026-27 men's basketball schedule",
           "url": "https://usfdons.com/sports/mens-basketball/schedule"
+        },
+        {
+          "label": "USF Dons 2026-27 schedule text table: no Radio/Listen field",
+          "url": "https://usfdons.com/sports/mens-basketball/schedule/text"
+        },
+        {
+          "label": "USF Dons Jan 28, 2026 preview: KNBR 1050 listen line, prior season only",
+          "url": "https://usfdons.com/news/2026/1/27/mens-basketball-san-francisco-heads-to-santa-clara-for-late-night-showdown"
         }
       ]
     },
@@ -627,7 +637,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 4,
+      "conditional_game_count": 0
     },
     {
       "id": "mlb-post-2026-09-30",
@@ -670,7 +682,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 4,
+      "conditional_game_count": 0
     },
     {
       "id": "wwo-nfl-548554",
@@ -754,7 +768,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 4,
+      "conditional_game_count": 4
     },
     {
       "id": "stanford-2026-10-03",
@@ -909,7 +925,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 4,
+      "conditional_game_count": 0
     },
     {
       "id": "wwo-ncaaf-557137",
@@ -1109,7 +1127,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 2,
+      "conditional_game_count": 0
     },
     {
       "id": "wwo-nfl-548535",
@@ -1193,7 +1213,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 2,
+      "conditional_game_count": 0
     },
     {
       "id": "wwo-soccer-570241",
@@ -1275,7 +1297,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 2,
+      "conditional_game_count": 0
     },
     {
       "id": "mlb-post-2026-10-07",
@@ -1318,7 +1342,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 4,
+      "conditional_game_count": 2
     },
     {
       "id": "wwo-nfl-548556",
@@ -1402,7 +1428,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 2,
+      "conditional_game_count": 2
     },
     {
       "id": "mlb-post-2026-10-09",
@@ -1445,7 +1473,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 2,
+      "conditional_game_count": 2
     },
     {
       "id": "wwo-soccer-570247",
@@ -1631,7 +1661,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 2,
+      "conditional_game_count": 2
     },
     {
       "id": "wwo-ncaaf-557139",
@@ -1830,7 +1862,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 1,
+      "conditional_game_count": 0
     },
     {
       "id": "wwo-nfl-548537",
@@ -1914,7 +1948,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 2,
+      "conditional_game_count": 0
     },
     {
       "id": "wwo-soccer-570250",
@@ -1996,7 +2032,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 1,
+      "conditional_game_count": 0
     },
     {
       "id": "quakes-2026-10-14",
@@ -2070,7 +2108,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 1,
+      "conditional_game_count": 0
     },
     {
       "id": "wwo-nfl-548557",
@@ -2154,7 +2194,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 2,
+      "conditional_game_count": 0
     },
     {
       "id": "mlb-post-2026-10-16",
@@ -2197,7 +2239,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 2,
+      "conditional_game_count": 1
     },
     {
       "id": "stanford-2026-10-17",
@@ -2344,7 +2388,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 1,
+      "conditional_game_count": 1
     },
     {
       "id": "wwo-ncaaf-557140",
@@ -2513,7 +2559,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 1,
+      "conditional_game_count": 1
     },
     {
       "id": "niners-2026-10-19",
@@ -2590,7 +2638,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 2,
+      "conditional_game_count": 2
     },
     {
       "id": "mlb-post-2026-10-20",
@@ -2633,7 +2683,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 1,
+      "conditional_game_count": 1
     },
     {
       "id": "wwo-nfl-548558",
@@ -2758,7 +2810,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 1,
+      "conditional_game_count": 0
     },
     {
       "id": "quakes-2026-10-24",
@@ -2864,7 +2918,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 1,
+      "conditional_game_count": 0
     },
     {
       "id": "wwo-ncaaf-557141",
@@ -3104,7 +3160,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 1,
+      "conditional_game_count": 0
     },
     {
       "id": "mlb-post-2026-10-27",
@@ -3147,7 +3205,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 1,
+      "conditional_game_count": 0
     },
     {
       "id": "quakes-2026-10-28",
@@ -3221,7 +3281,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 1,
+      "conditional_game_count": 1
     },
     {
       "id": "wwo-nfl-548560",
@@ -3305,7 +3367,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 1,
+      "conditional_game_count": 1
     },
     {
       "id": "wwo-ncaaf-557129",
@@ -3460,7 +3524,9 @@
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
-      ]
+      ],
+      "game_count": 1,
+      "conditional_game_count": 1
     },
     {
       "id": "stanford-2026-10-31",

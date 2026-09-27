@@ -4,7 +4,7 @@ No broadcast was added from memory. Every row in `data/broadcasts.json` was tran
 
 Window: **2026-09-27 through 2027-02-28**, America/Los_Angeles. Days before Sep 27 are labelled "before this snapshot", never "quiet".
 
-Result: **147 broadcasts**, 146 placed on a day, 1 deliberately unplaced. 37 official, 108 indicated, 2 review. 30 flags.
+Result: **147 date-level schedule entries**: 136 rows with at least one non-conditional listing (2 are mixed) and 11 entirely if-necessary rows. 146 entries have a date; 1 is deliberately unplaced. 37 official, 108 indicated, 2 review. 30 flags. The two mixed postseason rows also contain three if-necessary games; the feed records **21 possible games across 13 dates**. Three dates have only if-necessary possibilities and no non-conditional listing.
 
 ## Stations, and only these
 
@@ -26,10 +26,10 @@ HD subchannels (KNBR-F2, KSAN HD3) are not counted.
 - **https://www.mlb.com/giants/schedule/tv** — "English-language radio broadcasts: KNBR 680 AM & 104.5 FM."
 - **https://www.mlb.com/athletics/schedule/affiliates** — the A's Radio Network table, 960 AM KNEW, Bay Area.
 - **https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule** — "ESPN Radio will provide live national coverage of **all** 2026 MLB Postseason games." Wild Card from Sep 29; World Series Game 1 Fri Oct 23; a Game 7 would be Sat Oct 31.
-- **https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1** — 53 games over 28 dates. Every one carries `startTimeTBD: true` and a placeholder 07:33 UTC, so **no postseason row here has a clock time**. `ifNecessary` is recorded per date.
+- **https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1** — 53 games over 28 dates. Every one carries `startTimeTBD: true` and a placeholder 07:33 UTC, so **no postseason row here has a clock time**. `ifNecessary` is recorded per date. The grouped feed represents 21 if-necessary games across 13 dates: 18 games in 11 rows that are entirely conditional, plus 3 games inside two mixed rows. The mixed rows remain non-conditional listings because they also contain non-conditional games; their conditional portions are separately badged and excluded from duration/conflict calculations.
 - **Search on national MLB radio rights** — ESPN Radio holds MLB national audio for 2026–2028; Westwood One does not. Univision Radio carries Spanish.
 
-Because KTCT 1050 is a full-time ESPN Radio affiliate, the 28 postseason dates are listed on 1050 as **indicated**. That is a network row, not a per-game Bay Area clearance, and the `MLB_POSTSEASON_ESPN` flag says so in full.
+Because KTCT 1050 is a full-time ESPN Radio affiliate, the 28 postseason date-rows are listed on 1050 as **indicated**. That is an affiliate inference, not a per-game Bay Area clearance, and the `MLB_POSTSEASON_ESPN` flag says so in full.
 
 ### Pro football
 - **https://www.49ers.com/schedule/** — read in three chunks. Per-game radio lines for Weeks 3–18. Week 3 is "KSFO 810 AM / KSAN 107.7 FM"; Week 4 onward is "KSAN 107.7 FM / KNBR 104.5 FM / 680 AM". Week 18 at Arizona still has no date.
@@ -56,7 +56,13 @@ Because KTCT 1050 is a full-time ESPN Radio affiliate, the 28 postseason dates a
 ### Checked and deliberately not added
 - **https://www.westwoodonesports.com/ncaa-basketball/** — "No upcoming events". There is no 2026-27 national college basketball grid to transcribe.
 - **https://calbears.com/sports/mens-basketball/schedule** — 2026-27 games from Nov 2, TBD times, no radio column.
-- **https://usfdons.com/sports/mens-basketball/schedule** — 2026-27 schedule with ESPN+ and CBS Sports Network logos and **no radio column**, even though KTCT's station record names the Dons as an affiliate.
+- **https://usfdons.com/sports/mens-basketball/schedule** and **https://usfdons.com/sports/mens-basketball/schedule/text** — current 2026-27 schedule. The text-table columns are Date, Time, At, Opponent, Location, Tournament and Result; no Radio/Listen field. The live page shows TV logos for some games, not a station assignment. A prior-season official preview, **https://usfdons.com/news/2026/1/27/mens-basketball-san-francisco-heads-to-santa-clara-for-late-night-showdown**, explicitly says "Listen: KNBR 1050" for the Jan 28, 2026 game. That is evidence for 2025-26 only, not a 2026-27 renewal, so it is linked in `MBB_NO_RADIO_ROWS` but no 2026-27 row is inferred from it.
+
+## Automated monitoring boundary
+
+`.github/workflows/source-watch.yml` runs daily and can also be dispatched manually. It reads only the future portion of the official MLB postseason Stats API, compares dates, game descriptions and start-time TBD status with the checked-in snapshot, and opens or refreshes a GitHub issue on detected drift or an unavailable source. It is read-only: it does not edit the snapshot, publish a new Pages build, verify affiliate clearances, or monitor the station, school, club and network pages above. Other source changes still require a fresh review before the curated feed is rebuilt.
+
+A direct live run of `scripts/source_watch.py` in this development sandbox on 2026-09-27 could not complete: the MLB host closed the TLS connection (`EOF`). The monitor correctly reported **unavailable**, not “no drift.” Its comparison behavior is covered by the offline tests; this sandbox attempt is not a fresh confirmation of the endpoint contents.
 
 ## Transcription rule, and where it was broken
 
@@ -89,7 +95,7 @@ their venue field is empty.
 ## Confidence vocabulary
 
 - **official** — a club, school, league API or rights holder printed both the game and the station, or printed an explicit TBD.
-- **indicated** — a network's own schedule lists the game and its station finder lists a Bay Area affiliate, with the preemption caveat. Not a per-game clearance.
+- **indicated** — a network or rights-holder lists the event, and a separate source establishes a Bay Area affiliate relationship, with the preemption caveat. Not a per-game clearance.
 - **review** — two sources disagree, or the radio line was not quoted for that exact row. Shown, never hidden.
 
 ## What the builder enforces
@@ -98,9 +104,9 @@ their venue field is empty.
 
 `validate_flags()` additionally rejects a duplicate flag id, a bad severity, a flag link that is not https, and a flag whose primary `url` is not the first entry of its `sources` list. Every row is also required to carry a known duration bucket whose minutes equal the bucket default, so that resetting the on-page duration controls always restores the shipped numbers.
 
-`node scripts/ui_logic_test.js` checks the Pacific conversion, twelve-hour labels, Sunday-start calendar grids, overlap and TBD conflict detection, the band maths, and then re-validates the shipped JSON against the same invariants the page assumes — including that the file is already sorted.
+`node scripts/ui_logic_test.js` checks the Pacific conversion, twelve-hour labels, ISO dates, past/elapsed status wording, conditional and mixed-row exclusion from estimated time and conflict calculations, Sunday-start calendar grids, the band maths, and the shipped JSON invariants — including conditional game counts and feed ordering.
 
-`node scripts/render_smoke_test.js` extracts the real inline script from `index.html`, runs it against the real feed in a DOM shim, walks **all 155 days**, exercises the station filter, the sport filter, day and month navigation, the date picker, the search box and the duration controls, and fails if the page asks for an element id that is not in the markup. Two of its cases exist only as regressions: a date far outside the snapshot must not strand the calendar, and resetting the duration controls must return the day view byte for byte.
+`python3 scripts/source_watch_test.py` tests the read-only MLB monitor against synthetic API responses without network access. `node scripts/render_smoke_test.js` extracts the real inline script from `index.html`, runs it against the real feed in a DOM shim, walks **all 155 days**, exercises the filters, navigation, date picker, search and duration controls, and fails if the page asks for an element id that is not in the markup. Regression cases cover out-of-range and invalid dates, mixed/fully conditional postseason rows, and duration reset.
 
 ## What was deliberately left out
 

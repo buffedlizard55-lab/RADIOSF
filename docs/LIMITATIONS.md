@@ -1,6 +1,6 @@
 # Limitations, and the work that is still open
 
-Snapshot 2026-09-27. 147 broadcasts, 30 flags. The flags themselves live in `data/broadcasts.json` under `flags` and are rendered on the site under **Known gaps**, **Irregularities flagged for review** and **Notes**. This file is the human summary plus the to-do list.
+Snapshot 2026-09-27. 147 schedule entries: 136 rows with at least one non-conditional listing (2 are mixed) and 11 wholly if-necessary rows; 30 flags. The flags themselves live in `data/broadcasts.json` under `flags` and are rendered on the site under **Known gaps**, **Irregularities flagged for review** and **Notes**. This file is the human summary plus the to-do list.
 
 ## Closed since the previous pass
 
@@ -42,16 +42,16 @@ site it was asked to copy.
 
 ## Open limitations, worst first
 
-1. **No basketball at all, November through February.** Three official pages were checked and none printed a radio row: Westwood One's NCAA Basketball page says "No upcoming events", calbears.com men's basketball has no radio column, usfdons.com men's basketball has no radio column — even though KTCT's station record names the San Francisco Dons as an affiliate and KNBR historically carried Cal and USF. This is the largest hole in the winter half of the window. *Next session: try `usfdons.com` "Listen"/"Watch" links, the WCC network page, `calbears.com` broadcast page, and Stanford's basketball radio release.*
+1. **No basketball rows for the 2026-27 season, November through February.** Westwood One's NCAA Basketball page says "No upcoming events"; the Cal 2026-27 schedule has no radio column; and the USF 2026-27 text schedule has no Radio/Listen field. An official USF preview for a 2025-26 game did say "Listen: KNBR 1050", but that prior-season clearance does not establish the station for the current season; KTCT's affiliate record alone is not a schedule. This is the largest hole in the winter half of the window. *Next: check current-season USF/Cal/Stanford previews and official WCC broadcast pages as they publish.*
 2. **NFL postseason has no dates.** Cumulus guarantees every playoff game plus Super Bowl LXI on Westwood One, but `nfl.com/schedules/2026/POST` still redirects to the regular season, so only the Super Bowl is placed. Secondary write-ups say Jan 16–18 / Jan 23–24 / Jan 31; that is not official and is not used. *Next session: re-check nfl.com once the regular season ends; six wild-card games and four divisional games would each be a 1050/680/104.5 row.*
 3. **MLS Cup Playoffs have no radio plan.** The Earthquakes' radio table stops at Decision Day, Nov 7. If San Jose qualifies, November and December matches would be missing. *Next session: check the club newsroom after Nov 7.*
-4. **MLB postseason is a network inference, not a clearance.** ESPN Radio carries every game and 1050 is an ESPN Radio affiliate; no page confirms an individual game on 1050, and there is only one ESPN Radio feed, so on a four-game day at most one can be on the air. Start times are TBD in MLB's own API. *Next session: once brackets are set, MLB publishes per-game times; re-run the postseason endpoint and split the multi-game dates.*
+4. **MLB postseason is a network inference, not a clearance.** ESPN Radio carries every game and 1050 is an ESPN Radio affiliate; no page confirms an individual game on 1050, and there is only one ESPN Radio feed, so on a four-game day at most one can be on the air. Start times are TBD in MLB's own API. *The daily watcher now flags future date/count/description/start-time differences from MLB's API. Next: re-check once brackets are set, split dates into per-game rows only when a source supports the matchups and radio assignment, and expand monitoring beyond this single endpoint.*
 5. **Both KNBR weekly grids are frozen on the week of Aug 31 – Sep 7.** That is the only station-side programming evidence available, so the 10-to-10 finding is tested against a four-week-old format snapshot rather than a live log. *Next session: re-check; if the grids ever refresh, the talk-versus-games split can be measured properly.*
 6. **Station-finder tables are all labelled "(2025)".** They are the lists linked from the live 2026 pages and no 2026 list exists, but every `indicated` row ultimately rests on them.
 7. **Start times are listed starts, not kickoffs.** Westwood One prints a network join time and a placeholder 11:59 PM end. Where the same game also has a club row, the club time is 45–75 minutes later. All end times are estimates.
-8. **Forty-six placed rows have no clock time at all** — TBD college kickoffs, TBA Saturday NFL windows, the whole MLB postseason. They appear in the day list and in the calendar dots but contribute zero minutes to the 10-to-10 measurement, so that number is a floor.
+8. **Forty-six placed rows have no clock time at all** — 35 TBD rows that are not wholly conditional (2 contain mixed possibilities) and 11 wholly if-necessary rows. They appear in the day list and calendar; both contribute zero estimated minutes, but the 11 conditional rows are separately excluded from the non-conditional listing-day counts. Because duration and affiliate carriage are estimates, the total is not a measured floor or ceiling.
 9. **Nothing before Sep 27, 2026.** Days earlier than the window read "before this snapshot", not "no game".
-10. **This is a snapshot, not a feed.** Nothing re-fetches on its own. A postponement, a flex move or a station change lands here only on the next manual pass.
+10. **This is a snapshot, not an automatically refreshed feed.** A daily read-only GitHub Action compares future dates, game descriptions and TBD starts from the MLB postseason Stats API with the committed MLB postseason rows; drift or a failed fetch opens or refreshes a review issue. It does not update the feed or Pages, establish station clearance, or monitor the other 2026 sources. Postponements, flexes, station changes and other source updates remain absent from the published snapshot until a fresh line-by-line review and rebuild.
 11. **KNBR 680 carries unidentified national baseball** on idle Giants days, per the stale grid. No 2026 source names the network or the games, so none were added.
 
 ## Suggested order of work for the next session
@@ -62,7 +62,7 @@ site it was asked to copy.
 4. Split the MLB postseason date-rows into per-game rows once MLB assigns first pitches, and drop the "if necessary" dates that the brackets eliminate.
 5. Check whether the Earthquakes publish a playoff radio plan.
 6. Consider extending the window backwards to the start of the 2026 seasons, which needs another line-by-line pass over already-played games.
-7. Consider a small GitHub Action that re-runs the MLB Stats API portion weekly and opens an issue when the API disagrees with the committed feed. Everything else on this list needs a human reading a page.
+7. Expand the scheduled watcher to additional official machine-readable schedule endpoints (where available), and monitor the radio-clearance/affiliate sources separately. Preserve the read-only boundary: a detected change should prompt source review, not silently rewrite and publish an inferred station listing.
 
 ## Things that will not be fixed by more fetching
 

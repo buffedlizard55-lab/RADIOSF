@@ -16,6 +16,50 @@
     return { y: +p[0], m: +p[1], d: +p[2] };
   }
 
+  function isISODate(iso) {
+    if (typeof iso !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return false;
+    var p = parseISO(iso);
+    if (p.m < 1 || p.m > 12 || p.d < 1 || p.d > 31) return false;
+    var date = new Date(0);
+    date.setUTCHours(0, 0, 0, 0);
+    date.setUTCFullYear(p.y, p.m - 1, p.d);
+    return date.getUTCFullYear() === p.y && date.getUTCMonth() === p.m - 1 && date.getUTCDate() === p.d;
+  }
+
+  function isConditional(b) {
+    return !!(b && (b.conditional || b.status === "if-necessary"));
+  }
+
+  function hasConditionalPossibility(b) {
+    return isConditional(b) || !!(b && Number(b.conditional_game_count) > 0);
+  }
+
+  function conditionalGameCount(b) {
+    if (!b) return 0;
+    var count = Number(b.conditional_game_count) || 0;
+    if (count > 0) return count;
+    if (!isConditional(b)) return 0;
+    return Number(b.game_count) || 1;
+  }
+
+  /* The snapshot is a schedule, not a radio log. An explicit final status proves
+     the game ended, not that an affiliate carried it; a passed date or elapsed
+     duration estimate proves neither. Conditional windows are possibilities. */
+  function airState(b, now) {
+    if (!b.date) return "unplaced";
+    if (isConditional(b)) return "conditional";
+    if (hasConditionalPossibility(b)) return "mixed";
+    if (b.status === "final") return "final";
+    if (b.date < now.iso) return "past-unchecked";
+    if (!b.start_pt) return "tba";
+    if (b.date > now.iso) return "upcoming";
+    var start = minutes(b.start_pt);
+    var end = start + (b.duration_est_min || 0);
+    if (now.minutes < start) return b.status === "pregame" ? "pregame" : "upcoming";
+    if (now.minutes < end) return "on";
+    return "elapsed-unchecked";
+  }
+
   function toISO(y, m, d) {
     return y + "-" + pad(m) + "-" + pad(d);
   }
@@ -108,6 +152,10 @@
      station: a day with three TBD listings on 1050 produced three identical
      pairwise warnings before, which buried the real overlaps. */
   function sameDayConflicts(list) {
+    /* An if-necessary game is a possible future slot, not a scheduled broadcast.
+       Mixed date rows stay grouped until a source supplies per-game detail, so
+       they are conservatively held out of conflicts too. */
+    list = list.filter(function (b) { return !hasConditionalPossibility(b); });
     var out = [];
     var tbdOrder = [];
     var tbdByStation = {};
@@ -174,7 +222,7 @@
     var spans = [];
     var i, s, e, merged, cur, out, k;
     for (i = 0; i < list.length; i++) {
-      if (!list[i].start_pt || !list[i].duration_est_min) continue;
+      if (hasConditionalPossibility(list[i]) || !list[i].start_pt || !list[i].duration_est_min) continue;
       s = Math.max(lo, minutes(list[i].start_pt));
       e = Math.min(hi, endMinutes(list[i]));
       if (e > s) spans.push([s, e]);
@@ -254,33 +302,41 @@
   /*
    * Measures the user's "10 AM to 10 PM is mostly live sports" hunch against the data
    * instead of assuming it. Returns per-day coverage plus aggregates, all in minutes.
-   * Days whose only entries have no kickoff time count as zero covered minutes and are
-   * reported separately, so a TBD-heavy day is never mistaken for a quiet one.
+   * If-necessary-only rows never count as scheduled listings or minutes. Mixed grouped
+   * rows with conditional games are also excluded from minutes until per-game starts
+   * are available, while their possible-game count remains visible. TBD-heavy dates
+   * are reported separately rather than silently described as quiet.
    */
   function bandSummary(list, start, end, lo, hi) {
     var span = hi - lo;
     var dates = eachDate(start, end);
     var byWeekday = [];
     var i;
-    for (i = 0; i < 7; i++) byWeekday.push({ days: 0, covered: 0, withGames: 0 });
+    for (i = 0; i < 7; i++) byWeekday.push({ days: 0, covered: 0, withListings: 0 });
     var days = dates.map(function (iso) {
-      var rows = byDate(list, iso);
+      var allRows = byDate(list, iso);
+      var possibilities = allRows.filter(hasConditionalPossibility);
+      var rows = allRows.filter(function (b) { return !isConditional(b); });
       var covered = unionMinutes(rows, lo, hi);
       var timed = rows.filter(function (b) { return b.start_pt; }).length;
       var w = byWeekday[weekdayIndex(iso)];
       w.days++;
       w.covered += covered;
-      if (rows.length) w.withGames++;
+      if (rows.length) w.withListings++;
       return {
         date: iso,
         rows: rows.length,
+        possibilities: possibilities.length,
+        conditionalGames: possibilities.reduce(function (sum, b) { return sum + conditionalGameCount(b); }, 0),
         timed: timed,
         tbd: rows.length - timed,
         covered: covered,
         share: span ? covered / span : 0
       };
     });
-    var withGames = days.filter(function (d) { return d.rows > 0; });
+    var withListings = days.filter(function (d) { return d.rows > 0; });
+    var withPossibilities = days.filter(function (d) { return d.possibilities > 0; });
+    var conditionalOnly = days.filter(function (d) { return d.rows === 0 && d.possibilities > 0; });
     var majority = days.filter(function (d) { return d.covered * 2 > span; });
     var totalCovered = days.reduce(function (acc, d) { return acc + d.covered; }, 0);
     var busiest = days.slice().sort(function (a, b) {
@@ -292,12 +348,15 @@
       span: span,
       days: days,
       dayCount: days.length,
-      daysWithGames: withGames.length,
+      daysWithListings: withListings.length,
+      daysWithPossibilities: withPossibilities.length,
+      conditionalGames: days.reduce(function (sum, d) { return sum + d.conditionalGames; }, 0),
+      daysConditionalOnly: conditionalOnly.length,
       daysMajority: majority.length,
-      daysEmpty: days.length - withGames.length,
+      daysEmpty: days.filter(function (d) { return d.rows === 0 && d.possibilities === 0; }).length,
       meanCovered: days.length ? Math.round(totalCovered / days.length) : 0,
-      meanCoveredOnGameDays: withGames.length
-        ? Math.round(withGames.reduce(function (acc, d) { return acc + d.covered; }, 0) / withGames.length)
+      meanCoveredOnListingDays: withListings.length
+        ? Math.round(withListings.reduce(function (acc, d) { return acc + d.covered; }, 0) / withListings.length)
         : 0,
       byWeekday: byWeekday,
       busiest: busiest
@@ -311,6 +370,11 @@
     WEEKDAYS: WEEKDAYS,
     MONTHS: MONTHS,
     parseISO: parseISO,
+    isISODate: isISODate,
+    isConditional: isConditional,
+    hasConditionalPossibility: hasConditionalPossibility,
+    conditionalGameCount: conditionalGameCount,
+    airState: airState,
     toISO: toISO,
     addDays: addDays,
     weekdayIndex: weekdayIndex,
