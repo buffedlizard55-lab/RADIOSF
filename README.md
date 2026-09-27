@@ -53,16 +53,18 @@ It is the radio-only cousin of [ScheduleFreeTime](https://buffedlizard55-lab.git
 On the page you can:
 
 - **click any day** in the calendar, or use the arrows, Today button, date picker, or left/right arrow keys;
+- **see what is on now and what is next** in the strip at the top of the page — estimated from the listed windows, never a live station check;
 - **filter to a station** or sport, and search for a team, venue or date across the snapshot;
 - **change each sport's estimated duration** and see the window coverage recomputed;
+- **download the selected day as a calendar file** (`.ics`) that carries each row's source link and confidence;
 - **open a source for every row** and inspect its confidence and irregularity notes.
 
-Snapshot date: **2026-09-27**. Window: **2026-09-27 through 2027-02-28**, America/Los_Angeles (155 calendar days). The snapshot contains **153 date-level schedule entries**: 142 rows include at least one non-conditional listing and 11 rows are entirely if-necessary, plus 31 flags. Two of the 142 rows are mixed postseason rows and also carry three if-necessary game possibilities. In total, 21 possible postseason games are represented across 13 dates. 152 entries have a date; one 49ers Week 18 row remains deliberately unplaced. The snapshot is not a live station log; see [docs/VERIFICATION.md](docs/VERIFICATION.md).
+Snapshot date: **2026-09-27**. Window: **2026-09-27 through 2027-02-28**, America/Los_Angeles (155 calendar days). The snapshot contains **173 date-level schedule entries**: 162 rows include at least one non-conditional listing and 11 rows are entirely if-necessary, plus 33 flags. Two of the 162 rows are mixed postseason rows and also carry three if-necessary game possibilities. In total, 21 possible postseason games are represented across 13 dates. 172 entries have a date; one 49ers Week 18 row remains deliberately unplaced. The snapshot is not a live station log; see [docs/VERIFICATION.md](docs/VERIFICATION.md).
 
 | Confidence | Meaning | Entries |
 | --- | --- | ---: |
 | official | A club, school, league API or rights holder printed both the event and station, or an explicit TBD. | 37 |
-| indicated | A network or rights-holder lists the event, and a separate source establishes a Bay Area affiliate relationship. This is **not** per-game clearance; local programming may preempt it. | 114 |
+| indicated | A network or rights-holder lists the event, and a separate source establishes a Bay Area affiliate relationship. This is **not** per-game clearance; local programming may preempt it. | 134 |
 | review | Sources disagree, or the station line is not stated for that exact event. Shown for review, not silently resolved. | 2 |
 
 The 11 fully conditional rows are among the indicated entries; together they account for 18 possible games. Two other postseason date-rows mix three if-necessary games with non-conditional games. The row badges and source notes show that split. Conditional games are never treated as confirmed; any grouped postseason row containing a conditional game is conservatively excluded from duration and conflict calculations. A mixed row still counts as a non-conditional listing day because it also represents games not marked if-necessary. Past dates and elapsed estimated windows are labelled unchecked. Even a final game result does not prove that a local radio station carried it.
@@ -75,10 +77,10 @@ The 11 fully conditional rows are among the indicated entries; together they acc
 | 104.5 FM | KNBR-FM | Full-time simulcast of 680. Same events whenever a source lists both. Never Stanford. | 97 / 70 |
 | 810 AM | KSFO | 49ers Week 3 only; Cal football except the Big Game; Earthquakes English flagship. | 15 / 11 |
 | 960 AM | KNEW | Athletics through the last day of the regular season. Fox Sports Radio talk is not a game listing. | 1 / 1 |
-| 1050 AM | KTCT | Stanford football; Westwood One NFL, college football and U.S. Soccer; MLB postseason is indicated via ESPN Radio affiliation, not per-game clearance. | 122 / 80, including 11 if-necessary-only rows |
+| 1050 AM | KTCT | Stanford football; Westwood One NFL, college football and U.S. Soccer; MLB postseason and 20 NBA games indicated via the ESPN Radio affiliation, not per-game clearance. | 142 / 96, including 11 if-necessary-only rows |
 | 107.7 FM | KSAN | 49ers, every regular-season week listed here. | 15 / 14 |
 
-“Entries / dates” counts rows assigned to each station; one row may count on more than one station. The 1050 count includes 11 fully conditional postseason rows plus two mixed rows that also contain if-necessary games. Spanish calls (1370, 1510, 93.7, Univision Radio, the 49ers app) are not on these six frequencies and are omitted. HD subchannels (KNBR-F2, KSAN HD3) are omitted. Warriors, Valkyries (95.7) and Sharks (98.5) are out of scope, not missing.
+“Entries / dates” counts rows assigned to each station; one row may count on more than one station. The 1050 count includes 11 fully conditional postseason rows, two mixed rows that also contain if-necessary games, and the 20 NBA rows from the league's own ESPN Radio schedule. Spanish calls (1370, 1510, 93.7, Univision Radio, the 49ers app) are not on these six frequencies and are omitted. HD subchannels (KNBR-F2, KSAN HD3) are omitted. Warriors, Valkyries (95.7) and Sharks (98.5) are out of scope, not missing.
 
 ## NFL playoffs: dated rounds, undated games
 
@@ -103,6 +105,25 @@ The MLB Stats API currently lists all 53 postseason game slots across 28 dates, 
 
 The original watch only compared dates, counts, descriptions and TBD status. It could miss a changed opponent or conditional marker while still reporting “clear.” The monitor now compares each game's description, away/home labels and if-necessary status too. Its saved real-response fixture includes those fields; changes open a review issue and never auto-publish.
 
+## NBA on ESPN Radio: the first basketball rows, from the league's own schedule
+
+The winter half of the window had no basketball at all, because Westwood One's college basketball grid is empty, Cal's and Stanford's 2026-27 schedules print no radio column and USF's prints no station. The NBA does publish one, and it was found this pass: the league's [2026-27 schedule release](https://www.nba.com/news/2026-27-nba-regular-season-schedule) links a dated, per-game [**2026-27 ESPN Radio broadcast schedule**](https://ak-static.cms.nba.com/wp-content/uploads/sites/46/2026/08/2026-27-ESPN-Radio-Schedule.pdf) — weekday, date, away, home and tip-off in ET, stamped “AS OF AUG. 13, 2026 | SUBJECT TO CHANGE”. Every `nba-espn-` row is transcribed from that one document, and the row title keeps the PDF's own strings.
+
+| What the PDF prints | Rows here |
+| --- | ---: |
+| Dated games with a matchup and an ET time | 26 |
+| Dated but with the matchup and time still TBD (Cup championship, Dec 11) | 1 |
+| Undated TBD lines (the two Emirates NBA Cup semifinals) | 2 |
+| **Inside this window** | **20** |
+| Outside this window (Mar 6 – Apr 8, 2027) | 9 |
+
+The 17 in-window games with a time become rows on **1050** with the printed ET time converted to Pacific (for example Philadelphia at New York, Tue 7:00 PM ET → 4:00 PM PT on Oct 20), and they are `indicated`, not `official`: ESPN Radio carries them nationally and KTCT is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a Bay Area per-game clearance, so Stanford football, Earthquakes soccer or other local programming can take the station instead. The three Cup slots become one row per officially named date — Dec 8, Dec 9 and Dec 11 — asserting the date and the network and nothing else, with no matchup, no tip-off time, and no claim about which of the two semifinal days carries which game. All three contribute zero estimated minutes to the band maths.
+
+Two checks keep a transcription from drifting silently:
+
+- the PDF prints a weekday beside every date, and the builder refuses any row whose printed weekday does not match the real calendar for that date;
+- `scripts/espn_watch.py` (22 offline tests) re-reads the PDF daily, requires it to parse into the same shape (27 dated rows, ten `*` and three `^` Cup markers, both Cup footnotes present) and re-derives the ET time from each row's stored Pacific start, so a title that no longer matches the document fails the check instead of passing it.
+
 ## The 10 AM–10 PM observation — measured, not assumed
 
 For each of the 155 dates, the page takes the union of estimated windows for **non-conditional** rows inside 10 AM–10 PM, counting overlaps once. If-necessary placeholders are excluded. Rows without a listed start time contribute zero estimated minutes. The measure is an estimate from a schedule snapshot—not measured airtime, a live station log or proof of affiliate clearance.
@@ -110,16 +131,18 @@ For each of the 155 dates, the page takes the union of estimated windows for **n
 | Measure | Result |
 | --- | ---: |
 | Dates in the snapshot | 155 |
-| Dates with at least one non-conditional schedule listing | 80 |
+| Dates with at least one non-conditional schedule listing | 97 |
 | Dates with any if-necessary possibility | 13 |
 | If-necessary postseason game possibilities | 21 |
-| Conditional-only dates (no non-conditional listing) | 3 |
+| Conditional-only dates (no non-conditional listing) | 2 |
 | Dates where estimated windows cover **more than half** of 10 AM–10 PM | **18** |
-| Average estimated coverage, all dates | 1h 47m of 12h (15%) |
-| Average estimated coverage, the 80 listing dates | 3h 28m of 12h |
-| Busiest dates | Thanksgiving Nov 26, Christmas Dec 25 and Week 18 Saturday Jan 9 — 9h 15m each |
+| Average estimated coverage, all dates | 2h 2m of 12h (17%) |
+| Average estimated coverage, the 97 listing dates | 3h 15m of 12h |
+| Busiest date | Christmas Day, Dec 25 — 9h 45m |
 
-Average estimated coverage by weekday across **all** dates: **Sunday 3h 40m · Saturday 2h 56m · Thursday 2h 20m · Monday 2h 13m · Friday 41m · Wednesday 20m · Tuesday 16m.** Weekends are busier, but this snapshot does not show a 10-to-10 live-game pattern on most dates. Talk programming is not counted as a game.
+Average estimated coverage by weekday across **all** dates: **Sunday 3h 53m · Saturday 3h 24m · Friday 1h 3m · Thursday 2h 48m · Monday 2h 20m · Wednesday 20m · Tuesday 23m.** Weekends are busier, but this snapshot does not show a 10-to-10 live-game pattern on most dates. Talk programming is not counted as a game.
+
+Adding the 20 NBA rows moved both averages in opposite directions, which is worth seeing plainly: the mean across **all** dates rose from 1h 47m to 2h 2m because 17 previously empty dates now carry a listed game, while the mean on **listing days** fell from 3h 28m to 3h 15m because those new days carry one 150-minute evening game each rather than a full afternoon. Oct 20 is the clearest example: it had only if-necessary postseason possibilities before, and now has the NBA's opening-night game plus that possibility.
 
 ### Sensitivity to estimated game lengths
 
@@ -127,21 +150,22 @@ No source publishes when each radio broadcast actually ends. The default lengths
 
 | Scenario | Dates with non-conditional listings | Dates over half the band | Mean across all dates | Mean on listing dates |
 | --- | ---: | ---: | ---: | ---: |
-| Uniform 90-minute estimate for timed listings | 80 | 0 | 52m | 1h 41m |
-| Defaults minus 30 minutes | 80 | 5 | 1h 31m | 2h 56m |
-| **Defaults** | **80** | **18** | **1h 47m** | **3h 28m** |
-| Defaults plus 60 minutes | 80 | 18 | 2h 17m | 4h 26m |
-| Uniform 240-minute windows | 80 | 18 | 2h 13m | 4h 18m |
+| Uniform 90-minute estimate for timed listings | 97 | 0 | 1h 1m | 1h 38m |
+| Defaults minus 30 minutes | 97 | 5 | 1h 43m | 2h 44m |
+| **Defaults** | **97** | **18** | **2h 2m** | **3h 15m** |
+| Defaults plus 60 minutes | 97 | 18 | 2h 37m | 4h 11m |
+| Uniform 240-minute windows | 97 | 18 | 2h 35m | 4h 8m |
 
-Even assigning a generous four-hour estimate to every timed non-conditional listing yields a 2h 13m mean across the 12-hour band, and only 18 of 155 dates over half. The mean on listing dates fell from 3h 45m to 3h 28m when six playoff-window dates were added, because those rows are officially dated but carry no kickoff time and so contribute zero estimated minutes — the honest treatment, not a flattering one. This is a sensitivity check on the snapshot—not a prediction of airtime or station clearance.
+Even assigning a generous four-hour estimate to every timed non-conditional listing yields a 2h 35m mean across the 12-hour band, and only 18 of 155 dates over half. The count of dates over half the band has not moved from 18 through four successive additions of rows, which is the useful part: the finding is stable against how the snapshot is filled in, not an artifact of one pass. Rows with no published time — the six NFL playoff windows, the three NBA Cup slots and the 11 wholly if-necessary rows — contribute zero estimated minutes, the honest treatment rather than a flattering one. This is a sensitivity check on the snapshot—not a prediction of airtime or station clearance.
 
 ## Monitoring, rebuild and tests
 
-A scheduled, read-only GitHub Action (`source watch`, daily) runs **three** monitors and opens or refreshes one review issue when anything moves:
+A scheduled, read-only GitHub Action (`source watch`, daily) runs **four** monitors and opens or refreshes one review issue when anything moves:
 
 | Monitor | Source | What it watches | Rows covered |
 | --- | --- | --- | ---: |
 | `source_watch.py` | MLB 2026 postseason Stats API | future dates, counts, descriptions, away/home matchup labels, if-necessary markers and TBD start times | 28 |
+| `espn_watch.py` | NBA 2026-27 ESPN Radio schedule PDF | the parsed shape (27 dated rows, 10 `*` and 3 `^` Cup markers, both footnotes) plus every in-window date, matchup and printed ET time, re-derived from the snapshot rows | 20 |
 | `wwo_watch.py` | Westwood One NFL grid | event ids and printed titles the network advertises | 63 |
 | `wwo_watch.py` | Westwood One college football grid | same, including the SEC Championship and Army–Navy | 11 |
 | `wwo_watch.py` | Westwood One college basketball grid | currently empty — any event appearing is reported as drift | 0 |
@@ -150,7 +174,7 @@ A scheduled, read-only GitHub Action (`source watch`, daily) runs **three** moni
 | `page_watch.py` | NFL important-dates article and the nfl.com POST schedule URL | round-date text; alert when a postseason grid is published | 7 |
 | `page_watch.py` | KNBR 1050 weekly grid, USF 2026-27 basketball schedule | alert when the frozen grid refreshes or a station name appears on the USF schedule | 0 (gap watch) |
 
-That is **151 of the 153 rows** under a daily watch, up from 107. The other two are the Giants and Athletics finales on the snapshot date itself. **Confirmed live on 2026-09-27** from GitHub's runners (the development sandbox cannot reach these hosts): MLB clear, all four Westwood One grids clear, all nine pages clear. Every pull request also runs the `source watch preview` workflow, which runs all three monitors live and keeps one sticky PR comment with the reports, so a reviewer sees the current source state before merging.
+That is **171 of the 173 rows** under a daily watch, up from 151. The other two are the Giants and Athletics finales on the snapshot date itself. **Confirmed live on 2026-09-27** from GitHub's runners (the development sandbox cannot reach these hosts): MLB clear, all four Westwood One grids clear, all nine pages clear. The ESPN Radio monitor is new this pass, and its first live run is the check on the PDF text parser: it needs a PDF text extractor, which the workflow installs, and a run that cannot parse the document reports `unavailable`, never `clear`. Every pull request also runs the `source watch preview` workflow, which runs all four monitors live and keeps one sticky PR comment with the reports, so a reviewer sees the current source state before merging.
 
 **Monitor fixes:** the MLB monitor first read `startTimeTBD` from the top level of each game, but the API nests it inside `status`; that was fixed and covered by a real-response regression fixture. This pass found another blind spot: the monitor compared dates/counts/descriptions/time-TBD but not opponent labels or `ifNecessary`, so it could report clear while the matchups changed. The monitor now validates and compares all four game identity/status fields: description, away team, home team and conditional status. The feed and UI expose the verified API matchup labels while preserving unresolved seed placeholders and TBD starts. Regression tests cover matchup and conditional drift.
 
@@ -163,16 +187,18 @@ The monitors **never** edit `data/broadcasts.json` or publish a new GitHub Pages
 ```bash
 python3 scripts/build_feed.py        # regenerates data/broadcasts.json + docs/LINE_BY_LINE.md
 python3 scripts/source_watch_test.py # offline tests for the MLB monitor (incl. real-response fixture)
+python3 scripts/espn_watch_test.py   # offline tests for the NBA ESPN Radio monitor (incl. real-PDF text fixture)
 python3 scripts/wwo_watch_test.py    # offline tests for the Westwood One grid monitor
 python3 scripts/page_watch_test.py   # offline tests for the page watcher
 node scripts/ui_logic_test.js        # date, conditional, band-math and feed invariants
 node scripts/render_smoke_test.js    # real inline page script over all 155 dates
 python3 scripts/source_watch.py      # live MLB check; exit 0=clear, 2=drift, 3=unavailable
+python3 scripts/espn_watch.py        # live NBA PDF check; same exit codes (needs pypdf)
 python3 scripts/wwo_watch.py         # live grid check; same exit codes
 python3 scripts/page_watch.py        # live page check; same exit codes
 ```
 
-All three watchers take `--input <json>` so they can run against saved responses without a network. Do not add a row to the JSON by hand: add it in `scripts/build_feed.py` after a fresh source check, then rebuild. The `verify` Action regenerates the feed, rejects drift, and runs all offline suites plus the UI and page-render tests.
+All four watchers take `--input` so they can run against saved responses without a network. Do not add a row to the JSON by hand: add it in `scripts/build_feed.py` after a fresh source check, then rebuild. The `verify` Action regenerates the feed, rejects drift, and runs all offline suites plus the UI and page-render tests.
 
 ## Docs
 

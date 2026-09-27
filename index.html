@@ -144,6 +144,27 @@
     .upnext { list-style: none; padding: 0; margin: 0 0 12px; }
     .upnext button { width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding: 7px 0; cursor: pointer; display: flex; gap: 8px; }
     .upnext .when { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .nownext {
+      display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: baseline;
+      background: var(--paper); border: 1px solid var(--line); border-left: 4px solid var(--live);
+      padding: 9px 12px; margin: 0 0 14px; font-size: 15px;
+    }
+    .nownext .slot { display: flex; gap: 8px; align-items: baseline; min-width: 0; }
+    .nownext .slot b {
+      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+      font-weight: 600; white-space: nowrap;
+    }
+    .nownext .slot span { overflow-wrap: anywhere; }
+    .nownext button {
+      border: 0; background: transparent; padding: 0; cursor: pointer;
+      color: var(--accent); text-align: left; font: inherit;
+    }
+    .nownext button:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+    .ics-link {
+      border: 1px solid var(--line); background: var(--paper); border-radius: 8px;
+      padding: 6px 10px; text-decoration: none; display: inline-block;
+    }
+    .ics-link:hover { border-color: var(--ink); }
     section.ref { padding: 8px 0 20px; }
     .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
     .card { background: var(--paper); border: 1px solid var(--line); padding: 12px; }
@@ -193,6 +214,7 @@
       <h1>RADIOSF</h1>
       <p class="lede">When is there a live game on the radio? Click any day. Same idea as <a href="https://buffedlizard55-lab.github.io/ScheduleFreeTime/">ScheduleFreeTime</a>, narrowed to the six frequencies you can actually receive. Every row keeps the source link that produced it.</p>
       <p class="verified" id="verified" aria-live="polite">Loading the schedule snapshot…</p>
+      <div class="nownext" id="nownext" aria-live="polite"></div>
       <div class="controls">
         <div class="ctl">
           <span>Station</span>
@@ -214,6 +236,7 @@
           <button type="button" id="today">Today</button>
           <button type="button" id="next">Next day →</button>
           <input type="date" id="jump" aria-label="Jump to a date">
+          <span id="ics"></span>
         </div>
         <div id="answer" class="answer"></div>
         <div class="timeline" id="timeline" aria-hidden="true"></div>
@@ -281,7 +304,7 @@
   <footer>
     <div class="wrap">
       <p>Line-by-line list: <a href="docs/LINE_BY_LINE.md">docs/LINE_BY_LINE.md</a>. What was fetched and when: <a href="docs/VERIFICATION.md">docs/VERIFICATION.md</a>. Limits and the next pass: <a href="docs/LIMITATIONS.md">docs/LIMITATIONS.md</a>. Charter: <a href="docs/PROJECT_PROMPT.md">docs/PROJECT_PROMPT.md</a>.</p>
-      <p>This is a static snapshot, not a live station log. A daily, read-only GitHub Action compares this snapshot with five machine-readable schedule sources — the MLB postseason Stats API and Westwood One's NFL, college football, college basketball and U.S. Soccer grids — and checks nine club, school, league and station pages (49ers, Cal, Stanford, Earthquakes, the KNBR 1050 grid, USF basketball and the NFL playoff pages) for changed text. Together that watches 151 of the 153 rows; the other two are games on the snapshot date itself. It opens or refreshes a review issue if any source changes or a check fails. A check that cannot complete is reported as unknown, never as “no drift”. The Action does not edit the feed, publish a new Pages snapshot, or confirm that a Bay Area station actually carried a game. Rebuild with <code>python3 scripts/build_feed.py</code> only after a fresh source review.</p>
+      <p>This is a static snapshot, not a live station log. A daily, read-only GitHub Action compares this snapshot with six sources — the MLB postseason Stats API, the NBA's 2026-27 ESPN Radio schedule PDF, and Westwood One's NFL, college football, college basketball and U.S. Soccer grids — and checks nine club, school, league and station pages (49ers, Cal, Stanford, Earthquakes, the KNBR 1050 grid, USF basketball and the NFL playoff pages) for changed text. Together that watches 171 of the 173 rows; the other two are games on the snapshot date itself. It opens or refreshes a review issue if any source changes or a check fails. A check that cannot complete is reported as unknown, never as “no drift”. The Action does not edit the feed, publish a new Pages snapshot, or confirm that a Bay Area station actually carried a game. Rebuild with <code>python3 scripts/build_feed.py</code> only after a fresh source review.</p>
     </div>
   </footer>
   <script src="scripts/logic.js"></script>
@@ -311,7 +334,7 @@
         });
       }
       var STATION_CLASS = { "680": "s-680", "104.5": "s-1045", "810": "s-810", "960": "s-960", "1050": "s-1050", "107.7": "s-1077" };
-      var LEAGUE_LABEL = { NFL: "NFL", NCAAF: "College football", MLB: "Baseball", MLS: "MLS", SOCCER: "U.S. national teams" };
+      var LEAGUE_LABEL = { NFL: "NFL", NCAAF: "College football", NCAAAB: "College basketball", MLB: "Baseball", NBA: "NBA", MLS: "MLS", SOCCER: "U.S. national teams" };
       var BAND_LO = 10 * 60, BAND_HI = 22 * 60;
       var bounds = null;
 
@@ -433,6 +456,140 @@
             ". " + esc(b.notes) + " " + pills(b.stations) + sourceLinks(b) + "</div>";
         }).join("");
       }
+      function stationLabels(b) {
+        return b.stations.map(function (s) {
+          var meta = DATA.meta.stations.find(function (x) { return x.id === s; });
+          return meta ? meta.label : s;
+        }).join(", ");
+      }
+      function upcomingRows(fromIso, fromMinutes) {
+        return visible(ROWS).filter(function (b) {
+          if (!b.date || L.hasConditionalPossibility(b)) return false;
+          if (b.date > fromIso) return true;
+          return b.date === fromIso && b.start_pt && L.minutes(b.start_pt) > fromMinutes;
+        }).sort(function (a, b) {
+          if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+          if (!a.start_pt) return 1;
+          if (!b.start_pt) return -1;
+          return L.minutes(a.start_pt) - L.minutes(b.start_pt);
+        });
+      }
+
+      /* The one question this page exists to answer, at the top: is something on
+         now, and what is next. Both halves are estimates from the snapshot. */
+      function renderNowNext() {
+        var now = laNow();
+        var host = document.getElementById("nownext");
+        var inWindow = L.inWindow(now.iso, DATA.meta.window_start, DATA.meta.window_end);
+        var live = inWindow
+          ? visible(ROWS).filter(function (b) { return L.airState(b, now) === "on"; })
+          : [];
+        var next = upcomingRows(now.iso, now.minutes)[0];
+        var parts = [];
+        if (!inWindow) {
+          parts.push('<div class="slot"><b>Snapshot</b><span>' +
+            (now.iso < DATA.meta.window_start
+              ? "This snapshot starts " + esc(L.formatLong(DATA.meta.window_start)) + "."
+              : "This snapshot ends " + esc(L.formatLong(DATA.meta.window_end)) + "; it cannot answer for today.") +
+            "</span></div>");
+        } else if (live.length) {
+          parts.push('<div class="slot"><b>Now, by estimate</b><span>' + esc(live[0].title) + " on " +
+            esc(stationLabels(live[0])) +
+            (live.length > 1 ? " and " + (live.length - 1) + " more" : "") +
+            " <span class=\"notes\">(estimated window, not a live check)</span></span></div>");
+        } else {
+          parts.push('<div class="slot"><b>Now, by estimate</b><span>No listed window covers this minute. Talk programming is not listed as a game.</span></div>');
+        }
+        parts.push('<div class="slot"><b>Next</b><span>' + (next
+          ? '<button type="button" data-jump="' + esc(next.date) + '">' + esc(next.title) + " — " +
+            esc(L.formatLong(next.date).replace(/,\s*\d{4}$/, "")) + " " +
+            (next.start_pt ? esc(L.label12(next.start_pt)) : "time TBD") + " on " + esc(stationLabels(next)) +
+            "</button>"
+          : "Nothing later in this snapshot matches the current filters.") + "</span></div>");
+        host.innerHTML = parts.join("");
+      }
+      function icsStamp(isoUtc) {
+        return isoUtc.slice(0, 19).replace(/[-:]/g, "") + "Z";
+      }
+      function icsText(value) {
+        return String(value == null ? "" : value)
+          .replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,")
+          .replace(/\r?\n/g, "\\n");
+      }
+      /* RFC 5545 folds content lines at 75 octets, not characters, and a
+         continuation line begins with a space that counts toward its own limit.
+         Notes here contain en dashes, so the fold has to be measured in UTF-8
+         bytes or a strict parser will reject the file. */
+      function utf8Bytes(ch) {
+        var code = ch.codePointAt(0);
+        if (code < 0x80) return 1;
+        if (code < 0x800) return 2;
+        if (code < 0x10000) return 3;
+        return 4;
+      }
+      function foldLine(line) {
+        var out = [], current = "", bytes = 0;
+        Array.from(line).forEach(function (ch) {
+          var size = utf8Bytes(ch);
+          if (bytes + size > 73 && current.length) {
+            out.push(current);
+            current = " ";
+            bytes = 1;
+          }
+          current += ch;
+          bytes += size;
+        });
+        out.push(current);
+        return out;
+      }
+      /* Exports only what the page already shows, and keeps the caveats on the
+         event so a calendar entry cannot be read as a confirmed clearance. */
+      function buildIcs(date, rows) {
+        var stamp = icsStamp(new Date().toISOString());
+        var out = [
+          "BEGIN:VCALENDAR", "VERSION:2.0", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+          "PRODID:-//RADIOSF//source-backed radio schedule snapshot//EN",
+          "X-WR-CALNAME:RADIOSF " + date
+        ];
+        rows.forEach(function (b) {
+          var startIso = b.start_pt ? L.ptToUtcIso(date, b.start_pt) : null;
+          out.push("BEGIN:VEVENT");
+          out.push("UID:" + icsText(b.id) + "@radiosf");
+          out.push("DTSTAMP:" + stamp);
+          if (startIso) {
+            out.push("DTSTART:" + icsStamp(startIso));
+            out.push("DTEND:" + icsStamp(new Date(Date.parse(startIso) + b.duration_est_min * 60000).toISOString()));
+          } else {
+            out.push("DTSTART;VALUE=DATE:" + date.replace(/-/g, ""));
+          }
+          out.push("SUMMARY:" + icsText(b.title + " — " + stationLabels(b) +
+            (b.confidence === "official" ? "" : " (" + b.confidence + ")")));
+          out.push("CATEGORIES:" + icsText(LEAGUE_LABEL[b.league] || b.league));
+          if (b.venue) out.push("LOCATION:" + icsText(b.venue));
+          out.push("URL:" + b.sources[0].url);
+          out.push("DESCRIPTION:" + icsText(
+            (b.start_pt ? "Listed start " + L.label12(b.start_pt) + ". " : "Start time TBD. ") +
+            "Estimated length " + L.formatDuration(b.duration_est_min) + ". " +
+            "Confidence: " + b.confidence + ". " + (b.notes || "") +
+            " Sources: " + b.sources.map(function (s) { return s.label + " " + s.url; }).join(" | ") +
+            " This is a schedule snapshot entry, not a live station log and not proof a station carried the game."));
+          out.push("END:VEVENT");
+        });
+        out.push("END:VCALENDAR");
+        return out.map(foldLine).reduce(function (all, folded) {
+          return all.concat(folded);
+        }, []).join("\r\n") + "\r\n";
+      }
+      function renderIcs() {
+        var host = document.getElementById("ics");
+        var inWindow = L.inWindow(state.date, DATA.meta.window_start, DATA.meta.window_end);
+        var rows = inWindow ? L.sortBroadcasts(visible(L.byDate(ROWS, state.date))) : [];
+        if (!rows.length) { host.innerHTML = ""; return; }
+        var href = "data:text/calendar;charset=utf-8," + encodeURIComponent(buildIcs(state.date, rows));
+        host.innerHTML = '<a class="ics-link" download="radiosf-' + esc(state.date) +
+          '.ics" href="' + href + '" title="Creates a calendar file from the listings on this page, with their source links and caveats">' +
+          "Download this day (.ics)</a>";
+      }
       function renderUpNext() {
         var from = state.date;
         var rows = visible(ROWS).filter(function (b) { return b.date && b.date > from; }).slice(0, 6);
@@ -512,6 +669,7 @@
           document.getElementById("timeline").innerHTML = "";
           document.getElementById("conflicts").innerHTML = "";
           document.getElementById("log").innerHTML = "";
+          renderIcs();
           renderUpNext();
           return;
         }
@@ -619,6 +777,7 @@
         document.getElementById("log").innerHTML =
           '<div class="log-wrap"><table class="log"><thead><tr><th>PT</th><th>Station</th><th>Broadcast</th></tr></thead><tbody>' +
           body + "</tbody></table></div>";
+        renderIcs();
         renderUpNext();
       }
 
@@ -716,6 +875,7 @@
         rebuildRows();
         renderFilters();
         renderDurations();
+        renderNowNext();
         renderDay();
         renderCal();
         renderBand();
@@ -748,6 +908,7 @@
           if (!isFinite(v) || v < 30 || v > 360) return;   /* mid-typing, leave the last good value */
           state.durations[key] = v;
           rebuildRows();
+          renderNowNext();
           renderDay();
           renderCal();
           renderBand();
@@ -793,6 +954,7 @@
           setDate(btn.getAttribute("data-jump"));
           document.getElementById("day").scrollIntoView({ block: "start" });
         }
+        document.getElementById("nownext").addEventListener("click", jumpHandler);
         document.getElementById("results").addEventListener("click", jumpHandler);
         document.getElementById("upnext").addEventListener("click", jumpHandler);
         document.addEventListener("keydown", function (ev) {
