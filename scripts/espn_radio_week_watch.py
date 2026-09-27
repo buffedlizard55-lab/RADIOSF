@@ -69,12 +69,14 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[1]
 FEED_PATH = ROOT / "data" / "broadcasts.json"
 GRID_URL = "https://www.espn.com/espnradio/schedule"
-# espn.com answers bare scripted clients with HTTP 202 on many pages, so the
-# grid is requested with an ordinary browser agent — the same convention
-# page_watch.py uses for the club and school pages. The dated scoreboard lives
-# on site.api.espn.com, which automation reaches normally.
-USER_AGENT_HTML = ("Mozilla/5.0 (compatible; RADIOSF-source-watch/1.0; "
-                   "+https://github.com/buffedlizard55-lab/RADIOSF)")
+# espn.com answers the project's own scripted User-Agent with HTTP 202 on this
+# page (confirmed live from GitHub's runners on 2026-09-27). A current Chrome
+# desktop agent is what the fetch-page tool used successfully the same day.
+# The dated scoreboard lives on site.api.espn.com and does not need it.
+USER_AGENT_HTML = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+)
 USER_AGENT_API = "RADIOSF-source-watch/1.0 (+https://github.com/buffedlizard55-lab/RADIOSF)"
 
 TAG_RE = re.compile(r"<[^>]+>")
@@ -224,15 +226,30 @@ def parse_grid(document: str, supported_sports: set[str]) -> dict[str, Any]:
 
 
 def fetch(url: str, accept: str, agent: str, timeout: int = 30) -> str:
-    request = Request(url, headers={"User-Agent": agent, "Accept": accept})
+    request = Request(url, headers={
+        "User-Agent": agent,
+        "Accept": accept,
+        "Accept-Language": "en-US,en;q=0.9",
+    })
     try:
         with urlopen(request, timeout=timeout) as response:
+            if response.status == 202:
+                raise MonitorError(
+                    f"{url} returned HTTP 202 (espn.com often does this for scripted clients). "
+                    "The grid was not read; that is unavailable, not a dated week."
+                )
             if response.status != 200:
                 raise MonitorError(f"{url} returned HTTP {response.status}")
             body = response.read().decode("utf-8", errors="replace")
     except MonitorError:
         raise
     except (HTTPError, URLError, TimeoutError, OSError, HTTPException, UnicodeDecodeError) as exc:
+        code = getattr(exc, "code", None)
+        if code == 202:
+            raise MonitorError(
+                f"{url} returned HTTP 202 (espn.com often does this for scripted clients). "
+                "The grid was not read; that is unavailable, not a dated week."
+            ) from exc
         raise MonitorError(f"{url} could not be fetched ({exc})") from exc
     if len(body.strip()) < 200:
         raise MonitorError(f"{url} returned an almost-empty body, which is not evidence of anything")
