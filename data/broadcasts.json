@@ -356,10 +356,10 @@
       "url": "https://calbears.com/sports/football/schedule"
     },
     {
-      "id": "GOSTANFORD_2025",
-      "severity": "review",
-      "title": "gostanford.com serves last season's football schedule",
-      "detail": "Fetched 2026-09-27, gostanford.com/sports/football/schedule returns 2025 rows and /schedule/2026 returns 404. Stanford dates and kickoffs in this feed therefore come from ESPN's 2026 Stanford schedule, converted from Eastern to Pacific. The station, 1050 AM, comes from Stanford's own radio release and from the KNBR 1050 weekly grid, which shows \"Stanford Pre-Game with Jack Loder\" followed by a \"STANFORD FOOTBALL\" block. Re-check the school site once it rolls over to 2026.",
+      "id": "STANFORD_SCHEDULE_TWO_SEASONS",
+      "severity": "note",
+      "title": "The Stanford schedule page leads with last season's results",
+      "detail": "Read 2026-09-27, gostanford.com/sports/football/schedule opens with the completed 2025 results and only then shows a 2026 schedule ticker. An earlier pass read the first list, concluded the site served 2025 and took every Stanford date and kickoff from ESPN; that conclusion was wrong and is corrected here. The 2026 ticker prints the same eight dates as ESPN and gives the Pacific kickoff for the four games that have one - Oct 3 9:00 AM PDT, Oct 10 12:30 PM PDT, Oct 17 4:30 PM PDT and Fri Oct 23 7:30 PM PDT - and TBA for Oct 31, Nov 14, Nov 21 and Nov 28. Every Stanford row now cites the school page as well as ESPN, and the two agree. The station, 1050 AM, comes from Stanford's own radio release and from the KNBR 1050 weekly grid, which shows \"Stanford Pre-Game with Jack Loder\" followed by a \"STANFORD FOOTBALL\" block. The page cannot be watched by automation - the ticker is built in the browser, so a plain request receives a page without it - so those four TBA kickoffs are the one gap in the TBD-kickoff watch and are re-read by hand each session.",
       "url": "https://gostanford.com/sports/football/schedule"
     },
     {
@@ -1034,6 +1034,10 @@
       "duration_est_min": 204,
       "sources": [
         {
+          "label": "Stanford schedule ticker: \"Sat, Oct 3/9:00 AM PDT\" at Wake Forest",
+          "url": "https://gostanford.com/sports/football/schedule"
+        },
+        {
           "label": "ESPN 2026 Stanford schedule (dates and kickoffs, Eastern)",
           "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
         },
@@ -1050,9 +1054,9 @@
           "url": "https://www.thesportsleader.com/knbr1050shows/"
         }
       ],
-      "notes": "ESPN prints Sat Oct 3, 12:00 PM ET, which is 9:00 AM PT. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680. The school's own schedule page was serving 2025 rows when checked, so the date and time come from ESPN.",
+      "notes": "ESPN prints Sat Oct 3, 12:00 PM ET, which is 9:00 AM PT. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680. The school's own schedule page prints the same date and kickoff in Pacific; ESPN is cited beside it and the two agree.",
       "flag_ids": [
-        "GOSTANFORD_2025",
+        "STANFORD_SCHEDULE_TWO_SEASONS",
         "DURATION_ESTIMATE"
       ]
     },
@@ -1077,6 +1081,10 @@
         {
           "label": "Cal football schedule, Radio column",
           "url": "https://calbears.com/sports/football/schedule"
+        },
+        {
+          "label": "Cal football schedule, text view (the TBD-kickoff watch reads this page)",
+          "url": "https://calbears.com/sports/football/schedule/text"
         },
         {
           "label": "ESPN Cal schedule, date and time cross-check",
@@ -1905,6 +1913,10 @@
       "duration_est_min": 204,
       "sources": [
         {
+          "label": "Stanford schedule ticker: \"Sat, Oct 10/12:30 PM PDT\" at Notre Dame",
+          "url": "https://gostanford.com/sports/football/schedule"
+        },
+        {
           "label": "ESPN 2026 Stanford schedule (dates and kickoffs, Eastern)",
           "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
         },
@@ -1921,9 +1933,9 @@
           "url": "https://www.thesportsleader.com/knbr1050shows/"
         }
       ],
-      "notes": "ESPN prints Sat Oct 10, 3:30 PM ET on NBC, which is 12:30 PM PT. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680. The school's own schedule page was serving 2025 rows when checked, so the date and time come from ESPN.",
+      "notes": "ESPN prints Sat Oct 10, 3:30 PM ET on NBC, which is 12:30 PM PT. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680. The school's own schedule page prints the same date and kickoff in Pacific; ESPN is cited beside it and the two agree.",
       "flag_ids": [
-        "GOSTANFORD_2025",
+        "STANFORD_SCHEDULE_TWO_SEASONS",
         "DURATION_ESTIMATE"
       ]
     },
@@ -1981,11 +1993,15 @@
           "url": "https://calbears.com/sports/football/schedule"
         },
         {
+          "label": "Cal football schedule, text view (the TBD-kickoff watch reads this page)",
+          "url": "https://calbears.com/sports/football/schedule/text"
+        },
+        {
           "label": "ESPN Cal schedule, date and time cross-check",
           "url": "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
         }
       ],
-      "notes": "Radio column: KSFO 810. Kickoff not yet set on the schedule or on ESPN.",
+      "notes": "Radio column: KSFO 810. Kickoff not yet set on the schedule or on ESPN; scripts/tbd_time_watch.py reads the text view daily and reports the first printed kickoff.",
       "flag_ids": [
         "DURATION_ESTIMATE"
       ]
@@ -2717,6 +2733,10 @@
       "duration_est_min": 204,
       "sources": [
         {
+          "label": "Stanford schedule ticker: \"Sat, Oct 17/4:30 PM PDT\" vs Elon",
+          "url": "https://gostanford.com/sports/football/schedule"
+        },
+        {
           "label": "ESPN 2026 Stanford schedule (dates and kickoffs, Eastern)",
           "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
         },
@@ -2733,9 +2753,9 @@
           "url": "https://www.thesportsleader.com/knbr1050shows/"
         }
       ],
-      "notes": "ESPN prints Sat Oct 17, 7:30 PM ET, which is 4:30 PM PT. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680. The school's own schedule page was serving 2025 rows when checked, so the date and time come from ESPN.",
+      "notes": "ESPN prints Sat Oct 17, 7:30 PM ET, which is 4:30 PM PT. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680. The school's own schedule page prints the same date and kickoff in Pacific; ESPN is cited beside it and the two agree.",
       "flag_ids": [
-        "GOSTANFORD_2025",
+        "STANFORD_SCHEDULE_TWO_SEASONS",
         "DURATION_ESTIMATE"
       ]
     },
@@ -2793,11 +2813,15 @@
           "url": "https://calbears.com/sports/football/schedule"
         },
         {
+          "label": "Cal football schedule, text view (the TBD-kickoff watch reads this page)",
+          "url": "https://calbears.com/sports/football/schedule/text"
+        },
+        {
           "label": "ESPN Cal schedule, date and time cross-check",
           "url": "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
         }
       ],
-      "notes": "Radio column: KSFO 810. Kickoff not yet set. This row was missing from the previous snapshot and is now read directly from the Radio column.",
+      "notes": "Radio column: KSFO 810. Kickoff not yet set. This row was missing from the previous snapshot and is now read directly from the Radio column; the TBD-kickoff watch reads the text view daily.",
       "flag_ids": [
         "DURATION_ESTIMATE"
       ]
@@ -3288,6 +3312,10 @@
       "duration_est_min": 204,
       "sources": [
         {
+          "label": "Stanford schedule ticker: \"Fri, Oct 23/7:30 PM PDT\" vs NC State",
+          "url": "https://gostanford.com/sports/football/schedule"
+        },
+        {
           "label": "ESPN 2026 Stanford schedule (dates and kickoffs, Eastern)",
           "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
         },
@@ -3304,9 +3332,9 @@
           "url": "https://www.thesportsleader.com/knbr1050shows/"
         }
       ],
-      "notes": "ESPN prints Fri Oct 23, 10:30 PM ET, which is 7:30 PM PT. This is the Friday night game. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680. The school's own schedule page was serving 2025 rows when checked, so the date and time come from ESPN.",
+      "notes": "ESPN prints Fri Oct 23, 10:30 PM ET, which is 7:30 PM PT. This is the Friday night game. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680. The school's own schedule page prints the same date and kickoff in Pacific; ESPN is cited beside it and the two agree.",
       "flag_ids": [
-        "GOSTANFORD_2025",
+        "STANFORD_SCHEDULE_TWO_SEASONS",
         "DURATION_ESTIMATE"
       ]
     },
@@ -3417,11 +3445,15 @@
           "url": "https://calbears.com/sports/football/schedule"
         },
         {
+          "label": "Cal football schedule, text view (the TBD-kickoff watch reads this page)",
+          "url": "https://calbears.com/sports/football/schedule/text"
+        },
+        {
           "label": "ESPN Cal schedule, date and time cross-check",
           "url": "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
         }
       ],
-      "notes": "Radio column: KSFO 810. Kickoff not yet set.",
+      "notes": "Radio column: KSFO 810. Kickoff not yet set; watched daily by scripts/tbd_time_watch.py.",
       "flag_ids": [
         "DURATION_ESTIMATE"
       ]
@@ -4073,11 +4105,15 @@
           "url": "https://calbears.com/sports/football/schedule"
         },
         {
+          "label": "Cal football schedule, text view (the TBD-kickoff watch reads this page)",
+          "url": "https://calbears.com/sports/football/schedule/text"
+        },
+        {
           "label": "ESPN Cal schedule, date and time cross-check",
           "url": "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
         }
       ],
-      "notes": "Radio column: KSFO 810. Kickoff not yet set.",
+      "notes": "Radio column: KSFO 810. Kickoff not yet set; watched daily by scripts/tbd_time_watch.py.",
       "flag_ids": [
         "DURATION_ESTIMATE"
       ]
@@ -4154,6 +4190,10 @@
       "duration_est_min": 204,
       "sources": [
         {
+          "label": "Stanford schedule ticker: \"Sat, Oct 31/TBA\" at Louisville",
+          "url": "https://gostanford.com/sports/football/schedule"
+        },
+        {
           "label": "ESPN 2026 Stanford schedule (dates and kickoffs, Eastern)",
           "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
         },
@@ -4170,9 +4210,9 @@
           "url": "https://www.thesportsleader.com/knbr1050shows/"
         }
       ],
-      "notes": "ESPN prints Sat Oct 31 with kickoff TBD. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680. The school's own schedule page was serving 2025 rows when checked, so the date and time come from ESPN.",
+      "notes": "ESPN prints Sat Oct 31 with kickoff TBD. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680. The school's own schedule page prints the same date and kickoff in Pacific; ESPN is cited beside it and the two agree.",
       "flag_ids": [
-        "GOSTANFORD_2025",
+        "STANFORD_SCHEDULE_TWO_SEASONS",
         "DURATION_ESTIMATE"
       ]
     },
@@ -4682,11 +4722,15 @@
           "url": "https://calbears.com/sports/football/schedule"
         },
         {
+          "label": "Cal football schedule, text view (the TBD-kickoff watch reads this page)",
+          "url": "https://calbears.com/sports/football/schedule/text"
+        },
+        {
           "label": "ESPN Cal schedule, date and time cross-check",
           "url": "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
         }
       ],
-      "notes": "Radio column: KSFO 810. Kickoff not yet set. Cal's bye week is Nov 7.",
+      "notes": "Radio column: KSFO 810. Kickoff not yet set. Cal's bye week is Nov 7. Watched daily by scripts/tbd_time_watch.py.",
       "flag_ids": [
         "DURATION_ESTIMATE"
       ]
@@ -4710,6 +4754,10 @@
       "duration_est_min": 204,
       "sources": [
         {
+          "label": "Stanford schedule ticker: \"Sat, Nov 14/TBA\" at Virginia Tech",
+          "url": "https://gostanford.com/sports/football/schedule"
+        },
+        {
           "label": "ESPN 2026 Stanford schedule (dates and kickoffs, Eastern)",
           "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
         },
@@ -4726,9 +4774,9 @@
           "url": "https://www.thesportsleader.com/knbr1050shows/"
         }
       ],
-      "notes": "ESPN prints Sat Nov 14 with kickoff TBD. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680. The school's own schedule page was serving 2025 rows when checked, so the date and time come from ESPN.",
+      "notes": "ESPN prints Sat Nov 14 with kickoff TBD. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680. The school's own schedule page prints the same date and kickoff in Pacific; ESPN is cited beside it and the two agree.",
       "flag_ids": [
-        "GOSTANFORD_2025",
+        "STANFORD_SCHEDULE_TWO_SEASONS",
         "DURATION_ESTIMATE"
       ]
     },
@@ -5047,11 +5095,19 @@
           "url": "https://gostanford.com/news/2026/07/30/2026-football-radio-broadcast-team-announced"
         },
         {
+          "label": "Stanford schedule ticker: \"Sat, Nov 21/TBA\" at California",
+          "url": "https://gostanford.com/sports/football/schedule"
+        },
+        {
+          "label": "Cal football schedule, text view (the TBD-kickoff watch reads this page)",
+          "url": "https://calbears.com/sports/football/schedule/text"
+        },
+        {
           "label": "ESPN Stanford schedule: Nov 21 at California, kickoff TBD",
           "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
         }
       ],
-      "notes": "One game, two station claims, both shown. Cal's Radio column prints KNBR 104.5 FM / 680 AM for this row and KSFO 810 AM for every other 2026 row, so 810 is not assumed here. Kickoff TBD on both schedules.",
+      "notes": "One game, two station claims, both shown. Cal's Radio column prints KNBR 104.5 FM / 680 AM for this row and KSFO 810 AM for every other 2026 row, so 810 is not assumed here. Kickoff TBD on both schedules; scripts/tbd_time_watch.py reads Cal's text view daily and reports the first printed kickoff.",
       "flag_ids": [
         "BIG_GAME_STATIONS",
         "DURATION_ESTIMATE"
@@ -5459,11 +5515,15 @@
           "url": "https://calbears.com/sports/football/schedule"
         },
         {
+          "label": "Cal football schedule, text view (the TBD-kickoff watch reads this page)",
+          "url": "https://calbears.com/sports/football/schedule/text"
+        },
+        {
           "label": "ESPN Cal schedule, date and time cross-check",
           "url": "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
         }
       ],
-      "notes": "Radio column: KSFO 810. Kickoff not yet set. Season finale.",
+      "notes": "Radio column: KSFO 810. Kickoff not yet set. Season finale. Watched daily by scripts/tbd_time_watch.py.",
       "flag_ids": [
         "DURATION_ESTIMATE"
       ]
@@ -5487,6 +5547,10 @@
       "duration_est_min": 204,
       "sources": [
         {
+          "label": "Stanford schedule ticker: \"Sat, Nov 28/TBA\" vs SMU",
+          "url": "https://gostanford.com/sports/football/schedule"
+        },
+        {
           "label": "ESPN 2026 Stanford schedule (dates and kickoffs, Eastern)",
           "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
         },
@@ -5503,9 +5567,9 @@
           "url": "https://www.thesportsleader.com/knbr1050shows/"
         }
       ],
-      "notes": "ESPN prints Sat Nov 28 with kickoff TBD. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680. The school's own schedule page was serving 2025 rows when checked, so the date and time come from ESPN.",
+      "notes": "ESPN prints Sat Nov 28 with kickoff TBD. \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680. The school's own schedule page prints the same date and kickoff in Pacific; ESPN is cited beside it and the two agree.",
       "flag_ids": [
-        "GOSTANFORD_2025",
+        "STANFORD_SCHEDULE_TWO_SEASONS",
         "DURATION_ESTIMATE"
       ]
     },
@@ -7978,7 +8042,7 @@
           "url": "https://www.49ers.com/schedule/"
         }
       ],
-      "notes": "Date and kickoff are TBD on the club page. Not placed on a guessed day.",
+      "notes": "Date and kickoff are TBD on the club page. Not placed on a guessed day. scripts/tbd_time_watch.py reads the club page daily and reports the first printed date or kickoff.",
       "flag_ids": [
         "WEEK18_UNPLACED"
       ]

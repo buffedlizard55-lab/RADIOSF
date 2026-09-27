@@ -1,5 +1,5 @@
 {
-  "_about": "Read-only page-change watch for the club, school and station pages that have no machine-readable endpoint. Every 'expect' string was read on the live page on 2026-09-27; if one disappears the page changed and the rows it supports need a human re-read. Every 'alert_if_present' string was absent on 2026-09-27; if one appears, new schedule information may have been published. The watcher never edits data/broadcasts.json.",
+  "_about": "Read-only page-change watch for the club, school and station pages that have no machine-readable endpoint. Every 'expect' string was read on the live page on 2026-09-27; if one disappears the page changed and the rows it supports need a human re-read. Every 'alert_if_present' string was absent on 2026-09-27; if one appears, new schedule information may have been published. The watcher never edits data/broadcasts.json.\n\nA page that builds its schedule in the browser cannot be watched this way: gostanford.com/sports/football/schedule serves its 2026 ticker to a browser, not to a plain request, so an entry for it reported every expected string missing on the first live run (source watch preview, pull request 12) and was removed. Stanford dates, opponents and kickoffs stay watched through ESPN's schedule feed, which is machine-readable; the school page remains cited on every Stanford row for a human to open.",
   "checked": "2026-09-27",
   "pages": [
     {
@@ -29,9 +29,9 @@
     },
     {
       "id": "cal-football-schedule",
-      "label": "calbears.com football schedule (Radio column)",
+      "label": "calbears.com football schedule (Radio column; the column is in the raw HTML and is not reproduced by a rendered copy of the page)",
       "url": "https://calbears.com/sports/football/schedule",
-      "rows": "cal-* (8 rows) and the Big Game review row",
+      "rows": "cal-* (7 rows) and the Big Game review row",
       "expect": [
         {
           "text": "Radio: KSFO 810 AM",
@@ -137,7 +137,7 @@
       "id": "usf-mbb-schedule",
       "label": "USF men's basketball 2026-27 text schedule",
       "url": "https://usfdons.com/sports/mens-basketball/schedule/text",
-      "rows": "none yet — the basketball gap (flag MBB_NO_RADIO_ROWS)",
+      "rows": "none yet \u2014 the basketball gap (flag MBB_NO_RADIO_ROWS)",
       "expect": [
         {
           "text": "2026-27 Men's Basketball Schedule",
