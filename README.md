@@ -77,10 +77,10 @@ The 11 fully conditional rows are among the indicated entries; together they acc
 | 104.5 FM | KNBR-FM | Full-time simulcast of 680. Same events whenever a source lists both. Never Stanford. | 97 / 70 |
 | 810 AM | KSFO | 49ers Week 3 only; Cal football except the Big Game; Earthquakes English flagship. | 15 / 11 |
 | 960 AM | KNEW | Athletics through the last day of the regular season. Fox Sports Radio talk is not a game listing. | 1 / 1 |
-| 1050 AM | KTCT | Stanford football; Westwood One NFL, college football and U.S. Soccer; MLB postseason and 20 NBA games indicated via the ESPN Radio affiliation, not per-game clearance. | 142 / 96, including 11 if-necessary-only rows |
+| 1050 AM | KTCT | Stanford football; Westwood One NFL, college football and U.S. Soccer; MLB postseason and the NBA's ESPN Radio schedule indicated via the affiliation, not a per-game clearance. | 142 / 96, including 11 if-necessary-only rows and the 20 NBA/Cup rows |
 | 107.7 FM | KSAN | 49ers, every regular-season week listed here. | 15 / 14 |
 
-“Entries / dates” counts rows assigned to each station; one row may count on more than one station. The 1050 count includes 11 fully conditional postseason rows, two mixed rows that also contain if-necessary games, and the 20 NBA rows from the league's own ESPN Radio schedule. Spanish calls (1370, 1510, 93.7, Univision Radio, the 49ers app) are not on these six frequencies and are omitted. HD subchannels (KNBR-F2, KSAN HD3) are omitted. Warriors, Valkyries (95.7) and Sharks (98.5) are out of scope, not missing.
+“Entries / dates” counts rows assigned to each station; one row may count on more than one station. The 1050 count includes 11 fully conditional postseason rows, two mixed rows that also contain if-necessary games, and the 20 NBA rows from the league's own ESPN Radio schedule — 17 games with a printed time and three Cup dates with none. Spanish calls (1370, 1510, 93.7, Univision Radio, the 49ers app) are not on these six frequencies and are omitted. HD subchannels (KNBR-F2, KSAN HD3) are omitted. Warriors, Valkyries (95.7) and Sharks (98.5) are out of scope, not missing.
 
 ## NFL playoffs: dated rounds, undated games
 
