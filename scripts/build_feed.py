@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the verified radio feed. Source of truth for data/broadcasts.json.
+"""Build the curated, source-backed schedule snapshot. Source of truth for data/broadcasts.json.
 
 Every row below was transcribed from a page fetched on 2026-09-27.
 Do not add a game that is not in this file. Re-fetch before editing.
@@ -56,6 +56,8 @@ CAL = "https://calbears.com/sports/football/schedule"
 CAL_ESPN = "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
 CAL_MBB = "https://calbears.com/sports/mens-basketball/schedule"
 USF_MBB = "https://usfdons.com/sports/mens-basketball/schedule"
+USF_MBB_TEXT = "https://usfdons.com/sports/mens-basketball/schedule/text"
+USF_MBB_2026_PREVIEW = "https://usfdons.com/news/2026/1/27/mens-basketball-san-francisco-heads-to-santa-clara-for-late-night-showdown"
 KNBR_SHOWS = "https://www.thesportsleader.com/shows/"
 KNBR_1050_SHOWS = "https://www.thesportsleader.com/knbr1050shows/"
 KTCT_WIKI = "https://en.wikipedia.org/wiki/KTCT"
@@ -113,6 +115,10 @@ def game(**kw) -> dict:
         "notes": kw.get("notes") or "",
         "flag_ids": kw.get("flag_ids") or [],
     }
+    if "game_count" in kw:
+        row["game_count"] = int(kw["game_count"])
+    if "conditional_game_count" in kw:
+        row["conditional_game_count"] = int(kw["conditional_game_count"])
     bad = [s for s in row["stations"] if s not in ALLOWED]
     if bad:
         raise SystemExit(f"{row['id']} bad station {bad}")
@@ -124,6 +130,18 @@ def game(**kw) -> dict:
         raise SystemExit(f"{row['id']} bad confidence {row['confidence']}")
     if row["status"] not in ("scheduled", "tba", "final", "pregame", "if-necessary"):
         raise SystemExit(f"{row['id']} bad status {row['status']}")
+    if "game_count" in row and row["game_count"] <= 0:
+        raise SystemExit(f"{row['id']} game_count must be positive")
+    if row["status"] == "if-necessary" and not row["conditional"]:
+        raise SystemExit(f"{row['id']} must mark an if-necessary row as conditional")
+    if (row["status"] == "if-necessary" and "game_count" in row and
+            row.get("conditional_game_count", row["game_count"]) != row["game_count"]):
+        raise SystemExit(f"{row['id']} wholly conditional row must count all its games as conditional")
+    if "conditional_game_count" in row and (
+        "game_count" not in row or row["conditional_game_count"] < 0 or
+        row["conditional_game_count"] > row["game_count"]
+    ):
+        raise SystemExit(f"{row['id']} has an invalid conditional_game_count")
     if row["date"] and not (WINDOW_START <= row["date"] <= WINDOW_END):
         raise SystemExit(f"{row['id']} date {row['date']} outside window")
     if row["start_pt"] and not row["date"]:
@@ -476,19 +494,24 @@ FLAGS = [
         "severity": "limitation",
         "title": "No basketball rows could be verified for the 2026-27 season",
         "detail": (
-            "Three checks on 2026-09-27, all negative. Westwood One's NCAA Basketball page says "
+            "Current-season checks on 2026-09-27 found no 2026-27 radio listing. Westwood One's NCAA Basketball page says "
             "\"No upcoming events\", so there is no national college hoops grid to transcribe. "
             "calbears.com men's basketball lists games from Nov 2 with TBD times and no radio column. "
-            "usfdons.com men's basketball lists TV logos (ESPN+, CBS Sports Network) and no radio "
-            "column, even though KTCT's station record names the San Francisco Dons as an affiliate. "
-            "Stanford basketball was not re-verified onto 1050. Basketball is therefore absent from "
+            "The USF Dons 2026-27 text schedule lists dates, times, opponents, locations, tournament "
+            "and results but no Radio/Listen field; the live schedule displays TV logos for some "
+            "games. An official 2025-26 preview did say \"Listen: KNBR 1050\", but that is prior-season "
+            "evidence, not confirmation of a 2026-27 station assignment. KTCT's station record also "
+            "names the Dons as an affiliate, which is not a season schedule. Stanford basketball was "
+            "not re-verified onto 1050. Basketball is therefore absent from "
             "November to February, which is a gap in this feed, not a quiet radio dial."
         ),
         "url": WWO_NCAAB_URL,
         "sources": [
             src("Westwood One NCAA Basketball: \u201cNo upcoming events\u201d", WWO_NCAAB_URL),
             src("Cal men's basketball schedule: no radio column", CAL_MBB),
-            src("USF Dons men's basketball schedule: no radio column", USF_MBB),
+            src("USF Dons 2026-27 men's basketball schedule", USF_MBB),
+            src("USF Dons 2026-27 schedule text table: no Radio/Listen field", USF_MBB_TEXT),
+            src("USF Dons Jan 28, 2026 preview: KNBR 1050 listen line, prior season only", USF_MBB_2026_PREVIEW),
         ],
     },
     {
@@ -810,6 +833,8 @@ def mlb_postseason_rows() -> list[dict]:
             venue="",
             status="if-necessary" if all_conditional else "tba",
             conditional=all_conditional,
+            game_count=n,
+            conditional_game_count=if_nec,
             stations=["1050"],
             confidence="indicated",
             duration_key="MLB-POST",
@@ -1239,13 +1264,13 @@ def sort_key(r: dict):
 
 def line_markdown(rows: list[dict], flags: list[dict]) -> str:
     lines = [
-        "# Line-by-line broadcast list",
+        "# Line-by-line schedule list",
         "",
         f"Snapshot {SNAPSHOT}. Window {WINDOW_START} through {WINDOW_END}, America/Los_Angeles.",
         "Every row is generated from `scripts/build_feed.py`. Open the source link before treating a row as settled.",
         "",
-        "| Date | PT listed start | Stations | Confidence | Game | Sources |",
-        "| --- | --- | --- | --- | --- | --- |",
+        "| Date | PT listed start | Stations | Confidence | Status | Game | Sources |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
     ]
     for r in sorted(rows, key=sort_key):
         start = r["start_pt"] or "TBD"
@@ -1253,7 +1278,8 @@ def line_markdown(rows: list[dict], flags: list[dict]) -> str:
         links = ", ".join(f"[{s['label']}]({s['url']})" for s in r["sources"])
         date = r["date"] or "DATE TBD"
         title = r["title"].replace("|", "/")
-        lines.append(f"| {date} | {start} | {stations} | {r['confidence']} | {title} | {links} |")
+        status = r["status"]
+        lines.append(f"| {date} | {start} | {stations} | {r['confidence']} | {status} | {title} | {links} |")
     lines += ["", "## Flags", ""]
     for f in flags:
         lines.append(f"- **{f['id']}** ({f['severity']}): {f['title']} — {f['detail']} [link]({f['url']})")
@@ -1289,7 +1315,7 @@ def main() -> None:
                 {"id": "official", "label": "Official",
                  "detail": "A club, school, league API or rights holder printed both the game and the station."},
                 {"id": "indicated", "label": "Indicated",
-                 "detail": "A network lists the game and its station finder lists a Bay Area affiliate. That is a network row, not a per-game clearance."},
+                 "detail": "A network or rights-holder lists the event, and another source establishes a Bay Area affiliate relationship. This is not per-game clearance."},
                 {"id": "review", "label": "Needs review",
                  "detail": "Two sources disagree, or the radio line was not quoted for that exact row. Open the links."},
             ],
@@ -1315,6 +1341,8 @@ def main() -> None:
             ],
             "counts": {
                 "broadcasts": len(rows),
+                "conditional": sum(1 for r in rows if r["conditional"]),
+                "conditional_games": sum(r.get("conditional_game_count", 0) for r in rows),
                 "placed": sum(1 for r in rows if r["date"]),
                 "unplaced": sum(1 for r in rows if not r["date"]),
                 "official": sum(1 for r in rows if r["confidence"] == "official"),
@@ -1328,7 +1356,7 @@ def main() -> None:
     }
     OUT.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     LINE.write_text(line_markdown(rows, FLAGS), encoding="utf-8")
-    print(f"wrote {OUT} ({len(rows)} broadcasts, {len(FLAGS)} flags) and {LINE}")
+    print(f"wrote {OUT} ({len(rows)} schedule entries, {len(FLAGS)} flags) and {LINE}")
 
 
 if __name__ == "__main__":

@@ -17,6 +17,8 @@ jobs:
         run: |
           python3 scripts/build_feed.py
           git diff --exit-code -- data/broadcasts.json docs/LINE_BY_LINE.md
+      - name: Read-only source-watch regression tests
+        run: python3 scripts/source_watch_test.py
       - name: UI logic and feed invariants
         run: node scripts/ui_logic_test.js
       - name: Render the real page against the real feed

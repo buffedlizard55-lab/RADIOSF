@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>RADIOSF — Live sports on the stations you get</title>
-  <meta name="description" content="Click a day to see verified live sports broadcasts on 680, 810, 960, 1050, 104.5 and 107.7 in the San Francisco Bay Area. Every row keeps its source link.">
+  <meta name="description" content="Click a day to see source-backed sports radio listings for 680, 810, 960, 1050, 104.5 and 107.7 in the San Francisco Bay Area. Every row keeps its source link and confidence label.">
   <meta name="color-scheme" content="light">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%231c1915'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-size='11' fill='%23f3efe6' font-family='Georgia'%3E680%3C/text%3E%3C/svg%3E">
   <style>
@@ -50,6 +50,7 @@
     }
     .lede { max-width: 72ch; margin: 0 0 8px; font-size: 18px; }
     .verified { margin: 0 0 12px; color: var(--muted); font-size: 14px; max-width: 90ch; }
+    .verified.stale { color: #7f1d1d; background: #fff6f6; border-left: 4px solid var(--review); padding: 8px 10px; }
     .controls { display: flex; flex-wrap: wrap; gap: 18px; margin: 0 0 16px; }
     .ctl { display: flex; flex-direction: column; gap: 6px; }
     .ctl > span { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
@@ -109,9 +110,9 @@
     .badge.official { color: var(--live); border-color: #b7d7cb; background: #f3faf7; }
     .badge.indicated { color: #1e3a8a; border-color: #c7d2fe; background: #f5f7ff; }
     .badge.review { color: var(--review); border-color: #f0c9c9; background: #fff6f6; }
-    .badge.aired { color: var(--muted); }
+    .badge.final, .badge.result, .badge.past-unchecked, .badge.elapsed-unchecked { color: var(--muted); }
     .badge.pregame, .badge.on { color: var(--live); border-color: #b7d7cb; background: #f3faf7; }
-    .badge.conditional { color: #8a5a00; border-color: #ead7b2; background: #fff8ee; }
+    .badge.conditional, .badge.mixed { color: #8a5a00; border-color: #ead7b2; background: #fff8ee; }
     .badge.net { color: var(--muted); text-transform: none; letter-spacing: 0; }
     .pills { display: flex; flex-wrap: wrap; gap: 4px; }
     .pill { font-size: 12px; font-variant-numeric: tabular-nums; border-radius: 99px; padding: 2px 7px; color: white; white-space: nowrap; }
@@ -125,11 +126,13 @@
     .cell { border: 1px solid transparent; background: transparent; border-radius: 8px; min-height: 56px; padding: 4px 2px; cursor: pointer; }
     .cell.in { background: #f7f3ec; }
     .cell.has { background: #fff; border-color: var(--line); }
+    .cell.possible { border-style: dashed; border-color: #c99a4c; background: #fff9ee; }
     .cell.selected { outline: 2px solid var(--ink); }
     .cell.today .num { text-decoration: underline; text-underline-offset: 3px; }
     .num { font-variant-numeric: tabular-nums; font-weight: 650; }
     .mini { display: flex; justify-content: center; gap: 2px; margin-top: 4px; min-height: 8px; flex-wrap: wrap; }
     .mini i { width: 6px; height: 6px; border-radius: 50%; display: block; }
+    .mini i.possible { background: transparent; border: 1px solid #9a6700; }
     .search { width: 100%; border: 1px solid var(--line); background: var(--paper); border-radius: 8px; padding: 8px 10px; margin: 6px 0 10px; }
     .results { list-style: none; padding: 0; margin: 0 0 12px; }
     .results button { width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding: 8px 0; cursor: pointer; }
@@ -166,14 +169,14 @@
       .controls, .day-nav, aside, .skip { display: none; }
       body { background: white; }
     }
-      .durations { margin: 22px 0 6px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+      .durations { margin: 22px 0 6px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); }
     .durations-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
     .durations-head h3 { margin: 0; }
     .dur-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px 18px; margin-top: 14px; }
     .dur-grid label { display: block; font-size: 13px; color: var(--muted); }
     .dur-grid .row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
     .dur-grid input { width: 5.5em; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px;
-      background: var(--bg); color: var(--fg); font: inherit; font-size: 14px; }
+      background: var(--bg); color: var(--ink); font: inherit; font-size: 14px; }
     .dur-grid .unit { font-size: 13px; color: var(--muted); }
     .dur-grid .was { font-size: 12px; color: var(--muted); }
 </style>
@@ -185,7 +188,7 @@
       <p class="kicker">San Francisco Bay Area · the six stations you get</p>
       <h1>RADIOSF</h1>
       <p class="lede">When is there a live game on the radio? Click any day. Same idea as <a href="https://buffedlizard55-lab.github.io/ScheduleFreeTime/">ScheduleFreeTime</a>, narrowed to the six frequencies you can actually receive. Every row keeps the source link that produced it.</p>
-      <p class="verified" id="verified">Loading the verified snapshot…</p>
+      <p class="verified" id="verified" aria-live="polite">Loading the schedule snapshot…</p>
       <div class="controls">
         <div class="ctl">
           <span>Station</span>
@@ -212,7 +215,7 @@
         <div class="timeline" id="timeline" aria-hidden="true"></div>
         <div class="ticks" aria-hidden="true"><span>6a</span><span>10a</span><span>2p</span><span>6p</span><span>10p</span><span>12a</span></div>
         <div id="conflicts"></div>
-        <h3>On the radio this day</h3>
+        <h3>Source-backed radio listings for this day</h3>
         <div id="log"></div>
       </section>
       <aside>
@@ -236,7 +239,7 @@
 
     <section class="ref" id="band">
       <h2>Does live sport really fill 10 AM to 10 PM?</h2>
-      <p style="max-width:78ch">You said it looked that way. Rather than repeat the claim, this measures it: for every day in the snapshot, the estimated union of verified game broadcasts inside the 10 AM – 10 PM band, on the six stations, with overlapping games counted once.</p>
+      <p style="max-width:78ch">You said it looked that way. Rather than repeat the claim, this measures the estimated union of non-conditional source-backed broadcast windows inside the 10 AM – 10 PM band, with overlaps counted once. Indicated rows are not per-game clearances; if-necessary playoff placeholders are shown separately and excluded.</p>
       <div class="stat-row" id="band-stats"></div>
       <div class="durations">
         <div class="durations-head">
@@ -274,7 +277,7 @@
   <footer>
     <div class="wrap">
       <p>Line-by-line list: <a href="docs/LINE_BY_LINE.md">docs/LINE_BY_LINE.md</a>. What was fetched and when: <a href="docs/VERIFICATION.md">docs/VERIFICATION.md</a>. Limits and the next pass: <a href="docs/LIMITATIONS.md">docs/LIMITATIONS.md</a>. Charter: <a href="docs/PROJECT_PROMPT.md">docs/PROJECT_PROMPT.md</a>.</p>
-      <p>This is a static snapshot, not a live station log. Rebuild with <code>python3 scripts/build_feed.py</code> after a fresh source check.</p>
+      <p>This is a static snapshot, not a live station log. A daily, read-only GitHub Action compares only the future MLB postseason API schedule with this snapshot and opens or refreshes a review issue if it changes or the check fails. It does not edit the feed, publish a new Pages snapshot, confirm station clearance, or monitor the other source pages. Rebuild with <code>python3 scripts/build_feed.py</code> only after a fresh source review.</p>
     </div>
   </footer>
   <script src="scripts/logic.js"></script>
@@ -348,22 +351,14 @@
           return '<span class="pill ' + STATION_CLASS[s] + '">' + esc(meta ? meta.label : s) + "</span>";
         }).join("") + "</span>";
       }
-      function airState(b, now) {
-        if (!b.date) return "unplaced";
-        if (b.status === "final") return "aired";
-        if (!b.start_pt) return b.date < now.iso ? "aired" : "tba";
-        if (b.date < now.iso) return "aired";
-        if (b.date > now.iso) return "upcoming";
-        var start = L.minutes(b.start_pt);
-        var end = start + (b.duration_est_min || 0);
-        if (now.minutes < start) return b.status === "pregame" ? "pregame" : "upcoming";
-        if (now.minutes < end) return "on";
-        return "aired";
-      }
       function stateLabel(code) {
         return {
-          aired: "Aired", upcoming: "Scheduled", pregame: "Pre-game",
-          on: "Estimated on air", tba: "Time TBD", unplaced: "Date TBD"
+          final: "Game final · radio not verified", upcoming: "Scheduled", pregame: "Pre-game",
+          on: "Estimated window now · not live-checked", tba: "Time TBD", unplaced: "Date TBD",
+          conditional: "If necessary · not confirmed",
+          mixed: "Mixed listing · estimate omitted",
+          "past-unchecked": "Date passed · result not refreshed",
+          "elapsed-unchecked": "Estimated window elapsed · result not checked"
         }[code] || code;
       }
       function sourceLinks(b) {
@@ -390,10 +385,13 @@
       function renderStations() {
         var all = ROWS;
         document.getElementById("stations").innerHTML = DATA.meta.stations.map(function (s) {
-          var n = all.filter(function (b) { return b.stations.indexOf(s.id) !== -1; }).length;
+          var stationRows = all.filter(function (b) { return b.stations.indexOf(s.id) !== -1; });
+          var n = stationRows.length;
+          var conditional = stationRows.filter(L.isConditional).length;
           return '<article class="card"><h3><i class="dot ' + STATION_CLASS[s.id] + '"></i> ' +
             esc(s.label) + " · " + esc(s.call) + "</h3><p>" + esc(s.role) + "</p>" +
-            '<p class="notes">' + n + " broadcast" + (n === 1 ? "" : "s") + " in this snapshot." +
+            '<p class="notes">' + n + " schedule entr" + (n === 1 ? "y" : "ies") + " in this snapshot" +
+            (conditional ? ", including " + conditional + " if-necessary listing" + (conditional === 1 ? "" : "s") : "") + "." +
             (s.listen ? ' <a href="' + esc(s.listen) + '" rel="noopener">Station source</a>' : "") + "</p></article>";
         }).join("");
       }
@@ -436,18 +434,29 @@
         var rows = visible(ROWS).filter(function (b) { return b.date && b.date > from; }).slice(0, 6);
         document.getElementById("upnext").innerHTML = rows.length ? rows.map(function (b) {
           return '<li><button type="button" data-jump="' + esc(b.date) + '">' +
-            '<span class="when">' + esc(b.date.slice(5)) + " " + esc(b.start_pt ? L.label12(b.start_pt).replace(" PT", "") : "TBD") + "</span>" +
+            '<span class="when">' + (L.hasConditionalPossibility(b) ? "Includes if-necessary games · " : "") + esc(b.date.slice(5)) + " " +
+              esc(b.start_pt ? L.label12(b.start_pt).replace(" PT", "") : "TBD") + "</span>" +
             "<span>" + esc(b.title) + "</span></button></li>";
         }).join("") : '<li class="notes">Nothing later in this snapshot matches the current filters.</li>';
       }
       function renderBand() {
-        var s = L.bandSummary(visible(ROWS), DATA.meta.window_start, DATA.meta.window_end, BAND_LO, BAND_HI);
+        var filteredRows = visible(ROWS);
+        var s = L.bandSummary(filteredRows, DATA.meta.window_start, DATA.meta.window_end, BAND_LO, BAND_HI);
+        var fourHourRows = filteredRows.map(function (b) {
+          var copy = {};
+          for (var key in b) if (Object.prototype.hasOwnProperty.call(b, key)) copy[key] = b[key];
+          copy.duration_est_min = 240;
+          return copy;
+        });
+        var fourHour = L.bandSummary(fourHourRows, DATA.meta.window_start, DATA.meta.window_end, BAND_LO, BAND_HI);
         var pct = Math.round(s.meanCovered / s.span * 100);
         document.getElementById("band-stats").innerHTML =
-          '<div class="stat"><b>' + s.daysWithGames + " / " + s.dayCount + "</b><span>days with at least one verified game</span></div>" +
-          '<div class="stat"><b>' + s.daysMajority + "</b><span>days where games cover more than half of 10 AM – 10 PM</span></div>" +
+          '<div class="stat"><b>' + s.daysWithListings + " / " + s.dayCount + "</b><span>days with at least one non-conditional schedule listing</span></div>" +
+          '<div class="stat"><b>' + s.daysWithPossibilities + "</b><span>days with an if-necessary possibility</span></div>" +
+          '<div class="stat"><b>' + s.daysConditionalOnly + "</b><span>days with only if-necessary possibilities, not a confirmed game listing</span></div>" +
+          '<div class="stat"><b>' + s.daysMajority + "</b><span>days where estimated windows cover more than half of 10 AM – 10 PM</span></div>" +
           '<div class="stat"><b>' + L.formatDuration(s.meanCovered) + "</b><span>average per day across the whole snapshot (" + pct + "% of the band)</span></div>" +
-          '<div class="stat"><b>' + L.formatDuration(s.meanCoveredOnGameDays) + "</b><span>average on the days that do have a game</span></div>";
+          '<div class="stat"><b>' + L.formatDuration(s.meanCoveredOnListingDays) + "</b><span>average on days with a non-conditional listing</span></div>";
         var maxAvg = 1;
         var avgs = s.byWeekday.map(function (w) {
           var v = w.days ? Math.round(w.covered / w.days) : 0;
@@ -460,71 +469,92 @@
             "<small>" + L.WEEKDAYS[i].slice(0, 3) + "<br>" + L.formatDuration(v) + "</small></div>";
         }).join("");
         var busiest = s.busiest && s.busiest.covered
-          ? "The busiest single day in the snapshot is " + L.formatLong(s.busiest.date) + " with " + L.formatDuration(s.busiest.covered) + " of the band covered."
+          ? "The busiest single day in the snapshot is " + L.formatLong(s.busiest.date) + " with estimated windows covering " + L.formatDuration(s.busiest.covered) + " of the band."
           : "";
         document.getElementById("band-note").textContent =
-          "Verdict: the 10-to-10 band is mostly talk on a weekday and mostly games on an autumn Saturday and Sunday. " +
-          busiest + " Kickoff-TBD rows contribute zero minutes here, so this is a floor, not a ceiling. " +
-          "Lengths are estimates and the boxes above change them, but the conclusion does not rest on " +
-          "them: set every sport to a generous four hours and the average still only reaches 2h 13m of " +
-          "the twelve-hour band, with the same 18 days over half.";
+          "These are estimated windows from the current snapshot and selected filters, not a station log. " +
+          busiest + " Kickoff-TBD rows, if-necessary placeholders and mixed grouped rows add no minutes; mixed rows are omitted as a whole because per-game times are unavailable. Duration values are assumptions, not measured airtime. " +
+          "At a generous four hours for every timed non-conditional listing, the mean would be " +
+          L.formatDuration(fourHour.meanCovered) + " across all " + fourHour.dayCount + " days, with " +
+          fourHour.daysMajority + " days over half of the 10 AM–10 PM band.";
       }
 
       function renderDay() {
         var now = laNow();
         var date = state.date;
         var meta = DATA.meta;
-        var zone = (date >= "2026-11-01" && date < "2027-03-14") ? "PST (UTC−8)" : "PDT (UTC−7)";
+        var zoneParts = new Intl.DateTimeFormat("en-US", {
+          timeZone: "America/Los_Angeles", timeZoneName: "short"
+        }).formatToParts(new Date(date + "T20:00:00Z"));
+        var zone = zoneParts.find(function (p) { return p.type === "timeZoneName"; }).value;
         document.getElementById("day-title").textContent = L.formatLong(date) + " · " + zone;
         document.getElementById("jump").value = date;
         var before = date < meta.window_start;
         var after = date > meta.window_end;
-        var rows = L.sortBroadcasts(visible(L.byDate(ROWS, date)));
+        var allRows = L.sortBroadcasts(visible(L.byDate(ROWS, date)));
+        var conditionalRows = allRows.filter(L.isConditional);
+        var possibilityRows = allRows.filter(L.hasConditionalPossibility);
+        var possibleGames = possibilityRows.reduce(function (sum, b) {
+          return sum + L.conditionalGameCount(b);
+        }, 0);
+        var rows = allRows.filter(function (b) { return !L.isConditional(b); });
+        var estimateRows = rows.filter(function (b) { return !L.hasConditionalPossibility(b); });
         var answer = document.getElementById("answer");
         answer.className = "answer";
         if (before || after) {
-          answer.innerHTML = "<strong>Outside this snapshot.</strong> The verified list runs " +
+          answer.innerHTML = "<strong>Outside this snapshot.</strong> The source-backed list runs " +
             esc(L.formatLong(meta.window_start)) + " through " + esc(L.formatLong(meta.window_end)) +
-            ". A blank day inside that range means no verified game, not a promise the air is empty of talk.";
+            ". A blank day inside that range means no listing in this snapshot, not a promise the air is empty of talk.";
           document.getElementById("timeline").innerHTML = "";
           document.getElementById("conflicts").innerHTML = "";
           document.getElementById("log").innerHTML = "";
           renderUpNext();
           return;
         }
-        var covered = L.unionMinutes(rows, BAND_LO, BAND_HI);
+        var covered = L.unionMinutes(estimateRows, BAND_LO, BAND_HI);
         var pct = Math.round(covered / (BAND_HI - BAND_LO) * 100);
         var tbd = rows.filter(function (b) { return !b.start_pt; }).length;
-        var onAir = rows.filter(function (b) { return airState(b, now) === "on"; });
+        var onAir = estimateRows.filter(function (b) { return L.airState(b, now) === "on"; });
         var head;
         if (date === now.iso && onAir.length) {
           answer.className = "answer onair";
-          head = "<strong>On the air right now (estimated): " + esc(onAir[0].title) + "</strong> on " +
+          head = "<strong>Estimated game window overlaps now (not live-checked): " + esc(onAir[0].title) + "</strong> on " +
             esc(onAir[0].stations.join(", ")) + ". ";
+        } else if (!rows.length && conditionalRows.length) {
+          head = "<strong>No non-conditional listing; " + possibleGames + " " +
+            (possibleGames === 1 ? "if-necessary game is" : "if-necessary games are") + " possible, not confirmed.</strong> ";
         } else if (!rows.length) {
-          head = "<strong>No verified game on your stations this day.</strong> ";
+          head = "<strong>No scheduled broadcast listing in this snapshot for this day.</strong> ";
         } else {
-          head = "<strong>" + rows.length + " verified broadcast" + (rows.length === 1 ? "" : "s") + ".</strong> ";
+          head = "<strong>" + rows.length + " scheduled listing" + (rows.length === 1 ? "" : "s") + ".</strong> ";
         }
+        var conditionalNote = possibleGames
+          ? " " + possibleGames + " postseason game" + (possibleGames === 1 ? " is" : "s are") +
+            " listed only if necessary and not confirmed. Conditional possibilities are excluded from estimates and conflicts; a mixed grouped row is omitted as a whole because per-game times are unavailable."
+          : "";
+        var listedStations = DATA.meta.stations.filter(function (s) {
+          return rows.some(function (b) { return b.stations.indexOf(s.id) !== -1; });
+        }).map(function (s) { return esc(s.label); }).join(", ");
+        var possibleStations = DATA.meta.stations.filter(function (s) {
+          return possibilityRows.some(function (b) { return b.stations.indexOf(s.id) !== -1; }) &&
+            !rows.some(function (b) { return b.stations.indexOf(s.id) !== -1; });
+        }).map(function (s) { return esc(s.label); }).join(", ");
         answer.innerHTML = head +
-          "Estimated live-game time between 10 AM and 10 PM: " + L.formatDuration(covered) + " of 12h" +
-          (tbd ? " (plus " + tbd + " start time" + (tbd === 1 ? "" : "s") + " still TBD, not counted)" : "") + ". " +
+          "Estimated broadcast time from scheduled listings between 10 AM and 10 PM: " + L.formatDuration(covered) + " of 12h" +
+          (tbd ? " (plus " + tbd + " scheduled start time" + (tbd === 1 ? "" : "s") + " still TBD, not counted)" : "") + ". " +
           (covered * 2 > (BAND_HI - BAND_LO)
             ? "That estimated union is a majority of the window today. It is not a standing weekday pattern."
-            : "That is not a majority of the 10 AM–10 PM window. Talk shows may still be on. They are not listed as games.") +
+            : "That is not a majority of the 10 AM–10 PM window. Talk shows may still be on; they are not listed as games.") +
+          esc(conditionalNote) +
           '<div class="meter" aria-hidden="true"><span style="width:' + pct + '%"></span></div>' +
-          '<p class="sub">Stations busy today: ' +
-          (rows.length
-            ? DATA.meta.stations.filter(function (s) {
-                return rows.some(function (b) { return b.stations.indexOf(s.id) !== -1; });
-              }).map(function (s) { return esc(s.label); }).join(", ")
-            : "none") + ".</p>";
+          '<p class="sub">Stations with scheduled listings: ' + (listedStations || "none") + "." +
+          (possibleStations ? " Conditional-only station(s): " + possibleStations + "." : "") + "</p>";
 
         var timeline = document.getElementById("timeline");
         var origin = 6 * 60, span = 18 * 60;
         var bandLeft = ((BAND_LO - origin) / span) * 100;
         var bandWidth = ((BAND_HI - BAND_LO) / span) * 100;
-        var blocks = rows.filter(function (b) { return b.start_pt; }).map(function (b) {
+        var blocks = estimateRows.filter(function (b) { return b.start_pt; }).map(function (b) {
           var start = Math.max(origin, L.minutes(b.start_pt));
           var end = Math.min(origin + span, L.minutes(b.start_pt) + b.duration_est_min);
           if (end <= origin || start >= origin + span) return "";
@@ -543,18 +573,24 @@
           return '<div class="warn">' + esc(c.text) + "</div>";
         }).join("");
 
-        if (!rows.length) {
+        if (!allRows.length) {
           document.getElementById("log").innerHTML =
-            '<p class="answer">No verified live game on your stations this day. KNBR, 1050 and 960 may still be airing sports talk, and the Known gaps list below shows what this snapshot cannot see.</p>';
+            '<p class="answer">No scheduled listing in this snapshot for this day. KNBR, 1050 and 960 may still be airing sports talk, and the Known gaps list below shows what this snapshot cannot see.</p>';
           renderUpNext();
           return;
         }
-        var body = rows.map(function (b) {
-          var code = airState(b, now);
+        var body = allRows.map(function (b) {
+          var code = L.airState(b, now);
           var reviewNotes = (b.flag_ids || []).map(function (id) {
             var f = DATA.flags.find(function (x) { return x.id === id; });
             return f && f.severity === "review" ? '<div class="notes">Flagged: ' + esc(f.title) + "</div>" : "";
           }).join("");
+          var conditionalCount = L.conditionalGameCount(b);
+          var conditionalBadge = conditionalCount
+            ? '<span class="badge conditional">' + esc(L.isConditional(b)
+              ? conditionalCount + " game" + (conditionalCount === 1 ? "" : "s") + " only if necessary"
+              : conditionalCount + " of " + b.game_count + " games only if necessary") + "</span>"
+            : "";
           return '<tr class="' + (b.start_pt ? "" : "tbd-row") + '"><td>' +
             esc(b.start_pt ? L.label12(b.start_pt) : "Time TBD") +
             '<div class="notes">' + (b.start_pt ? "est. " + L.formatDuration(b.duration_est_min) : "") + "</div></td>" +
@@ -562,9 +598,9 @@
             '<td><div class="title">' + esc(b.title) + "</div>" +
             '<span class="badge ' + esc(b.confidence) + '">' + esc(b.confidence) + "</span>" +
             '<span class="badge ' + esc(code) + '">' + esc(stateLabel(code)) + "</span>" +
-            (b.conditional ? '<span class="badge conditional">Only if the series goes this far</span>' : "") +
+            conditionalBadge +
             (b.network ? '<span class="badge net">' + esc(b.network) + "</span>" : "") +
-            (b.result ? '<span class="badge aired">' + esc(b.result) + "</span>" : "") +
+            (b.result ? '<span class="badge result">Game result: ' + esc(b.result) + "</span>" : "") +
             (b.confidence !== "official" ? reviewNotes : "") +
             '<p class="notes">' + esc(b.venue) + (b.venue ? " · " : "") + esc(b.notes) + "</p>" +
             sourceLinks(b) + "</td></tr>";
@@ -589,15 +625,28 @@
         var html = cells.map(function (iso) {
           if (!iso) return '<div class="cell"></div>';
           var inWin = L.inWindow(iso, DATA.meta.window_start, DATA.meta.window_end);
-          var rows = inWin ? visible(L.byDate(ROWS, iso)) : [];
+          var allRows = inWin ? visible(L.byDate(ROWS, iso)) : [];
+          var rows = allRows.filter(function (b) { return !L.isConditional(b); });
+          var possibilities = allRows.filter(L.hasConditionalPossibility);
+          var possibleGames = possibilities.reduce(function (sum, b) {
+            return sum + L.conditionalGameCount(b);
+          }, 0);
           var order = DATA.meta.stations.map(function (s) { return s.id; });
           var dots = order.filter(function (id) {
             return rows.some(function (b) { return b.stations.indexOf(id) !== -1; });
           });
-          var mini = dots.slice(0, 6).map(function (s) { return '<i class="' + STATION_CLASS[s] + '"></i>'; }).join("");
+          var possibleDots = order.filter(function (id) {
+            return possibilities.some(function (b) { return b.stations.indexOf(id) !== -1; });
+          });
+          var mini = dots.slice(0, 6).map(function (s) { return '<i class="' + STATION_CLASS[s] + '"></i>'; }).join("") +
+            possibleDots.slice(0, 6).map(function () { return '<i class="possible" aria-hidden="true"></i>'; }).join("");
           var cls = "cell" + (inWin ? " in" : "") + (rows.length ? " has" : "") +
+            (possibilities.length ? " possible" : "") +
             (iso === state.date ? " selected" : "") + (iso === now ? " today" : "");
-          var label = L.formatLong(iso) + ": " + (rows.length ? rows.length + " broadcast" + (rows.length === 1 ? "" : "s") : "nothing verified");
+          var label = L.formatLong(iso) + ": " + (inWin
+            ? (rows.length ? rows.length + " non-conditional schedule listing" + (rows.length === 1 ? "" : "s") : "no non-conditional schedule listing") +
+              (possibleGames ? ", " + possibleGames + " if-necessary game possibilit" + (possibleGames === 1 ? "y" : "ies") : "")
+            : "outside this snapshot");
           return '<button type="button" class="' + cls + '" data-date="' + iso + '" aria-label="' + esc(label) + '"' +
             (iso === state.date ? ' aria-current="date"' : "") + ">" +
             '<div class="num">' + L.parseISO(iso).d + '</div><div class="mini">' + mini + "</div></button>";
@@ -619,6 +668,7 @@
         return { y: y, m: m };
       }
       function setDate(iso, push) {
+        if (!L.isISODate(iso)) return false;
         state.date = iso;
         var p = L.parseISO(iso);
         var shown = clampToBounds(p.y, p.m);
@@ -627,6 +677,7 @@
         if (push !== false) history.replaceState(null, "", "#" + iso);
         renderDay();
         renderCal();
+        return true;
       }
       function shiftMonth(n) {
         var m = state.month + n, y = state.year;
@@ -701,7 +752,7 @@
           setDate(L.inWindow(now, DATA.meta.window_start, DATA.meta.window_end) ? now : DATA.meta.snapshot_date);
         });
         document.getElementById("jump").addEventListener("change", function (ev) {
-          if (/^\d{4}-\d{2}-\d{2}$/.test(ev.target.value)) setDate(ev.target.value);
+          if (L.isISODate(ev.target.value)) setDate(ev.target.value);
         });
         document.getElementById("prev-month").addEventListener("click", function () { shiftMonth(-1); });
         document.getElementById("next-month").addEventListener("click", function () { shiftMonth(1); });
@@ -721,6 +772,7 @@
           }).slice(0, 8);
           box.innerHTML = hits.map(function (b) {
             return '<li><button type="button" data-jump="' + esc(b.date || "") + '">' +
+              (L.hasConditionalPossibility(b) ? "Includes if-necessary games · " : "") +
               esc(b.date || "Date TBD") + " · " + esc(b.title) + "</button></li>";
           }).join("") || '<li class="notes">No match in this snapshot.</li>';
         });
@@ -745,16 +797,28 @@
         var jump = document.getElementById("jump");
         jump.min = data.meta.window_start;
         jump.max = data.meta.window_end;
-        document.getElementById("verified").textContent =
-          "Verified snapshot " + data.meta.snapshot_date + " · " + data.meta.timezone + " · " +
-          data.meta.counts.broadcasts + " broadcasts over " +
+        var today = laNow().iso;
+        var snapshotDeltaDays = Math.floor((Date.parse(today + "T00:00:00Z") -
+          Date.parse(data.meta.snapshot_date + "T00:00:00Z")) / 86400000);
+        var ageDays = Math.max(0, snapshotDeltaDays);
+        var verified = document.getElementById("verified");
+        var snapshotSummary = L.bandSummary(data.broadcasts, data.meta.window_start, data.meta.window_end, BAND_LO, BAND_HI);
+        verified.className = "verified" + (snapshotDeltaDays > 0 ? " stale" : "");
+        verified.textContent = (snapshotDeltaDays > 0
+          ? "STALE · " + ageDays + " day" + (ageDays === 1 ? "" : "s") + " since the snapshot date " + data.meta.snapshot_date + ". Schedules may have changed. "
+          : snapshotDeltaDays < 0
+            ? "Snapshot date " + data.meta.snapshot_date + " is later than the current Pacific date. This is not a live log. "
+            : "Snapshot date " + data.meta.snapshot_date + " (Pacific today). This is not a live log. ") +
+          data.meta.timezone + " · " + data.meta.counts.broadcasts + " schedule entries; " +
+          data.meta.counts.conditional + " fully conditional rows; " + data.meta.counts.conditional_games +
+          " if-necessary game possibilities across " + snapshotSummary.daysWithPossibilities + " dates (including mixed rows). " +
           L.eachDate(data.meta.window_start, data.meta.window_end).length + " days (" +
           data.meta.counts.official + " official, " + data.meta.counts.indicated + " indicated, " +
           data.meta.counts.review + " need review) and " + data.meta.counts.flags +
           " flagged irregularities. " + data.meta.verified_note;
         document.getElementById("cal-note").textContent =
-          "A dot means a verified broadcast on a station you get, in station order. Days before " +
-          data.meta.window_start + " are outside this snapshot, not \u201cno game\u201d.";
+          "Solid dots are non-conditional listings; hollow amber dots are if-necessary possibilities, in station order. Days outside " +
+          data.meta.window_start + "–" + data.meta.window_end + " are outside this snapshot, not \u201cno game\u201d.";
         rebuildRows();
         renderStations();
         renderLegend();
@@ -764,7 +828,7 @@
         var hash = location.hash.replace("#", "");
         var now = laNow().iso;
         var start = data.meta.snapshot_date;
-        if (/^\d{4}-\d{2}-\d{2}$/.test(hash)) start = hash;
+        if (L.isISODate(hash)) start = hash;
         else if (L.inWindow(now, data.meta.window_start, data.meta.window_end)) start = now;
         state.date = start;
         refreshAll();
