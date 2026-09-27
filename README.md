@@ -2,7 +2,7 @@
 
 ## Project charter — read this first
 
-Read this before changing the feed. The same text is in [docs/PROJECT_PROMPT.md](docs/PROJECT_PROMPT.md).
+Read this before changing the feed. The same text is in [docs/PROJECT_PROMPT.md](docs/PROJECT_PROMPT.md); the start-of-session checklist is [AGENTS.md](AGENTS.md).
 
 Review the repo.
 
@@ -131,35 +131,42 @@ Even assigning a generous four-hour estimate to every timed non-conditional list
 
 ## Monitoring, rebuild and tests
 
-A scheduled, read-only GitHub Action checks **five** machine-readable schedule sources every day:
+A scheduled, read-only GitHub Action (`source watch`, daily) runs **three** monitors and opens or refreshes one review issue when anything moves:
 
-| Source | What it watches | Rows covered |
-| --- | --- | ---: |
-| MLB 2026 postseason Stats API | future dates, game counts, descriptions and TBD start times | 28 |
-| Westwood One NFL grid | the event ids and printed titles the network is advertising | 63 |
-| Westwood One college football grid | same, including the SEC Championship and Army–Navy | 11 |
-| Westwood One college basketball grid | currently empty — any event appearing is reported as drift | 0 |
-| Westwood One U.S. Soccer grid | same | 5 |
+| Monitor | Source | What it watches | Rows covered |
+| --- | --- | --- | ---: |
+| `source_watch.py` | MLB 2026 postseason Stats API | future dates, game counts, descriptions and TBD start times | 28 |
+| `wwo_watch.py` | Westwood One NFL grid | event ids and printed titles the network advertises | 63 |
+| `wwo_watch.py` | Westwood One college football grid | same, including the SEC Championship and Army–Navy | 11 |
+| `wwo_watch.py` | Westwood One college basketball grid | currently empty — any event appearing is reported as drift | 0 |
+| `wwo_watch.py` | Westwood One U.S. Soccer grid | same | 5 |
+| `page_watch.py` | 49ers.com, calbears.com, ESPN's Stanford feed, KNBR's Stanford page, the Earthquakes radio release | the exact radio/venue/opponent strings the rows were transcribed from | 37 |
+| `page_watch.py` | NFL important-dates article and the nfl.com POST schedule URL | round-date text; alert when a postseason grid is published | 7 |
+| `page_watch.py` | KNBR 1050 weekly grid, USF 2026-27 basketball schedule | alert when the frozen grid refreshes or a station name appears on the USF schedule | 0 (gap watch) |
 
-That is **107 of the 153 rows** under automated watch, up from 28. A detected difference, or a check that cannot complete, opens or refreshes a single review issue. The college basketball grid is watched precisely because it is empty: it is the largest hole in the winter half of the window, and the monitor will report the moment Westwood One publishes it.
+That is **151 of the 153 rows** under a daily watch, up from 107. The other two are the Giants and Athletics finales on the snapshot date itself. **Confirmed live on 2026-09-27** from GitHub's runners (the development sandbox cannot reach these hosts): MLB clear, all four Westwood One grids clear, all nine pages clear. Every pull request also runs the `source watch preview` workflow, which runs all three monitors live and keeps one sticky PR comment with the reports, so a reviewer sees the current source state before merging.
 
-Two failure modes are kept strictly apart. A grid that should list events and returns none, or a page whose expected heading cannot be found, is reported as **unavailable** — the schedule state is unknown — and never as "no drift". A parser that silently matched nothing would otherwise look identical to a source that had not changed.
+**Bug fixed this pass:** the MLB monitor read `startTimeTBD` from the top level of each game, but the live API nests it inside `status`. Every scheduled run would have reported "unavailable". The test fixture had the same invented shape, which is why the tests passed. The monitor now reads the real shape, and a regression test runs against the real API response saved on 2026-09-27 (`scripts/fixtures/`).
 
-The monitors **never** edit `data/broadcasts.json` or publish a new GitHub Pages snapshot. They do not check the club, school or station pages, and they cannot establish per-game affiliate clearance. The static snapshot must still be reviewed and rebuilt by hand before a change appears on the site.
+The page watcher does **not** parse schedules. Each `expect` string in `data/page_watch.json` was read on the live page; if one disappears, the page changed and the listed rows need a human re-read. Each `alert_if_present` string was absent; if it appears, new information may have been published. A page that cannot be fetched is **unavailable**, never "unchanged". ESPN's HTML schedule answers automated requests with HTTP 202, so the watcher reads ESPN's schedule feed for the same data.
+
+Two failure modes are kept strictly apart throughout: **changed** (a real difference) and **unavailable** (state unknown). A parser that silently matched nothing must never look like a source that had not changed.
+
+The monitors **never** edit `data/broadcasts.json` or publish a new GitHub Pages snapshot, and they cannot establish per-game affiliate clearance. The snapshot is still reviewed and rebuilt by hand before a change appears on the site.
 
 ```bash
 python3 scripts/build_feed.py        # regenerates data/broadcasts.json + docs/LINE_BY_LINE.md
-python3 scripts/source_watch_test.py # offline tests for the MLB monitor
+python3 scripts/source_watch_test.py # offline tests for the MLB monitor (incl. real-response fixture)
 python3 scripts/wwo_watch_test.py    # offline tests for the Westwood One grid monitor
+python3 scripts/page_watch_test.py   # offline tests for the page watcher
 node scripts/ui_logic_test.js        # date, conditional, band-math and feed invariants
 node scripts/render_smoke_test.js    # real inline page script over all 155 dates
-python3 scripts/source_watch.py      # optional live MLB check; exit 2=drift, 3=unavailable
-python3 scripts/wwo_watch.py         # optional live grid check; exit 2=drift, 3=unavailable
+python3 scripts/source_watch.py      # live MLB check; exit 0=clear, 2=drift, 3=unavailable
+python3 scripts/wwo_watch.py         # live grid check; same exit codes
+python3 scripts/page_watch.py        # live page check; same exit codes
 ```
 
-Both watchers take `--input <json>` so they can be run against saved responses without a network, and `--today` so the future/past split is testable. The Westwood One watcher reads its widget ids, row-id prefixes and merged 49ers event ids from `meta.wwo_watch` in the feed, so the watcher and the feed cannot disagree about which grid belongs to which rows.
-
-Do not add a row to the JSON by hand. Add it in `scripts/build_feed.py` only after a fresh source check, then rebuild. The `verify` GitHub Action regenerates the curated feed and rejects drift, and runs both offline watcher suites plus the UI and page-render tests. The scheduled watcher is **not** an auto-publisher; it is an early-warning check over the machine-readable part of the feed, not automatic maintenance of all of it.
+All three watchers take `--input <json>` so they can run against saved responses without a network. Do not add a row to the JSON by hand: add it in `scripts/build_feed.py` after a fresh source check, then rebuild. The `verify` Action regenerates the feed, rejects drift, and runs all offline suites plus the UI and page-render tests.
 
 ## Docs
 
@@ -167,3 +174,5 @@ Do not add a row to the JSON by hand. Add it in `scripts/build_feed.py` only aft
 - [docs/VERIFICATION.md](docs/VERIFICATION.md) — which pages were fetched on 2026-09-27, what they settled, and what the source monitor can and cannot see
 - [docs/LIMITATIONS.md](docs/LIMITATIONS.md) — what is still missing, limitations of automation and prioritized follow-up
 - [docs/PROJECT_PROMPT.md](docs/PROJECT_PROMPT.md) — the charter, same text as the top of this file
+- [AGENTS.md](AGENTS.md) — the start-of-session checklist: charter, open watch issues, the PR preview comment, the rules
+- [data/page_watch.json](data/page_watch.json) — the pages and exact strings the page watcher checks

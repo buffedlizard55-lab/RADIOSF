@@ -75,11 +75,12 @@ Because KTCT 1050 is a full-time ESPN Radio affiliate, the 28 postseason date-ro
 ### Checked and deliberately not added
 - **https://www.westwoodonesports.com/ncaa-basketball/** — "No upcoming events". There is no 2026-27 national college basketball grid to transcribe.
 - **https://calbears.com/sports/mens-basketball/schedule** — 2026-27 games from Nov 2, TBD times, no radio column.
+- **https://www.thesportsleader.com/stanfordbasketball/** — "Page Not Found" (2026-09-27). KNBR's site has a Stanford Football page and no basketball equivalent.
 - **https://usfdons.com/sports/mens-basketball/schedule** and **https://usfdons.com/sports/mens-basketball/schedule/text** — current 2026-27 schedule. The text-table columns are Date, Time, At, Opponent, Location, Tournament and Result; no Radio/Listen field. The live page shows TV logos for some games, not a station assignment. A prior-season official preview, **https://usfdons.com/news/2026/1/27/mens-basketball-san-francisco-heads-to-santa-clara-for-late-night-showdown**, explicitly says "Listen: KNBR 1050" for the Jan 28, 2026 game. That is evidence for 2025-26 only, not a 2026-27 renewal, so it is linked in `MBB_NO_RADIO_ROWS` but no 2026-27 row is inferred from it.
 
 ## Automated monitoring boundary
 
-`.github/workflows/source-watch.yml` runs daily and can also be dispatched manually. It now runs **two** read-only monitors and opens or refreshes **one** combined review issue.
+`.github/workflows/source-watch.yml` runs daily and can also be dispatched manually. It runs **three** read-only monitors and opens or refreshes **one** combined review issue.
 
 | Monitor | Source | Compares | Rows |
 | --- | --- | --- | ---: |
@@ -88,12 +89,38 @@ Because KTCT 1050 is a full-time ESPN Radio affiliate, the 28 postseason date-ro
 | `scripts/wwo_watch.py` | Westwood One college football grid (47030) | event ids and printed titles | 11 |
 | `scripts/wwo_watch.py` | Westwood One college basketball grid (47031) | event ids — the snapshot expects none, so any event is drift | 0 |
 | `scripts/wwo_watch.py` | Westwood One U.S. Soccer grid (47032) | event ids and printed titles | 5 |
+| `scripts/page_watch.py` | 49ers.com schedule | radio lines, Week 11 and Week 18 venues | 15 |
+| `scripts/page_watch.py` | calbears.com schedule; ESPN Stanford schedule feed; KNBR Stanford page | Radio column text; opponents; station statement | 15 |
+| `scripts/page_watch.py` | Earthquakes 2026 radio release | radio column, Oct 31 and Nov 7 rows; alert on "Playoffs" | 7 |
+| `scripts/page_watch.py` | NFL important dates (seahawks.com); nfl.com/schedules/2026/POST | round-date text; alert on "Wild Card Weekend" | 7 |
+| `scripts/page_watch.py` | KNBR 1050 grid; USF 2026-27 men's basketball text schedule | frozen-week marker; alert on "KNBR" | gap watch |
 
-That is **107 of the 153 rows** under automated watch. The widget ids, the row-id prefixes and the four merged 49ers event ids are read from `meta.wwo_watch` in the feed itself, so the watcher and the snapshot cannot disagree about which grid belongs to which rows.
+That is **151 of the 153 rows** under a daily watch; the remaining two (Giants and Athletics finales) are dated 2026-09-27, the snapshot date. The Westwood One watcher reads its widget ids, row-id prefixes and merged 49ers event ids from `meta.wwo_watch` in the feed. The page watcher reads `data/page_watch.json`; every `expect` string there was read on the live page on 2026-09-27 and every `alert_if_present` string was absent.
 
-Both monitors are read-only: neither edits the snapshot, publishes a new Pages build, verifies affiliate clearances, nor monitors the club, school or station pages. The 46 rows built from 49ers.com, mlb.com, calbears.com, ESPN, sjearthquakes.com and the KNBR grids still need a human re-read. A monitor that cannot complete reports **unavailable** and never “no drift”: for the Westwood One watcher that includes a grid which returns no events at all when the snapshot has rows built from it, and a page whose expected heading cannot be found, because a parser that silently matched nothing would otherwise be indistinguishable from a source that had not changed. Where one widget fails and another shows real drift, the combined status is **changed**, so a failure cannot bury a difference.
+All monitors are read-only: none edits the snapshot, publishes a Pages build, or verifies affiliate clearance. The page watcher reports that text moved; it does not parse a schedule. A monitor that cannot complete reports **unavailable** and never "no drift". Where one check fails and another shows real drift, the combined status is **changed**, so a failure cannot bury a difference.
 
-Direct live runs of both scripts in this development sandbox on 2026-09-27 could not complete: outbound TLS from the sandbox is closed (`EOF`) for `statsapi.mlb.com` and `westwoodonesports.com` alike. Each monitor correctly reported **unavailable** with a per-widget line, not “no drift”, and exited 3. Their comparison and failure behavior is covered by the offline suites. **The Westwood One HTML parser has therefore not yet been confirmed against a live fetch from this sandbox**; it is tested against fixtures built from the exact event ids, titles and venues printed on the grids when they were read through the fetch tool today, and its first scheduled run in CI is the live confirmation. If the markup differs enough that no heading can be located, the watcher reports unavailable and opens an issue rather than passing silently.
+### Live confirmation, 2026-09-27
+
+The development sandbox still cannot open TLS connections to these hosts (`EOF`). The monitors were therefore confirmed live from GitHub's runners through the new `source watch preview` workflow on pull request #6. It runs on every PR and posts one sticky comment:
+
+- MLB postseason API: **clear**, 28 dates and 53 games, all TBD, matching the snapshot. The same response was also read through the fetch tool, saved as `scripts/fixtures/mlb_postseason_2026-09-27.json` and compared offline: no differences.
+- Westwood One: **clear** on all four grids — NFL 67 events listed (63 snapshot rows compared), college football 11, college basketball empty as expected, U.S. Soccer 5. This is the first live confirmation of the HTML parser.
+- Pages: **clear** on all nine. ESPN's HTML schedule page returned HTTP 202 to automation on the first run; the watcher now reads ESPN's schedule feed (`site.api.espn.com/.../teams/24/schedule`), which carries the same games.
+
+**Defect found by the live run:** the MLB monitor read `startTimeTBD` at the top level of each game, but the API nests it under `status`. Every scheduled run would have reported "unavailable" and opened a misleading issue. The synthetic test fixture had the same wrong shape. Both are fixed, and a regression test now runs against the real response.
+
+**Second defect:** the issue body de-duplication removed only the first "Checked:" timestamp line. With one line per report, the review issue would have been rewritten on every run even when nothing changed. The regular expression is now global.
+
+### Hand re-verification, 2026-09-27 (fifth pass)
+
+Re-read through the fetch tool and compared with the feed line by line. No discrepancies were found:
+
+- **49ers.com/schedule/** — all 15 rows: date, Pacific kickoff, radio line (Week 3 "KSFO 810 AM / KSAN 107.7 FM"; Weeks 4–18 "KSAN 107.7 FM / KNBR 104.5 FM / 680 AM"), venue, Week 8 bye, Week 18 TBD.
+- **calbears.com/sports/football/schedule/text** and the main schedule — Oct 3 12:30 PM at UNLV; every later game still has no time; "Radio: KSFO 810 AM" on the game rows.
+- **ESPN Stanford schedule** — Oct 3 12:00 PM ET (9:00 PT), Oct 10 3:30 PM ET (12:30 PT), Oct 17 7:30 PM ET (4:30 PT), Oct 23 10:30 PM ET (7:30 PT); Oct 31, Nov 14, Nov 21 and Nov 28 TBD.
+- **Earthquakes radio release** — Oct 10, 14, 17, 24, 28, 31 and Nov 7 times and "810 / 1370", unchanged.
+- **nfl.com/schedules/2026/POST** — still redirects to the regular-season page, so there are still no per-game playoff rows.
+- **KNBR 1050 grid** — still prints "MONDAY 8-31".
 
 ## Transcription rule, and where it was broken
 
@@ -140,7 +167,7 @@ their venue field is empty.
 
 `node scripts/ui_logic_test.js` checks the Pacific conversion, twelve-hour labels, ISO dates, past/elapsed status wording, conditional and mixed-row exclusion from estimated time and conflict calculations, Sunday-start calendar grids, the band maths, and the shipped JSON invariants — including conditional game counts and feed ordering.
 
-`python3 scripts/source_watch_test.py` tests the read-only MLB monitor against synthetic API responses without network access. `python3 scripts/wwo_watch_test.py` does the same for the Westwood One grid monitor with 29 cases: it checks that the three anchors sharing one event href yield the printed title rather than the artwork or the “Full Details” chrome, that the generic “Upcoming Broadcasts” strip below a grid cannot inject another sport's events into it, that a missing heading or an empty grid where rows exist is a failure and not a clean result, that a past row dropping off the grid is not drift while a future or undated one is, that the four merged 49ers events are not reported as missing, that a populated college basketball grid is reported as drift, and that the exit codes are 0 clear / 2 changed / 3 unavailable. `node scripts/render_smoke_test.js` extracts the real inline script from `index.html`, runs it against the real feed in a DOM shim, walks **all 155 days**, exercises the filters, navigation, date picker, search and duration controls, and fails if the page asks for an element id that is not in the markup. Regression cases cover out-of-range and invalid dates, mixed/fully conditional postseason rows, and duration reset.
+`python3 scripts/source_watch_test.py` tests the read-only MLB monitor against synthetic API responses and the saved real response, without network access. `python3 scripts/page_watch_test.py` covers the page watcher: tag-split strings, entity and typography folding, a vanished expected string, an appearing alert string, fetch failure and empty bodies reported as unavailable, change outranking unavailable, and config validation. `python3 scripts/wwo_watch_test.py` does the same for the Westwood One grid monitor with 29 cases: it checks that the three anchors sharing one event href yield the printed title rather than the artwork or the “Full Details” chrome, that the generic “Upcoming Broadcasts” strip below a grid cannot inject another sport's events into it, that a missing heading or an empty grid where rows exist is a failure and not a clean result, that a past row dropping off the grid is not drift while a future or undated one is, that the four merged 49ers events are not reported as missing, that a populated college basketball grid is reported as drift, and that the exit codes are 0 clear / 2 changed / 3 unavailable. `node scripts/render_smoke_test.js` extracts the real inline script from `index.html`, runs it against the real feed in a DOM shim, walks **all 155 days**, exercises the filters, navigation, date picker, search and duration controls, and fails if the page asks for an element id that is not in the markup. Regression cases cover out-of-range and invalid dates, mixed/fully conditional postseason rows, and duration reset.
 
 ## What was deliberately left out
 

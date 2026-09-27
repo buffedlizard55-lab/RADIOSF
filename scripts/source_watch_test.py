@@ -30,7 +30,8 @@ class SourceWatchTests(unittest.TestCase):
                     games.append({
                         "officialDate": game_date,
                         "description": description,
-                        "startTimeTBD": True,
+                        # Real API shape: startTimeTBD lives inside "status".
+                        "status": {"detailedState": "Scheduled", "startTimeTBD": True},
                     })
             dates.append({"date": game_date, "games": games})
         return {"dates": dates}
@@ -41,10 +42,23 @@ class SourceWatchTests(unittest.TestCase):
         self.assertEqual(len(self.expected), 28)
         self.assertEqual(sum(item["count"] for item in self.expected.values()), 53)
 
+    def test_real_api_response_shape_matches_snapshot(self):
+        # Regression: the live API nests startTimeTBD under "status". The monitor
+        # once read it from the top level and would have reported every run as
+        # unavailable. The fixture is the real response fetched 2026-09-27.
+        fixture = Path(__file__).resolve().parent / "fixtures" / "mlb_postseason_2026-09-27.json"
+        document = json.loads(fixture.read_text(encoding="utf-8"))
+        for block in document["dates"]:
+            for game in block["games"]:
+                self.assertNotIn("startTimeTBD", game)
+        observed = source_watch.observed_schedule(document, self.today)
+        self.assertEqual(source_watch.compare(self.expected, observed), [])
+
     def test_new_game_date_is_reported(self):
         api = self.api_fixture()
         api["dates"].append({"date": "2026-11-01", "games": [{
-            "officialDate": "2026-11-01", "description": "New postseason game", "startTimeTBD": True,
+            "officialDate": "2026-11-01", "description": "New postseason game",
+            "status": {"startTimeTBD": True},
         }]})
         observed = source_watch.observed_schedule(api, self.today)
         self.assertTrue(any("2026-11-01" in item and "no row" in item for item in
@@ -54,7 +68,7 @@ class SourceWatchTests(unittest.TestCase):
         api = self.api_fixture()
         game = api["dates"][0]["games"][0]
         game["description"] = "Renamed postseason game"
-        game["startTimeTBD"] = False
+        game["status"]["startTimeTBD"] = False
         observed = source_watch.observed_schedule(api, self.today)
         differences = source_watch.compare(self.expected, observed)
         self.assertTrue(any("Newly returned or renamed" in item for item in differences))
@@ -62,7 +76,8 @@ class SourceWatchTests(unittest.TestCase):
 
     def test_past_dates_are_ignored(self):
         api = {"dates": [{"date": "2026-09-26", "games": [{
-            "officialDate": "2026-09-26", "description": "Already played", "startTimeTBD": False,
+            "officialDate": "2026-09-26", "description": "Already played",
+            "status": {"startTimeTBD": False},
         }]}]}
         self.assertEqual(source_watch.observed_schedule(api, self.today), {})
 

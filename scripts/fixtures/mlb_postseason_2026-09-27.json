@@ -1,0 +1,622 @@
+{
+ "_source": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1 (fields-filtered), fetched 2026-09-27",
+ "dates": [
+  {
+   "date": "2026-09-29",
+   "games": [
+    {
+     "gamePk": 849849,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "AL Wild Card 'A' Game 1",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849851,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "AL Wild Card 'B' Game 1",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849845,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NL Wild Card 'A' Game 1",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849843,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NL Wild Card 'B' Game 1",
+     "ifNecessary": "N"
+    }
+   ]
+  },
+  {
+   "date": "2026-09-30",
+   "games": [
+    {
+     "gamePk": 849848,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "AL Wild Card 'B' Game 2",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849846,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "AL Wild Card 'A' Game 2",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849841,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NL Wild Card 'A' Game 2",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849842,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NL Wild Card 'B' Game 2",
+     "ifNecessary": "N"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-01",
+   "games": [
+    {
+     "gamePk": 849850,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "AL Wild Card 'A' Game 3",
+     "ifNecessary": "Y"
+    },
+    {
+     "gamePk": 849844,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NL Wild Card 'A' Game 3",
+     "ifNecessary": "Y"
+    },
+    {
+     "gamePk": 849847,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "AL Wild Card 'B' Game 3",
+     "ifNecessary": "Y"
+    },
+    {
+     "gamePk": 849840,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NL Wild Card 'B' Game 3",
+     "ifNecessary": "Y"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-03",
+   "games": [
+    {
+     "gamePk": 849835,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALDS 'A' Game 1",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849829,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALDS 'B' Game 1",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849830,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLDS 'A' Game 1",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849828,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLDS 'B' Game 1",
+     "ifNecessary": "N"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-04",
+   "games": [
+    {
+     "gamePk": 849825,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLDS 'A' Game 2",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849823,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLDS 'B' Game 2",
+     "ifNecessary": "N"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-05",
+   "games": [
+    {
+     "gamePk": 849839,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALDS 'A' Game 2",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849834,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALDS 'B' Game 2",
+     "ifNecessary": "N"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-06",
+   "games": [
+    {
+     "gamePk": 849819,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLDS 'B' Game 3",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849826,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLDS 'A' Game 3",
+     "ifNecessary": "N"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-07",
+   "games": [
+    {
+     "gamePk": 849838,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALDS 'A' Game 3",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849822,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLDS 'B' Game 4",
+     "ifNecessary": "Y"
+    },
+    {
+     "gamePk": 849833,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALDS 'B' Game 3",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849827,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLDS 'A' Game 4 ",
+     "ifNecessary": "Y"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-08",
+   "games": [
+    {
+     "gamePk": 849837,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALDS 'A' Game 4",
+     "ifNecessary": "Y"
+    },
+    {
+     "gamePk": 849832,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALDS 'B' Game 4",
+     "ifNecessary": "Y"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-09",
+   "games": [
+    {
+     "gamePk": 849824,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLDS 'A' Game 5",
+     "ifNecessary": "Y"
+    },
+    {
+     "gamePk": 849821,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLDS 'B' Game 5",
+     "ifNecessary": "Y"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-10",
+   "games": [
+    {
+     "gamePk": 849836,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALDS 'A' Game 5",
+     "ifNecessary": "Y"
+    },
+    {
+     "gamePk": 849831,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALDS 'B' Game 5",
+     "ifNecessary": "Y"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-11",
+   "games": [
+    {
+     "gamePk": 849809,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLCS Game 1",
+     "ifNecessary": "N"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-12",
+   "games": [
+    {
+     "gamePk": 849820,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALCS Game 1",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849812,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLCS Game 2",
+     "ifNecessary": "N"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-13",
+   "games": [
+    {
+     "gamePk": 849813,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALCS Game 2",
+     "ifNecessary": "N"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-14",
+   "games": [
+    {
+     "gamePk": 849811,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLCS Game 3",
+     "ifNecessary": "N"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-15",
+   "games": [
+    {
+     "gamePk": 849818,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALCS Game 3",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849810,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLCS Game 4",
+     "ifNecessary": "N"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-16",
+   "games": [
+    {
+     "gamePk": 849817,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALCS Game 4",
+     "ifNecessary": "N"
+    },
+    {
+     "gamePk": 849808,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLCS Game 5",
+     "ifNecessary": "Y"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-17",
+   "games": [
+    {
+     "gamePk": 849816,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALCS Game 5",
+     "ifNecessary": "Y"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-18",
+   "games": [
+    {
+     "gamePk": 849806,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLCS Game 6",
+     "ifNecessary": "Y"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-19",
+   "games": [
+    {
+     "gamePk": 849807,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "NLCS Game 7",
+     "ifNecessary": "Y"
+    },
+    {
+     "gamePk": 849815,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALCS Game 6",
+     "ifNecessary": "Y"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-20",
+   "games": [
+    {
+     "gamePk": 849814,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "ALCS Game 7",
+     "ifNecessary": "Y"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-23",
+   "games": [
+    {
+     "gamePk": 849805,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "World Series Game 1",
+     "ifNecessary": "N"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-24",
+   "games": [
+    {
+     "gamePk": 849802,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "World Series Game 2",
+     "ifNecessary": "N"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-26",
+   "games": [
+    {
+     "gamePk": 849804,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "World Series Game 3",
+     "ifNecessary": "N"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-27",
+   "games": [
+    {
+     "gamePk": 849803,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "World Series Game 4",
+     "ifNecessary": "N"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-28",
+   "games": [
+    {
+     "gamePk": 849799,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "World Series Game 5",
+     "ifNecessary": "Y"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-30",
+   "games": [
+    {
+     "gamePk": 849801,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "World Series Game 6",
+     "ifNecessary": "Y"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-31",
+   "games": [
+    {
+     "gamePk": 849800,
+     "status": {
+      "detailedState": "Scheduled",
+      "startTimeTBD": true
+     },
+     "description": "World Series Game 7",
+     "ifNecessary": "Y"
+    }
+   ]
+  }
+ ]
+}

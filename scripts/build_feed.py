@@ -564,8 +564,14 @@ FLAGS = [
             "and results but no Radio/Listen field; the live schedule displays TV logos for some "
             "games. An official 2025-26 preview did say \"Listen: KNBR 1050\", but that is prior-season "
             "evidence, not confirmation of a 2026-27 station assignment. KTCT's station record also "
-            "names the Dons as an affiliate, which is not a season schedule. Stanford basketball was "
-            "not re-verified onto 1050. Basketball is therefore absent from "
+            "names the Dons as an affiliate, which is not a season schedule. Stanford basketball: "
+            "KNBR's site has a Stanford Football page, but thesportsleader.com/stanfordbasketball "
+            "returned \"Page Not Found\" on 2026-09-27, and the gostanford pages naming KNBR 1050 for "
+            "men's basketball date from 2013 and 2017, so nothing is placed on 1050 for 2026-27. "
+            "Re-checked 2026-09-27: the USF 2026-27 text schedule now lists 34 dates, still with no "
+            "station and mostly blank times. The daily page watch alerts when \"KNBR\" appears on it, "
+            "and the Westwood One watch alerts when its basketball grid gains an event. "
+            "Basketball is therefore absent from "
             "November to February, which is a gap in this feed, not a quiet radio dial."
         ),
         "url": WWO_NCAAB_URL,

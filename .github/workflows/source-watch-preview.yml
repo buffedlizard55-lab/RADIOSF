@@ -1,0 +1,57 @@
+name: source watch preview
+# Runs the three read-only monitors live on every pull request so a reviewer can
+# see, before merging, whether the sources still match the snapshot. It is
+# informational: it never fails the check, never opens an issue, never edits the
+# feed. It keeps one sticky PR comment up to date with the three reports. The
+# daily "source watch" workflow remains the one that files issues.
+on:
+  pull_request:
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run every monitor against the live sources
+        run: |
+          set +e
+          python3 scripts/source_watch.py --report "$RUNNER_TEMP/mlb.md"; mlb=$?
+          python3 scripts/wwo_watch.py --report "$RUNNER_TEMP/wwo.md"; wwo=$?
+          python3 scripts/page_watch.py --report "$RUNNER_TEMP/pages.md"; pages=$?
+          for r in mlb wwo pages; do
+            cat "$RUNNER_TEMP/$r.md"
+            cat "$RUNNER_TEMP/$r.md" >> "$GITHUB_STEP_SUMMARY"
+            printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+          done
+          echo "exit codes (0 clear, 2 changed, 3 unavailable): mlb=$mlb wwo=$wwo pages=$pages"
+          exit 0
+      - name: Keep one sticky PR comment with the live reports
+        if: always() && github.event.pull_request.head.repo.full_name == github.repository
+        continue-on-error: true
+        uses: actions/github-script@v7
+        env:
+          REPORT_DIR: ${{ runner.temp }}
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- radiosf-source-watch-preview -->';
+            const read = name => {
+              const path = `${process.env.REPORT_DIR}/${name}.md`;
+              return fs.existsSync(path) ? fs.readFileSync(path, 'utf8') : `_${name} report missing_`;
+            };
+            const body = `${marker}\n**Live source-watch preview** for ${context.sha.slice(0, 7)} ` +
+              `(informational, read-only)\n\n` + ['mlb', 'wwo', 'pages'].map(read).join('\n\n---\n\n');
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number });
+            const mine = comments.find(c => (c.body || '').startsWith(marker));
+            if (mine) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: mine.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
