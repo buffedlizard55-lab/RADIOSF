@@ -692,12 +692,38 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: AL Wild Card 'A' Game 1; AL Wild Card 'B' Game 1; NL Wild Card 'A' Game 1; NL Wild Card 'B' Game 1. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "AL Wild Card 'A' Game 1",
+          "away": "Chicago White Sox",
+          "home": "HOU/TEX",
+          "conditional": false
+        },
+        {
+          "description": "AL Wild Card 'B' Game 1",
+          "away": "Boston Red Sox",
+          "home": "New York Yankees",
+          "conditional": false
+        },
+        {
+          "description": "NL Wild Card 'A' Game 1",
+          "away": "NL Wild Card #3",
+          "home": "Atlanta Braves",
+          "conditional": false
+        },
+        {
+          "description": "NL Wild Card 'B' Game 1",
+          "away": "Chicago Cubs",
+          "home": "San Diego Padres",
+          "conditional": false
+        }
       ],
       "game_count": 4,
       "conditional_game_count": 0
@@ -737,12 +763,38 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: AL Wild Card 'A' Game 2; AL Wild Card 'B' Game 2; NL Wild Card 'A' Game 2; NL Wild Card 'B' Game 2. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "AL Wild Card 'B' Game 2",
+          "away": "Boston Red Sox",
+          "home": "New York Yankees",
+          "conditional": false
+        },
+        {
+          "description": "AL Wild Card 'A' Game 2",
+          "away": "Chicago White Sox",
+          "home": "HOU/TEX",
+          "conditional": false
+        },
+        {
+          "description": "NL Wild Card 'A' Game 2",
+          "away": "NL Wild Card #3",
+          "home": "Atlanta Braves",
+          "conditional": false
+        },
+        {
+          "description": "NL Wild Card 'B' Game 2",
+          "away": "Chicago Cubs",
+          "home": "San Diego Padres",
+          "conditional": false
+        }
       ],
       "game_count": 4,
       "conditional_game_count": 0
@@ -823,12 +875,38 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: AL Wild Card 'A' Game 3; AL Wild Card 'B' Game 3; NL Wild Card 'A' Game 3; NL Wild Card 'B' Game 3. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "AL Wild Card 'A' Game 3",
+          "away": "Chicago White Sox",
+          "home": "HOU/TEX",
+          "conditional": true
+        },
+        {
+          "description": "NL Wild Card 'A' Game 3",
+          "away": "NL Wild Card #3",
+          "home": "Atlanta Braves",
+          "conditional": true
+        },
+        {
+          "description": "AL Wild Card 'B' Game 3",
+          "away": "Boston Red Sox",
+          "home": "New York Yankees",
+          "conditional": true
+        },
+        {
+          "description": "NL Wild Card 'B' Game 3",
+          "away": "Chicago Cubs",
+          "home": "San Diego Padres",
+          "conditional": true
+        }
       ],
       "game_count": 4,
       "conditional_game_count": 4
@@ -980,12 +1058,38 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: ALDS 'A' Game 1; ALDS 'B' Game 1; NLDS 'A' Game 1; NLDS 'B' Game 1. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "ALDS 'A' Game 1",
+          "away": "AL 4/5 Winner",
+          "home": "Tampa Bay Rays",
+          "conditional": false
+        },
+        {
+          "description": "ALDS 'B' Game 1",
+          "away": "AL 3/6 Winner",
+          "home": "Cleveland Guardians",
+          "conditional": false
+        },
+        {
+          "description": "NLDS 'A' Game 1",
+          "away": "NL 4/5 Winner",
+          "home": "Milwaukee Brewers",
+          "conditional": false
+        },
+        {
+          "description": "NLDS 'B' Game 1",
+          "away": "NL 3/6 Winner",
+          "home": "Los Angeles Dodgers",
+          "conditional": false
+        }
       ],
       "game_count": 4,
       "conditional_game_count": 0
@@ -1187,12 +1291,26 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: NLDS 'A' Game 2; NLDS 'B' Game 2. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "NLDS 'A' Game 2",
+          "away": "NL 4/5 Winner",
+          "home": "Milwaukee Brewers",
+          "conditional": false
+        },
+        {
+          "description": "NLDS 'B' Game 2",
+          "away": "NL 3/6 Winner",
+          "home": "Los Angeles Dodgers",
+          "conditional": false
+        }
       ],
       "game_count": 2,
       "conditional_game_count": 0
@@ -1273,12 +1391,26 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: ALDS 'A' Game 2; ALDS 'B' Game 2. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "ALDS 'A' Game 2",
+          "away": "AL 4/5 Winner",
+          "home": "Tampa Bay Rays",
+          "conditional": false
+        },
+        {
+          "description": "ALDS 'B' Game 2",
+          "away": "AL 3/6 Winner",
+          "home": "Cleveland Guardians",
+          "conditional": false
+        }
       ],
       "game_count": 2,
       "conditional_game_count": 0
@@ -1357,12 +1489,26 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: NLDS 'A' Game 3; NLDS 'B' Game 3. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "NLDS 'B' Game 3",
+          "away": "Los Angeles Dodgers",
+          "home": "NL 3/6 Winner",
+          "conditional": false
+        },
+        {
+          "description": "NLDS 'A' Game 3",
+          "away": "Milwaukee Brewers",
+          "home": "NL 4/5 Winner",
+          "conditional": false
+        }
       ],
       "game_count": 2,
       "conditional_game_count": 0
@@ -1402,12 +1548,38 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: ALDS 'A' Game 3; ALDS 'B' Game 3; NLDS 'A' Game 4; NLDS 'B' Game 4. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "ALDS 'A' Game 3",
+          "away": "Tampa Bay Rays",
+          "home": "AL 4/5 Winner",
+          "conditional": false
+        },
+        {
+          "description": "NLDS 'B' Game 4",
+          "away": "Los Angeles Dodgers",
+          "home": "NL 3/6 Winner",
+          "conditional": true
+        },
+        {
+          "description": "ALDS 'B' Game 3",
+          "away": "Cleveland Guardians",
+          "home": "AL 3/6 Winner",
+          "conditional": false
+        },
+        {
+          "description": "NLDS 'A' Game 4",
+          "away": "Milwaukee Brewers",
+          "home": "NL 4/5 Winner",
+          "conditional": true
+        }
       ],
       "game_count": 4,
       "conditional_game_count": 2
@@ -1488,12 +1660,26 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: ALDS 'A' Game 4; ALDS 'B' Game 4. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "ALDS 'A' Game 4",
+          "away": "Tampa Bay Rays",
+          "home": "AL 4/5 Winner",
+          "conditional": true
+        },
+        {
+          "description": "ALDS 'B' Game 4",
+          "away": "Cleveland Guardians",
+          "home": "AL 3/6 Winner",
+          "conditional": true
+        }
       ],
       "game_count": 2,
       "conditional_game_count": 2
@@ -1533,12 +1719,26 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: NLDS 'A' Game 5; NLDS 'B' Game 5. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "NLDS 'A' Game 5",
+          "away": "NL 4/5 Winner",
+          "home": "Milwaukee Brewers",
+          "conditional": true
+        },
+        {
+          "description": "NLDS 'B' Game 5",
+          "away": "NL 3/6 Winner",
+          "home": "Los Angeles Dodgers",
+          "conditional": true
+        }
       ],
       "game_count": 2,
       "conditional_game_count": 2
@@ -1721,12 +1921,26 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: ALDS 'A' Game 5; ALDS 'B' Game 5. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "ALDS 'A' Game 5",
+          "away": "AL 4/5 Winner",
+          "home": "Tampa Bay Rays",
+          "conditional": true
+        },
+        {
+          "description": "ALDS 'B' Game 5",
+          "away": "AL 3/6 Winner",
+          "home": "Cleveland Guardians",
+          "conditional": true
+        }
       ],
       "game_count": 2,
       "conditional_game_count": 2
@@ -1927,12 +2141,20 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: NLCS Game 1. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "NLCS Game 1",
+          "away": "NL Lower Seed",
+          "home": "NL Higher Seed",
+          "conditional": false
+        }
       ],
       "game_count": 1,
       "conditional_game_count": 0
@@ -2013,12 +2235,26 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: ALCS Game 1; NLCS Game 2. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "ALCS Game 1",
+          "away": "AL Lower Seed",
+          "home": "AL Higher Seed",
+          "conditional": false
+        },
+        {
+          "description": "NLCS Game 2",
+          "away": "NL Lower Seed",
+          "home": "NL Higher Seed",
+          "conditional": false
+        }
       ],
       "game_count": 2,
       "conditional_game_count": 0
@@ -2097,12 +2333,20 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: ALCS Game 2. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "ALCS Game 2",
+          "away": "AL Lower Seed",
+          "home": "AL Higher Seed",
+          "conditional": false
+        }
       ],
       "game_count": 1,
       "conditional_game_count": 0
@@ -2173,12 +2417,20 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: NLCS Game 3. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "NLCS Game 3",
+          "away": "NL Higher Seed",
+          "home": "NL Lower Seed",
+          "conditional": false
+        }
       ],
       "game_count": 1,
       "conditional_game_count": 0
@@ -2259,12 +2511,26 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: ALCS Game 3; NLCS Game 4. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "ALCS Game 3",
+          "away": "AL Higher Seed",
+          "home": "AL Lower Seed",
+          "conditional": false
+        },
+        {
+          "description": "NLCS Game 4",
+          "away": "NL Higher Seed",
+          "home": "NL Lower Seed",
+          "conditional": false
+        }
       ],
       "game_count": 2,
       "conditional_game_count": 0
@@ -2304,12 +2570,26 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: ALCS Game 4; NLCS Game 5. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "ALCS Game 4",
+          "away": "AL Higher Seed",
+          "home": "AL Lower Seed",
+          "conditional": false
+        },
+        {
+          "description": "NLCS Game 5",
+          "away": "NL Higher Seed",
+          "home": "NL Lower Seed",
+          "conditional": true
+        }
       ],
       "game_count": 2,
       "conditional_game_count": 1
@@ -2453,12 +2733,20 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: ALCS Game 5. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "ALCS Game 5",
+          "away": "AL Higher Seed",
+          "home": "AL Lower Seed",
+          "conditional": true
+        }
       ],
       "game_count": 1,
       "conditional_game_count": 1
@@ -2629,12 +2917,20 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: NLCS Game 6. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "NLCS Game 6",
+          "away": "NL Lower Seed",
+          "home": "NL Higher Seed",
+          "conditional": true
+        }
       ],
       "game_count": 1,
       "conditional_game_count": 1
@@ -2708,12 +3004,26 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: ALCS Game 6; NLCS Game 7. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "NLCS Game 7",
+          "away": "NL Lower Seed",
+          "home": "NL Higher Seed",
+          "conditional": true
+        },
+        {
+          "description": "ALCS Game 6",
+          "away": "AL Lower Seed",
+          "home": "AL Higher Seed",
+          "conditional": true
+        }
       ],
       "game_count": 2,
       "conditional_game_count": 2
@@ -2753,12 +3063,20 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: ALCS Game 7. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "ALCS Game 7",
+          "away": "AL Lower Seed",
+          "home": "AL Higher Seed",
+          "conditional": true
+        }
       ],
       "game_count": 1,
       "conditional_game_count": 1
@@ -2880,12 +3198,20 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: World Series Game 1. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "World Series Game 1",
+          "away": "Lower Seed League Champion",
+          "home": "Higher Seed League Champion",
+          "conditional": false
+        }
       ],
       "game_count": 1,
       "conditional_game_count": 0
@@ -2988,12 +3314,20 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: World Series Game 2. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "World Series Game 2",
+          "away": "Lower Seed League Champion",
+          "home": "Higher Seed League Champion",
+          "conditional": false
+        }
       ],
       "game_count": 1,
       "conditional_game_count": 0
@@ -3235,12 +3569,20 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: World Series Game 3. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "World Series Game 3",
+          "away": "Higher Seed League Champion",
+          "home": "Lower Seed League Champion",
+          "conditional": false
+        }
       ],
       "game_count": 1,
       "conditional_game_count": 0
@@ -3280,12 +3622,20 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: World Series Game 4. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "World Series Game 4",
+          "away": "Higher Seed League Champion",
+          "home": "Lower Seed League Champion",
+          "conditional": false
+        }
       ],
       "game_count": 1,
       "conditional_game_count": 0
@@ -3356,12 +3706,20 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: World Series Game 5. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "World Series Game 5",
+          "away": "Higher Seed League Champion",
+          "home": "Lower Seed League Champion",
+          "conditional": true
+        }
       ],
       "game_count": 1,
       "conditional_game_count": 1
@@ -3442,12 +3800,20 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: World Series Game 6. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "World Series Game 6",
+          "away": "Lower Seed League Champion",
+          "home": "Higher Seed League Champion",
+          "conditional": true
+        }
       ],
       "game_count": 1,
       "conditional_game_count": 1
@@ -3604,12 +3970,20 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Stats API descriptions for this date: World Series Game 7. First pitch was still TBD on every postseason game when the endpoint was read on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
         "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "description": "World Series Game 7",
+          "away": "Lower Seed League Champion",
+          "home": "Higher Seed League Champion",
+          "conditional": true
+        }
       ],
       "game_count": 1,
       "conditional_game_count": 1

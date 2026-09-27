@@ -180,6 +180,16 @@ feed.broadcasts.forEach(function (row) {
     assert.ok(row.game_count != null && row.conditional_game_count <= row.game_count,
       row.id + " conditional count needs a total and cannot exceed it");
   }
+  if (row.id.startsWith("mlb-post-")) {
+    assert.ok(Array.isArray(row.game_details), row.id + " lists MLB schedule slots");
+    assert.strictEqual(row.game_details.length, row.game_count, row.id + " matchup count matches game count");
+    assert.strictEqual(row.game_details.filter(function (g) { return g.conditional; }).length,
+      row.conditional_game_count, row.id + " conditional details match the count");
+    row.game_details.forEach(function (g) {
+      assert.ok(g.description && g.away && g.home, row.id + " has complete matchup fields");
+      assert.strictEqual(typeof g.conditional, "boolean", row.id + " has explicit conditional status");
+    });
+  }
   if (row.status === "if-necessary") {
     assert.ok(L.isConditional(row), row.id + " must identify conditional postseason listings");
     assert.strictEqual(row.conditional_game_count, row.game_count,

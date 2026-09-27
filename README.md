@@ -97,6 +97,12 @@ Leaving January 17, 18, 23 and 24 blank would have read as "no live sports radio
 
 An earlier version of this feed called these dates "not official". They are the league's own announcement; that was wrong and it is corrected here.
 
+## MLB postseason: published matchups, start times still TBD
+
+The MLB Stats API currently lists all 53 postseason game slots across 28 dates, with away/home labels and `ifNecessary` status. The site now shows those API-printed matchup labels on each date, including unresolved placeholders such as “AL 4/5 Winner”; it does not guess the teams behind a placeholder. The API still marks every first pitch TBD, so no MLB postseason clock time is displayed. Games marked if necessary remain possibilities, not confirmed games. This is the MLB schedule—not a per-game 1050 clearance: ESPN's national radio coverage plus KTCT's ESPN affiliate relationship only supports an **indicated** listing, and local preemption remains possible.
+
+The original watch only compared dates, counts, descriptions and TBD status. It could miss a changed opponent or conditional marker while still reporting “clear.” The monitor now compares each game's description, away/home labels and if-necessary status too. Its saved real-response fixture includes those fields; changes open a review issue and never auto-publish.
+
 ## The 10 AM–10 PM observation — measured, not assumed
 
 For each of the 155 dates, the page takes the union of estimated windows for **non-conditional** rows inside 10 AM–10 PM, counting overlaps once. If-necessary placeholders are excluded. Rows without a listed start time contribute zero estimated minutes. The measure is an estimate from a schedule snapshot—not measured airtime, a live station log or proof of affiliate clearance.
@@ -135,7 +141,7 @@ A scheduled, read-only GitHub Action (`source watch`, daily) runs **three** moni
 
 | Monitor | Source | What it watches | Rows covered |
 | --- | --- | --- | ---: |
-| `source_watch.py` | MLB 2026 postseason Stats API | future dates, game counts, descriptions and TBD start times | 28 |
+| `source_watch.py` | MLB 2026 postseason Stats API | future dates, counts, descriptions, away/home matchup labels, if-necessary markers and TBD start times | 28 |
 | `wwo_watch.py` | Westwood One NFL grid | event ids and printed titles the network advertises | 63 |
 | `wwo_watch.py` | Westwood One college football grid | same, including the SEC Championship and Army–Navy | 11 |
 | `wwo_watch.py` | Westwood One college basketball grid | currently empty — any event appearing is reported as drift | 0 |
@@ -146,7 +152,7 @@ A scheduled, read-only GitHub Action (`source watch`, daily) runs **three** moni
 
 That is **151 of the 153 rows** under a daily watch, up from 107. The other two are the Giants and Athletics finales on the snapshot date itself. **Confirmed live on 2026-09-27** from GitHub's runners (the development sandbox cannot reach these hosts): MLB clear, all four Westwood One grids clear, all nine pages clear. Every pull request also runs the `source watch preview` workflow, which runs all three monitors live and keeps one sticky PR comment with the reports, so a reviewer sees the current source state before merging.
 
-**Bug fixed this pass:** the MLB monitor read `startTimeTBD` from the top level of each game, but the live API nests it inside `status`. Every scheduled run would have reported "unavailable". The test fixture had the same invented shape, which is why the tests passed. The monitor now reads the real shape, and a regression test runs against the real API response saved on 2026-09-27 (`scripts/fixtures/`).
+**Monitor fixes:** the MLB monitor first read `startTimeTBD` from the top level of each game, but the API nests it inside `status`; that was fixed and covered by a real-response regression fixture. This pass found another blind spot: the monitor compared dates/counts/descriptions/time-TBD but not opponent labels or `ifNecessary`, so it could report clear while the matchups changed. The monitor now validates and compares all four game identity/status fields: description, away team, home team and conditional status. The feed and UI expose the verified API matchup labels while preserving unresolved seed placeholders and TBD starts. Regression tests cover matchup and conditional drift.
 
 The page watcher does **not** parse schedules. Each `expect` string in `data/page_watch.json` was read on the live page; if one disappears, the page changed and the listed rows need a human re-read. Each `alert_if_present` string was absent; if it appears, new information may have been published. A page that cannot be fetched is **unavailable**, never "unchanged". ESPN's HTML schedule answers automated requests with HTTP 202, so the watcher reads ESPN's schedule feed for the same data.
 

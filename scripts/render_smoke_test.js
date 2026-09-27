@@ -165,6 +165,11 @@ Promise.resolve().then(function () {
     if (els.log.innerHTML.indexOf("<table") !== -1) withTable++;
   });
   assert.strictEqual(withTable, 83, "every day with a listing or conditional possibility shows a table");
+  fire("cal:click", fakeEvent("data-date", "2026-09-29"));
+  assert.ok(els.log.innerHTML.indexOf("MLB schedule slots (not per-game 1050 clearance)") !== -1,
+    "MLB matchup details are clearly distinguished from per-game station clearance");
+  assert.ok(els.log.innerHTML.indexOf("Chicago White Sox at HOU/TEX") !== -1,
+    "source-printed MLB away/home labels render on the selected date");
 
   /* Conditional-only postseason dates stay visible, but neither get counted as
      scheduled days nor contribute estimated broadcast minutes. */

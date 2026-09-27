@@ -39,6 +39,7 @@ HD subchannels (KNBR-F2, KSAN HD3) are not counted.
 
 ### Baseball
 - **MLB Stats API, teams 137 and 133, 2026-09-27 → 2026-11-15** — exactly one Giants game (gamePk 823164) and one Athletics game (gamePk 824948) remain, both 12:05 PM PT on Sep 27. Nothing later exists to add.
+- **MLB Stats API postseason endpoint, re-fetched 2026-09-27** — all 53 games on 28 dates were checked for description, away/home team labels, `ifNecessary` marker and `status.startTimeTBD`. The API prints matchups or unresolved placeholders (for example “AL 4/5 Winner”), explicitly marks 21 games “If Necessary Game”, and still marks every game's start time TBD. The site now exposes those source-printed matchups and conditional markers; no placeholder is resolved by inference. The [compact fields view](https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1&fields=dates,date,games,officialDate,description,teams,away,team,name,home,status,startTimeTBD,ifNecessary,ifNecessaryDescription) was read in full; the saved fixture is `scripts/fixtures/mlb_postseason_2026-09-27.json`.
 - **https://www.mlb.com/giants/schedule/tv** — "English-language radio broadcasts: KNBR 680 AM & 104.5 FM."
 - **https://www.mlb.com/athletics/schedule/affiliates** — the A's Radio Network table, 960 AM KNEW, Bay Area.
 - **https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule** — "ESPN Radio will provide live national coverage of **all** 2026 MLB Postseason games." Wild Card from Sep 29; World Series Game 1 Fri Oct 23; a Game 7 would be Sat Oct 31.
@@ -84,7 +85,7 @@ Because KTCT 1050 is a full-time ESPN Radio affiliate, the 28 postseason date-ro
 
 | Monitor | Source | Compares | Rows |
 | --- | --- | --- | ---: |
-| `scripts/source_watch.py` | MLB postseason Stats API | future dates, game counts, descriptions and start-time TBD status | 28 |
+| `scripts/source_watch.py` | MLB postseason Stats API | future dates, game counts, descriptions, away/home matchup labels, if-necessary markers and start-time TBD status | 28 |
 | `scripts/wwo_watch.py` | Westwood One NFL grid (widget 47029) | event ids and printed titles | 63 |
 | `scripts/wwo_watch.py` | Westwood One college football grid (47030) | event ids and printed titles | 11 |
 | `scripts/wwo_watch.py` | Westwood One college basketball grid (47031) | event ids — the snapshot expects none, so any event is drift | 0 |
@@ -108,6 +109,8 @@ The development sandbox still cannot open TLS connections to these hosts (`EOF`)
 - Pages: **clear** on all nine. ESPN's HTML schedule page returned HTTP 202 to automation on the first run; the watcher now reads ESPN's schedule feed (`site.api.espn.com/.../teams/24/schedule`), which carries the same games.
 
 **Defect found by the live run:** the MLB monitor read `startTimeTBD` at the top level of each game, but the API nests it under `status`. Every scheduled run would have reported "unavailable" and opened a misleading issue. The synthetic test fixture had the same wrong shape. Both are fixed, and a regression test now runs against the real response.
+
+**Another defect found during this review:** the MLB monitor compared dates, counts, API descriptions and TBD starts, but not participant labels or the if-necessary marker. The 2026-09-27 API now exposes away/home names, so a change to who is playing (or whether a game is conditional) could previously pass as clear. The feed, displayed rows, line-by-line review, saved fixture and monitor now include and compare exact API descriptions, away/home labels, `ifNecessary` and TBD status. Unresolved seed placeholders are copied exactly rather than guessed.
 
 **Second defect:** the issue body de-duplication removed only the first "Checked:" timestamp line. With one line per report, the review issue would have been rewritten on every run even when nothing changed. The regular expression is now global.
 

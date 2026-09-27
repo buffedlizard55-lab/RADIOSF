@@ -147,6 +147,8 @@ def game(**kw) -> dict:
         "notes": kw.get("notes") or "",
         "flag_ids": kw.get("flag_ids") or [],
     }
+    if "game_details" in kw:
+        row["game_details"] = kw["game_details"]
     if "game_count" in kw:
         row["game_count"] = int(kw["game_count"])
     if "conditional_game_count" in kw:
@@ -174,6 +176,16 @@ def game(**kw) -> dict:
         row["conditional_game_count"] > row["game_count"]
     ):
         raise SystemExit(f"{row['id']} has an invalid conditional_game_count")
+    if "game_details" in row:
+        details = row["game_details"]
+        if (not isinstance(details, list) or len(details) != row.get("game_count") or
+                any(not isinstance(item, dict) or
+                    not all(isinstance(item.get(key), str) and item[key].strip()
+                            for key in ("description", "away", "home")) or
+                    not isinstance(item.get("conditional"), bool) for item in details)):
+            raise SystemExit(f"{row['id']} has incomplete game_details")
+        if sum(item["conditional"] for item in details) != row.get("conditional_game_count"):
+            raise SystemExit(f"{row['id']} game_details disagree with its conditional count")
     if row["date"] and not (WINDOW_START <= row["date"] <= WINDOW_END):
         raise SystemExit(f"{row['id']} date {row['date']} outside window")
     if row["start_pt"] and not row["date"]:
@@ -843,50 +855,123 @@ def mlb_postseason_rows() -> list[dict]:
     gets a clock time. MLB's own release puts every game on ESPN Radio; KTCT 1050 is a
     full-time ESPN Radio affiliate. That is a network row, not a per-game clearance.
     """
-    # date, round label for the title, list of exact Stats API descriptions, if-necessary count
+    # Each API schedule slot is (description, away, home, if_necessary). Team
+    # placeholders are retained verbatim; a real participant is never inferred.
     raw = [
-        ("2026-09-29", "Wild Card Series, Game 1",
-         ["AL Wild Card 'A' Game 1", "AL Wild Card 'B' Game 1", "NL Wild Card 'A' Game 1", "NL Wild Card 'B' Game 1"], 0),
-        ("2026-09-30", "Wild Card Series, Game 2",
-         ["AL Wild Card 'A' Game 2", "AL Wild Card 'B' Game 2", "NL Wild Card 'A' Game 2", "NL Wild Card 'B' Game 2"], 0),
-        ("2026-10-01", "Wild Card Series, Game 3",
-         ["AL Wild Card 'A' Game 3", "AL Wild Card 'B' Game 3", "NL Wild Card 'A' Game 3", "NL Wild Card 'B' Game 3"], 4),
-        ("2026-10-03", "Division Series, Game 1",
-         ["ALDS 'A' Game 1", "ALDS 'B' Game 1", "NLDS 'A' Game 1", "NLDS 'B' Game 1"], 0),
-        ("2026-10-04", "NL Division Series, Game 2",
-         ["NLDS 'A' Game 2", "NLDS 'B' Game 2"], 0),
-        ("2026-10-05", "AL Division Series, Game 2",
-         ["ALDS 'A' Game 2", "ALDS 'B' Game 2"], 0),
-        ("2026-10-06", "NL Division Series, Game 3",
-         ["NLDS 'A' Game 3", "NLDS 'B' Game 3"], 0),
-        ("2026-10-07", "AL Division Series Game 3, NL Division Series Game 4",
-         ["ALDS 'A' Game 3", "ALDS 'B' Game 3", "NLDS 'A' Game 4", "NLDS 'B' Game 4"], 2),
-        ("2026-10-08", "AL Division Series, Game 4",
-         ["ALDS 'A' Game 4", "ALDS 'B' Game 4"], 2),
-        ("2026-10-09", "NL Division Series, Game 5",
-         ["NLDS 'A' Game 5", "NLDS 'B' Game 5"], 2),
-        ("2026-10-10", "AL Division Series, Game 5",
-         ["ALDS 'A' Game 5", "ALDS 'B' Game 5"], 2),
-        ("2026-10-11", "NLCS Game 1", ["NLCS Game 1"], 0),
-        ("2026-10-12", "ALCS Game 1, NLCS Game 2", ["ALCS Game 1", "NLCS Game 2"], 0),
-        ("2026-10-13", "ALCS Game 2", ["ALCS Game 2"], 0),
-        ("2026-10-14", "NLCS Game 3", ["NLCS Game 3"], 0),
-        ("2026-10-15", "ALCS Game 3, NLCS Game 4", ["ALCS Game 3", "NLCS Game 4"], 0),
-        ("2026-10-16", "ALCS Game 4, NLCS Game 5", ["ALCS Game 4", "NLCS Game 5"], 1),
-        ("2026-10-17", "ALCS Game 5", ["ALCS Game 5"], 1),
-        ("2026-10-18", "NLCS Game 6", ["NLCS Game 6"], 1),
-        ("2026-10-19", "ALCS Game 6, NLCS Game 7", ["ALCS Game 6", "NLCS Game 7"], 2),
-        ("2026-10-20", "ALCS Game 7", ["ALCS Game 7"], 1),
-        ("2026-10-23", "World Series Game 1", ["World Series Game 1"], 0),
-        ("2026-10-24", "World Series Game 2", ["World Series Game 2"], 0),
-        ("2026-10-26", "World Series Game 3", ["World Series Game 3"], 0),
-        ("2026-10-27", "World Series Game 4", ["World Series Game 4"], 0),
-        ("2026-10-28", "World Series Game 5", ["World Series Game 5"], 1),
-        ("2026-10-30", "World Series Game 6", ["World Series Game 6"], 1),
-        ("2026-10-31", "World Series Game 7", ["World Series Game 7"], 1),
+        ("2026-09-29", "Wild Card Series, Game 1", [
+            ("AL Wild Card 'A' Game 1", "Chicago White Sox", "HOU/TEX", False),
+            ("AL Wild Card 'B' Game 1", "Boston Red Sox", "New York Yankees", False),
+            ("NL Wild Card 'A' Game 1", "NL Wild Card #3", "Atlanta Braves", False),
+            ("NL Wild Card 'B' Game 1", "Chicago Cubs", "San Diego Padres", False),
+        ]),
+        ("2026-09-30", "Wild Card Series, Game 2", [
+            ("AL Wild Card 'B' Game 2", "Boston Red Sox", "New York Yankees", False),
+            ("AL Wild Card 'A' Game 2", "Chicago White Sox", "HOU/TEX", False),
+            ("NL Wild Card 'A' Game 2", "NL Wild Card #3", "Atlanta Braves", False),
+            ("NL Wild Card 'B' Game 2", "Chicago Cubs", "San Diego Padres", False),
+        ]),
+        ("2026-10-01", "Wild Card Series, Game 3", [
+            ("AL Wild Card 'A' Game 3", "Chicago White Sox", "HOU/TEX", True),
+            ("NL Wild Card 'A' Game 3", "NL Wild Card #3", "Atlanta Braves", True),
+            ("AL Wild Card 'B' Game 3", "Boston Red Sox", "New York Yankees", True),
+            ("NL Wild Card 'B' Game 3", "Chicago Cubs", "San Diego Padres", True),
+        ]),
+        ("2026-10-03", "Division Series, Game 1", [
+            ("ALDS 'A' Game 1", "AL 4/5 Winner", "Tampa Bay Rays", False),
+            ("ALDS 'B' Game 1", "AL 3/6 Winner", "Cleveland Guardians", False),
+            ("NLDS 'A' Game 1", "NL 4/5 Winner", "Milwaukee Brewers", False),
+            ("NLDS 'B' Game 1", "NL 3/6 Winner", "Los Angeles Dodgers", False),
+        ]),
+        ("2026-10-04", "NL Division Series, Game 2", [
+            ("NLDS 'A' Game 2", "NL 4/5 Winner", "Milwaukee Brewers", False),
+            ("NLDS 'B' Game 2", "NL 3/6 Winner", "Los Angeles Dodgers", False),
+        ]),
+        ("2026-10-05", "AL Division Series, Game 2", [
+            ("ALDS 'A' Game 2", "AL 4/5 Winner", "Tampa Bay Rays", False),
+            ("ALDS 'B' Game 2", "AL 3/6 Winner", "Cleveland Guardians", False),
+        ]),
+        ("2026-10-06", "NL Division Series, Game 3", [
+            ("NLDS 'B' Game 3", "Los Angeles Dodgers", "NL 3/6 Winner", False),
+            ("NLDS 'A' Game 3", "Milwaukee Brewers", "NL 4/5 Winner", False),
+        ]),
+        ("2026-10-07", "AL Division Series Game 3, NL Division Series Game 4", [
+            ("ALDS 'A' Game 3", "Tampa Bay Rays", "AL 4/5 Winner", False),
+            ("NLDS 'B' Game 4", "Los Angeles Dodgers", "NL 3/6 Winner", True),
+            ("ALDS 'B' Game 3", "Cleveland Guardians", "AL 3/6 Winner", False),
+            ("NLDS 'A' Game 4", "Milwaukee Brewers", "NL 4/5 Winner", True),
+        ]),
+        ("2026-10-08", "AL Division Series, Game 4", [
+            ("ALDS 'A' Game 4", "Tampa Bay Rays", "AL 4/5 Winner", True),
+            ("ALDS 'B' Game 4", "Cleveland Guardians", "AL 3/6 Winner", True),
+        ]),
+        ("2026-10-09", "NL Division Series, Game 5", [
+            ("NLDS 'A' Game 5", "NL 4/5 Winner", "Milwaukee Brewers", True),
+            ("NLDS 'B' Game 5", "NL 3/6 Winner", "Los Angeles Dodgers", True),
+        ]),
+        ("2026-10-10", "AL Division Series, Game 5", [
+            ("ALDS 'A' Game 5", "AL 4/5 Winner", "Tampa Bay Rays", True),
+            ("ALDS 'B' Game 5", "AL 3/6 Winner", "Cleveland Guardians", True),
+        ]),
+        ("2026-10-11", "NLCS Game 1", [
+            ("NLCS Game 1", "NL Lower Seed", "NL Higher Seed", False),
+        ]),
+        ("2026-10-12", "ALCS Game 1, NLCS Game 2", [
+            ("ALCS Game 1", "AL Lower Seed", "AL Higher Seed", False),
+            ("NLCS Game 2", "NL Lower Seed", "NL Higher Seed", False),
+        ]),
+        ("2026-10-13", "ALCS Game 2", [
+            ("ALCS Game 2", "AL Lower Seed", "AL Higher Seed", False),
+        ]),
+        ("2026-10-14", "NLCS Game 3", [
+            ("NLCS Game 3", "NL Higher Seed", "NL Lower Seed", False),
+        ]),
+        ("2026-10-15", "ALCS Game 3, NLCS Game 4", [
+            ("ALCS Game 3", "AL Higher Seed", "AL Lower Seed", False),
+            ("NLCS Game 4", "NL Higher Seed", "NL Lower Seed", False),
+        ]),
+        ("2026-10-16", "ALCS Game 4, NLCS Game 5", [
+            ("ALCS Game 4", "AL Higher Seed", "AL Lower Seed", False),
+            ("NLCS Game 5", "NL Higher Seed", "NL Lower Seed", True),
+        ]),
+        ("2026-10-17", "ALCS Game 5", [
+            ("ALCS Game 5", "AL Higher Seed", "AL Lower Seed", True),
+        ]),
+        ("2026-10-18", "NLCS Game 6", [
+            ("NLCS Game 6", "NL Lower Seed", "NL Higher Seed", True),
+        ]),
+        ("2026-10-19", "ALCS Game 6, NLCS Game 7", [
+            ("NLCS Game 7", "NL Lower Seed", "NL Higher Seed", True),
+            ("ALCS Game 6", "AL Lower Seed", "AL Higher Seed", True),
+        ]),
+        ("2026-10-20", "ALCS Game 7", [
+            ("ALCS Game 7", "AL Lower Seed", "AL Higher Seed", True),
+        ]),
+        ("2026-10-23", "World Series Game 1", [
+            ("World Series Game 1", "Lower Seed League Champion", "Higher Seed League Champion", False),
+        ]),
+        ("2026-10-24", "World Series Game 2", [
+            ("World Series Game 2", "Lower Seed League Champion", "Higher Seed League Champion", False),
+        ]),
+        ("2026-10-26", "World Series Game 3", [
+            ("World Series Game 3", "Higher Seed League Champion", "Lower Seed League Champion", False),
+        ]),
+        ("2026-10-27", "World Series Game 4", [
+            ("World Series Game 4", "Higher Seed League Champion", "Lower Seed League Champion", False),
+        ]),
+        ("2026-10-28", "World Series Game 5", [
+            ("World Series Game 5", "Higher Seed League Champion", "Lower Seed League Champion", True),
+        ]),
+        ("2026-10-30", "World Series Game 6", [
+            ("World Series Game 6", "Lower Seed League Champion", "Higher Seed League Champion", True),
+        ]),
+        ("2026-10-31", "World Series Game 7", [
+            ("World Series Game 7", "Lower Seed League Champion", "Higher Seed League Champion", True),
+        ]),
     ]
     rows = []
-    for date, label, descriptions, if_nec in raw:
+    for date, label, game_details in raw:
+        descriptions = [detail[0] for detail in game_details]
+        if_nec = sum(1 for detail in game_details if detail[3])
         n = len(descriptions)
         all_conditional = if_nec == n
         suffix = " (if necessary)" if all_conditional else (f" — {if_nec} of them if necessary" if if_nec else "")
@@ -902,6 +987,10 @@ def mlb_postseason_rows() -> list[dict]:
             conditional=all_conditional,
             game_count=n,
             conditional_game_count=if_nec,
+            game_details=[
+                {"description": desc, "away": away, "home": home, "conditional": is_conditional}
+                for desc, away, home, is_conditional in game_details
+            ],
             stations=["1050"],
             confidence="indicated",
             duration_key="MLB-POST",
@@ -913,9 +1002,10 @@ def mlb_postseason_rows() -> list[dict]:
                 src("KTCT station record: network ESPN Radio", KTCT_WIKI),
             ],
             notes=(
-                f"Stats API descriptions for this date: {'; '.join(descriptions)}. "
-                "First pitch was still TBD on every postseason game when the endpoint was read on "
-                "2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a "
+                "Matchups and game labels below are transcribed from MLB's Stats API; placeholders "
+                "such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. "
+                "Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. "
+                "ESPN Radio runs one national feed, so on a "
                 f"{n}-game day at most one of these can be on 1050 at a time"
                 + (", and Stanford football, the Earthquakes or Westwood One college football can take the station instead. "
                    if date <= "2026-11-07" else ". ")
@@ -1428,7 +1518,15 @@ def line_markdown(rows: list[dict], flags: list[dict]) -> str:
         stations = ", ".join(r["stations"])
         links = ", ".join(f"[{s['label']}]({s['url']})" for s in r["sources"])
         date = r["date"] or "DATE TBD"
-        title = r["title"].replace("|", "/")
+        title = r["title"]
+        if r.get("game_details"):
+            slots = "; ".join(
+                f"{item['description']}: {item['away']} at {item['home']}" +
+                (" (if necessary)" if item["conditional"] else "")
+                for item in r["game_details"]
+            )
+            title += " — MLB API schedule slots: " + slots
+        title = title.replace("|", "/")
         status = r["status"]
         lines.append(f"| {date} | {start} | {stations} | {r['confidence']} | {status} | {title} | {links} |")
     lines += ["", "## Flags", ""]
