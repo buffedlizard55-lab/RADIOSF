@@ -39,22 +39,38 @@ jobs:
             --report "$RUNNER_TEMP/page-source-watch.md" \
             --github-output "$GITHUB_OUTPUT"
 
+      # The NBA publishes its ESPN Radio game list as a PDF, so this monitor needs
+      # a text extractor. Without one it reports the check as unavailable rather
+      # than as no drift, but installing it keeps the check meaningful.
+      - name: Install the PDF text extractor for the ESPN Radio monitor
+        run: python3 -m pip install --quiet --disable-pip-version-check pypdf
+
+      - name: Compare the NBA ESPN Radio schedule PDF with the checked-in snapshot
+        id: espn
+        continue-on-error: true
+        run: |
+          python3 scripts/espn_watch.py \
+            --report "$RUNNER_TEMP/espn-source-watch.md" \
+            --github-output "$GITHUB_OUTPUT"
+
       # A monitor that could not run is never allowed to read as "no drift", so an
       # empty output defaults to unavailable rather than clear.
-      - name: Combine all three monitors into one status
+      - name: Combine all four monitors into one status
         id: combined
         if: always()
         env:
           MLB_STATUS: ${{ steps.mlb.outputs.status }}
           WWO_STATUS: ${{ steps.wwo.outputs.wwo_status }}
           PAGE_STATUS: ${{ steps.pages.outputs.page_status }}
+          ESPN_STATUS: ${{ steps.espn.outputs.espn_status }}
         run: |
           mlb="${MLB_STATUS:-unavailable}"
           wwo="${WWO_STATUS:-unavailable}"
           pages="${PAGE_STATUS:-unavailable}"
-          if [ "$mlb" = "changed" ] || [ "$wwo" = "changed" ] || [ "$pages" = "changed" ]; then
+          espn="${ESPN_STATUS:-unavailable}"
+          if [ "$mlb" = "changed" ] || [ "$wwo" = "changed" ] || [ "$pages" = "changed" ] || [ "$espn" = "changed" ]; then
             overall="changed"
-          elif [ "$mlb" = "unavailable" ] || [ "$wwo" = "unavailable" ] || [ "$pages" = "unavailable" ]; then
+          elif [ "$mlb" = "unavailable" ] || [ "$wwo" = "unavailable" ] || [ "$pages" = "unavailable" ] || [ "$espn" = "unavailable" ]; then
             overall="unavailable"
           else
             overall="clear"
@@ -64,13 +80,14 @@ jobs:
             echo "mlb=$mlb"
             echo "wwo=$wwo"
             echo "pages=$pages"
+            echo "espn=$espn"
           } >> "$GITHUB_OUTPUT"
-          echo "MLB postseason: $mlb / Westwood One grids: $wwo / pages: $pages / overall: $overall"
+          echo "MLB postseason: $mlb / Westwood One grids: $wwo / pages: $pages / ESPN Radio NBA: $espn / overall: $overall"
 
       - name: Add every source-watch report to the run summary
         if: always()
         run: |
-          for report in mlb-source-watch.md wwo-source-watch.md page-source-watch.md; do
+          for report in mlb-source-watch.md wwo-source-watch.md page-source-watch.md espn-source-watch.md; do
             if [ -f "$RUNNER_TEMP/$report" ]; then
               cat "$RUNNER_TEMP/$report" >> "$GITHUB_STEP_SUMMARY"
               printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
@@ -87,9 +104,11 @@ jobs:
           MLB_STATUS: ${{ steps.combined.outputs.mlb }}
           WWO_STATUS: ${{ steps.combined.outputs.wwo }}
           PAGE_STATUS: ${{ steps.combined.outputs.pages }}
+          ESPN_STATUS: ${{ steps.combined.outputs.espn }}
           PAGE_REPORT: ${{ runner.temp }}/page-source-watch.md
           MLB_REPORT: ${{ runner.temp }}/mlb-source-watch.md
           WWO_REPORT: ${{ runner.temp }}/wwo-source-watch.md
+          ESPN_REPORT: ${{ runner.temp }}/espn-source-watch.md
         with:
           script: |
             const fs = require('fs');
@@ -99,6 +118,7 @@ jobs:
             const mlb = process.env.MLB_STATUS || 'unavailable';
             const wwo = process.env.WWO_STATUS || 'unavailable';
             const pages = process.env.PAGE_STATUS || 'unavailable';
+            const espn = process.env.ESPN_STATUS || 'unavailable';
             const sections = [
               read(process.env.MLB_REPORT,
                 'The MLB monitor did not produce a report. Check the failed workflow run; that source is unknown.'),
@@ -106,6 +126,8 @@ jobs:
                 'The Westwood One monitor did not produce a report. Check the failed workflow run; those rows are unknown.'),
               read(process.env.PAGE_REPORT,
                 'The page monitor did not produce a report. Check the failed workflow run; those pages are unknown.'),
+              read(process.env.ESPN_REPORT,
+                'The ESPN Radio monitor did not produce a report. Check the failed workflow run; the NBA rows are unknown.'),
             ];
             const title = '[Automated source watch] Schedule sources need review';
             const { owner, repo } = context.repo;
@@ -114,7 +136,8 @@ jobs:
             });
             const existing = openIssues.find(issue => !issue.pull_request && issue.title === title);
             const body = `${sections.join('\n\n---\n\n')}\n\nOverall monitor status: **${overall}** ` +
-              `(MLB postseason: **${mlb}**, Westwood One grids: **${wwo}**, pages: **${pages}**). ` +
+              `(MLB postseason: **${mlb}**, Westwood One grids: **${wwo}**, pages: **${pages}**, ` +
+              `ESPN Radio NBA: **${espn}**). ` +
               `This automation never edits or publishes the static feed.`;
             // Ignore the timestamp and comparison-date lines, which differ on every
             // run and would otherwise rewrite the issue daily with no new information.

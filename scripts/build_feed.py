@@ -14,6 +14,7 @@ Rules this file enforces:
 from __future__ import annotations
 
 import json
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -92,6 +93,16 @@ KTCT_WIKI = "https://en.wikipedia.org/wiki/KTCT"
 KNEW_WIKI = "https://en.wikipedia.org/wiki/KNEW_(AM)"
 NFL_SEASON_WIKI = "https://en.wikipedia.org/wiki/2026_NFL_season"
 NFL_SCHEDULES = "https://www.nfl.com/schedules/"
+# The NBA's own schedule release links a dated, per-game ESPN Radio schedule. It
+# is the only official ESPN Radio game list that exists for 2026-27, and it is
+# what the twenty "nba-espn-" rows are transcribed from.
+NBA_ESPN_RADIO_PDF = (
+    "https://ak-static.cms.nba.com/wp-content/uploads/sites/46/2026/08/"
+    "2026-27-ESPN-Radio-Schedule.pdf"
+)
+NBA_RELEASE = "https://www.nba.com/news/2026-27-nba-regular-season-schedule"
+NBA_CUP_KEY_DATES = "https://www.nba.com/news/emirates-nba-cup-key-dates-schedule"
+NBA_CHRISTMAS = "https://www.nba.com/news/nba-on-christmas-day-schedule-2026-27"
 # The league's own 2026-2027 important-dates announcement, republished verbatim by
 # an NFL club. This is where the postseason round dates come from; nfl.com/schedules/2026/POST
 # still redirects to the regular season and prints no round dates.
@@ -105,11 +116,12 @@ DURATIONS = [
     {"id": "MLB-POST", "label": "MLB postseason", "minutes": 210},
     {"id": "NFL", "label": "NFL", "minutes": 195},
     {"id": "NCAAF", "label": "College football", "minutes": 204},
+    {"id": "NBA", "label": "NBA", "minutes": 150},
     {"id": "MLS", "label": "MLS", "minutes": 120},
     {"id": "SOCCER", "label": "International soccer", "minutes": 120},
 ]
 DUR = {d["id"]: d["minutes"] for d in DURATIONS}
-LEAGUE_DUR = {"MLB": 165, "NFL": 195, "NCAAF": 204, "MLS": 120, "SOCCER": 120}
+LEAGUE_DUR = {"MLB": 165, "NFL": 195, "NCAAF": 204, "NBA": 150, "MLS": 120, "SOCCER": 120}
 
 
 def et_to_pt(hhmm: str) -> str:
@@ -339,6 +351,61 @@ FLAGS = [
             "1050 on autumn weekends. Neither the Giants nor the Athletics are in this field."
         ),
         "url": MLB_POST_PRESS,
+    },
+    {
+        "id": "ESPN_RADIO_NBA",
+        "severity": "review",
+        "title": "The NBA rows are an ESPN Radio network schedule, not a Bay Area per-game clearance",
+        "detail": (
+            "The NBA's own 2026-27 schedule release links a dated \u201c2026-27 ESPN Radio Schedule\u201d PDF and "
+            "says ESPN Radio provides national audio coverage of the NBA all season, naming 76ers at "
+            "Knicks on opening night, the two Emirates NBA Cup semifinals, the Cup championship, and "
+            "Spurs at Knicks and Heat at Celtics on Christmas Day. The PDF prints 17 dated games inside "
+            "this snapshot's window with an ET time, plus two TBD semifinal lines and the December 11 "
+            "championship, and is stamped \u201cAS OF AUG. 13, 2026 | SUBJECT TO CHANGE\u201d. KTCT 1050 AM is a "
+            "full-time ESPN Radio affiliate \u2014 its published weekly grid is the ESPN Radio network "
+            "schedule \u2014 so these rows are \u201cindicated\u201d, exactly like the MLB postseason rows. Three "
+            "caveats. The PDF can change without notice. There is one ESPN Radio feed, so if two listed "
+            "games share a window only one of them can be on 1050. And Stanford football, Earthquakes "
+            "soccer or other local programming can preempt 1050 for any of these games. No Cumulus or "
+            "ESPN page publishes a game-by-game Bay Area clearance list. The PDF prints nine further "
+            "games from March 6, 2027 onward; they are outside this snapshot's window and no rows were "
+            "made from them."
+        ),
+        "url": NBA_ESPN_RADIO_PDF,
+        "sources": [
+            src("NBA ESPN Radio schedule PDF (as of Aug. 13, 2026) \u2014 the printed dates, matchups and ET times",
+                NBA_ESPN_RADIO_PDF),
+            src("NBA schedule release \u2014 the PDF is linked here and ESPN Radio is named as a carrier", NBA_RELEASE),
+            src("KNBR 1050 weekly grid \u2014 the ESPN Radio network schedule on the station's own site", KNBR_1050_SHOWS),
+            src("KTCT station record: network ESPN Radio", KTCT_WIKI),
+        ],
+    },
+    {
+        "id": "NBA_CUP_TBD",
+        "severity": "review",
+        "title": "Emirates NBA Cup semifinals and championship: no matchup, no time, and no single day for the semifinals",
+        "detail": (
+            "The NBA's key-dates page dates the Emirates NBA Cup 2026 semifinals \u201cDecember 8 and/or "
+            "December 9\u201d in NBA team markets, with each game at the home arena of the higher-seeded "
+            "team, and the championship on Friday, December 11 at Hinkle Fieldhouse in Indianapolis. "
+            "The ESPN Radio PDF prints two TBD lines for the semifinals and one for the championship. "
+            "Because two semifinals cannot both be asserted on both days, this snapshot carries one row "
+            "on each named date; each row claims only that an ESPN Radio Cup semifinal is officially "
+            "scheduled on one of those two days. Neither matchup, nor which day carries which game, nor "
+            "any tip-off time is known, and the championship matchup is equally unknown even though its "
+            "date and venue are published. With no clock time, all three rows contribute zero estimated "
+            "minutes to the 10 AM\u201310 PM band maths, so they cannot inflate the coverage figures. "
+            "Re-check after December 5, when the knockout bracket is set."
+        ),
+        "url": NBA_ESPN_RADIO_PDF,
+        "sources": [
+            src("NBA ESPN Radio schedule PDF \u2014 the TBD semifinal and championship lines and their footnotes",
+                NBA_ESPN_RADIO_PDF),
+            src("NBA key dates: semifinals December 8 and/or 9, championship December 11 at Hinkle Fieldhouse",
+                NBA_CUP_KEY_DATES),
+            src("NBA release: ESPN Radio carries the two semifinals and the championship", NBA_RELEASE),
+        ],
     },
     {
         "id": "NO_LOCAL_MLB_AFTER_0927",
@@ -1016,6 +1083,146 @@ def mlb_postseason_rows() -> list[dict]:
     return rows
 
 
+# --- NBA on ESPN Radio --------------------------------------------------------
+# Transcribed verbatim on 2026-09-27 from the NBA's own "2026-27 NBA SEASON:
+# ESPN RADIO BROADCAST SCHEDULE" PDF, linked from the NBA's schedule release.
+# Columns as printed: DAY | DATE | AWAY | HOME | TIME (ET). Two TBD lines carry
+# the footnote for the Emirates NBA Cup semifinals and one for the Dec. 11
+# championship; nothing else about them is printed.
+NBA_ESPN_ROWS = [
+    ("Tue.", "10/20/26", "Philadelphia", "New York", "7:00 PM"),
+    ("Fri.", "11/6/26", "Philadelphia", "Cleveland", "7:30 PM"),
+    ("Fri.", "11/13/26", "Golden State", "San Antonio", "9:30 PM"),
+    ("Fri.", "11/20/26", "Houston", "Denver", "10:00 PM"),
+    ("Fri.", "12/25/26", "San Antonio", "New York", "12:00 PM"),
+    ("Fri.", "12/25/26", "Miami", "Boston", "2:30 PM"),
+    ("Thu.", "1/7/27", "Boston", "LA Lakers", "10:00 PM"),
+    ("Mon.", "1/18/27", "Minnesota", "New York", "5:00 PM"),
+    ("Thu.", "1/21/27", "Philadelphia", "Boston", "7:30 PM"),
+    ("Thu.", "1/28/27", "Miami", "Milwaukee", "9:30 PM"),
+    ("Sat.", "1/30/27", "LA Lakers", "New York", "8:30 PM"),
+    ("Sat.", "2/6/27", "LA Lakers", "San Antonio", "8:30 PM"),
+    ("Sun.", "2/7/27", "Boston", "Philadelphia", "7:00 PM"),
+    ("Thu.", "2/11/27", "San Antonio", "Oklahoma City", "9:30 PM"),
+    ("Sat.", "2/13/27", "Golden State", "New York", "8:30 PM"),
+    ("Sat.", "2/27/27", "Philadelphia", "New York", "8:30 PM"),
+    ("Sun.", "2/28/27", "LA Lakers", "Dallas", "3:30 PM"),
+]
+# Dated slots that are printed with no matchup, no time, and for the semifinals
+# no single day. One row per officially named date, the same treatment the NFL
+# playoff windows get; nothing beyond the date and the network is asserted.
+NBA_CUP_SLOTS = [
+    ("2026-12-08", "nba-espn-2026-12-08-cup-semifinal-1",
+     "NBA Cup Semifinal on ESPN Radio — one of the two semifinals; the NBA dates them December 8 and/or December 9"),
+    ("2026-12-09", "nba-espn-2026-12-09-cup-semifinal-2",
+     "NBA Cup Semifinal on ESPN Radio — the other semifinal; the NBA dates them December 8 and/or December 9"),
+    ("2026-12-11", "nba-espn-2026-12-11-cup-championship",
+     "NBA Cup Championship on ESPN Radio — matchup and tip-off TBD"),
+]
+
+
+def printed_et_to_pt(et: str) -> str:
+    """Convert the PDF's printed '7:00 PM' ET clock to 24-hour Pacific."""
+    hhmm, meridiem = et.split()
+    h, m = (int(x) for x in hhmm.split(":"))
+    if meridiem == "PM" and h != 12:
+        h += 12
+    if meridiem == "AM" and h == 12:
+        h = 0
+    return et_to_pt(f"{h:02d}:{m:02d}")
+
+
+def nba_espn_radio_rows() -> list[dict]:
+    """Transcribe the NBA's official 2026-27 ESPN Radio schedule into rows.
+
+    Only the games that fall inside this snapshot's window become rows; the PDF
+    prints nine more from March 6, 2027 onward, which are out of scope here and
+    are recorded in the ESPN monitor instead. Nothing is inferred: the away and
+    home strings are the PDF's own city/franchise strings, and the clock time is
+    its printed ET time converted to Pacific.
+    """
+    rows = []
+    for day, us_date, away, home, et in NBA_ESPN_ROWS:
+        month, daynum, year = (int(x) for x in us_date.split("/"))
+        iso = f"{2000 + year:04d}-{month:02d}-{daynum:02d}"
+        # The PDF prints a weekday next to every date. If a transcription ever
+        # drifts, the printed day will stop matching the calendar and this fails.
+        real_day = date.fromisoformat(iso).strftime("%a") + "."
+        if real_day != day:
+            raise SystemExit(f"NBA ESPN Radio row {us_date}: printed {day}, calendar says {real_day}")
+        if not (WINDOW_START <= iso <= WINDOW_END):
+            raise SystemExit(f"NBA ESPN Radio row {us_date} is outside the window; see the ESPN monitor")
+        start_pt = printed_et_to_pt(et)
+        slug = f"{away}-at-{home}".lower().replace(" ", "-")
+        rows.append(game(
+            id=f"nba-espn-{iso}-{slug}",
+            date=iso,
+            start_pt=start_pt,
+            title=f"NBA on ESPN Radio: {away} at {home}",
+            league="NBA",
+            network="ESPN Radio",
+            venue="",
+            status="scheduled",
+            stations=["1050"],
+            confidence="indicated",
+            duration_key="NBA",
+            duration_est_min=DUR["NBA"],
+            sources=[
+                src(f"NBA ESPN Radio schedule PDF, {us_date}: {away} at {home}, {et} ET", NBA_ESPN_RADIO_PDF),
+                src("NBA release: ESPN Radio carries the NBA all season; the PDF is linked here", NBA_RELEASE),
+                src("KNBR 1050 weekly grid — the ESPN Radio network schedule", KNBR_1050_SHOWS),
+                src("KTCT station record: network ESPN Radio", KTCT_WIKI),
+            ],
+            notes=(
+                f"Listed start {start_pt} PT, converted from the {et} ET printed on the NBA's "
+                "2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a "
+                "Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local "
+                "programming can take the station instead, and ESPN Radio runs one feed, so a second "
+                "game in the same window cannot also be on 1050. Matchup strings are the PDF's own."
+            ),
+            flag_ids=["ESPN_RADIO_NBA", "TALK_NOT_GAMES", "SPANISH_EXCLUDED", "DURATION_ESTIMATE"],
+        ))
+
+    for iso, row_id, title in NBA_CUP_SLOTS:
+        championship = row_id.endswith("cup-championship")
+        rows.append(game(
+            id=row_id,
+            date=iso,
+            start_pt=None,
+            title=title,
+            league="NBA",
+            network="ESPN Radio",
+            venue="Hinkle Fieldhouse, Indianapolis" if championship else "",
+            status="tba",
+            stations=["1050"],
+            confidence="indicated",
+            duration_key="NBA",
+            duration_est_min=DUR["NBA"],
+            sources=[
+                src("NBA ESPN Radio schedule PDF — the TBD line and its footnote", NBA_ESPN_RADIO_PDF),
+                src("NBA key dates: semifinals December 8 and/or 9, championship December 11 at Hinkle Fieldhouse",
+                    NBA_CUP_KEY_DATES),
+                src("NBA release: ESPN Radio carries the two semifinals and the championship", NBA_RELEASE),
+                src("KNBR 1050 weekly grid — the ESPN Radio network schedule", KNBR_1050_SHOWS),
+                src("KTCT station record: network ESPN Radio", KTCT_WIKI),
+            ],
+            notes=(
+                ("The NBA dates the Cup championship December 11, 2026 at Hinkle Fieldhouse in "
+                 "Indianapolis and names ESPN Radio as one of its carriers, but prints no matchup and "
+                 "no tip-off time, so neither is asserted here. "
+                 if championship else
+                 "The NBA's key-dates page dates the two Cup semifinals \u201cDecember 8 and/or December 9\u201d; "
+                 "the ESPN Radio PDF carries two TBD lines for them. This row asserts only that a "
+                 "semifinal is officially scheduled on one of these two days on ESPN Radio \u2014 not which "
+                 "day carries which game, who plays, or when it tips off. ")
+                + "No clock time means this row adds zero estimated minutes to the 10 AM\u201310 PM band "
+                "maths, and it is not a confirmed Bay Area clearance."
+            ),
+            flag_ids=["NBA_CUP_TBD", "ESPN_RADIO_NBA", "SPANISH_EXCLUDED", "DURATION_ESTIMATE"],
+        ))
+    return rows
+
+
 # --- local clubs and schools --------------------------------------------------
 def local_rows() -> list[dict]:
     rows = []
@@ -1408,6 +1615,7 @@ def validate(rows: list[dict]) -> None:
         "wwo-soccer-": 5,
         "nfl-post-": 6,
         "mlb-post-": 28,
+        "nba-espn-": 20,
         "stanford-": 7,
         "cal-": 7,
         "quakes-": 7,
@@ -1457,6 +1665,21 @@ def validate(rows: list[dict]) -> None:
                 raise SystemExit("mlb postseason rows are network-level, not official")
         if rid.startswith("wwo-soccer-") and r["stations"] != ["1050"]:
             raise SystemExit("soccer station is the finder's only Bay Area row")
+        if rid.startswith("nba-espn-"):
+            if r["stations"] != ["1050"]:
+                raise SystemExit("an ESPN Radio NBA row is a 1050 row")
+            if r["confidence"] != "indicated":
+                raise SystemExit("an ESPN Radio NBA row is a network row, not official")
+            if not (WINDOW_START <= r["date"] <= WINDOW_END):
+                raise SystemExit(f"{rid}: outside the window")
+            if r["network"] != "ESPN Radio":
+                raise SystemExit(f"{rid}: the NBA release puts these games on ESPN Radio")
+            if r["start_pt"] and r["status"] != "scheduled":
+                raise SystemExit(f"{rid}: a timed row cannot be TBA")
+            if not r["start_pt"] and r["status"] != "tba":
+                raise SystemExit(f"{rid}: a row with no clock time must be TBA")
+            if not r["start_pt"] and not rid.endswith(("semifinal-1", "semifinal-2", "cup-championship")):
+                raise SystemExit(f"{rid}: only the three Cup slots may lack a printed time")
         if rid.startswith("nfl-post-"):
             if r["stations"] != WWO_NFL_STATIONS:
                 raise SystemExit(
@@ -1544,6 +1767,7 @@ def main() -> None:
         + wwo_soccer_rows()
         + nfl_postseason_rows()
         + mlb_postseason_rows()
+        + nba_espn_radio_rows()
     )
     validate_flags()
     validate(rows)
@@ -1556,8 +1780,9 @@ def main() -> None:
             "window_end": WINDOW_END,
             "timezone": "America/Los_Angeles",
             "verified_note": (
-                "Line-checked against pages fetched 2026-09-27. Not a live scrape. The Westwood One "
-                "NFL list was read end to end this pass, so there is no longer a missing-chunk gap."
+                "Line-checked against pages fetched 2026-09-27. Not a live scrape. This pass added the "
+                "NBA's own 2026-27 ESPN Radio schedule as 20 \u201cindicated\u201d rows on 1050 \u2014 the first "
+                "basketball rows in the feed \u2014 and a monitor that re-reads that PDF daily."
             ),
             "durations": DURATIONS,
             "band": {"start": "10:00", "end": "22:00", "label": "10 AM–10 PM, the window you asked about"},
@@ -1583,7 +1808,7 @@ def main() -> None:
                  "role": "Athletics baseball through the end of the regular season. Fox Sports Radio talk otherwise, which is not listed as games.",
                  "listen": ATH_RADIO},
                 {"id": "1050", "label": "1050 AM", "call": "KTCT", "brand": "KNBR 1050",
-                 "role": "Stanford football. Westwood One NFL, college football and U.S. Soccer affiliate. Full-time ESPN Radio affiliate, which is how the MLB postseason reaches the Bay Area.",
+                 "role": "Stanford football. Westwood One NFL, college football and U.S. Soccer affiliate. Full-time ESPN Radio affiliate, which is how the MLB postseason and the NBA's ESPN Radio games reach the Bay Area.",
                  "listen": KNBR_1050_SHOWS},
                 {"id": "107.7", "label": "107.7 FM", "call": "KSAN", "brand": "107.7 The Bone",
                  "role": "49ers FM flagship, every listed regular-season game. Classic rock otherwise.",
@@ -1602,6 +1827,22 @@ def main() -> None:
             },
             # Single source of truth for scripts/wwo_watch.py, so the watcher and the
             # feed can never disagree about which grid belongs to which rows.
+            # Single source of truth for scripts/espn_watch.py, so the watcher and
+            # the feed can never disagree about which PDF row belongs to which row.
+            "espn_watch": {
+                "pdf": NBA_ESPN_RADIO_PDF,
+                "release": NBA_RELEASE,
+                "cup_key_dates": NBA_CUP_KEY_DATES,
+                "christmas": NBA_CHRISTMAS,
+                "in_window_dated_rows": len(NBA_ESPN_ROWS),
+                "cup_tbd_rows": len(NBA_CUP_SLOTS),
+                "note": (
+                    "Read-only. The PDF prints nine further games from 2027-03-06 onward that are "
+                    "outside this window; the watcher reports them as out-of-window, never as missing. "
+                    "A PDF that cannot be fetched or parsed is reported as a failed check, never as "
+                    "no drift."
+                ),
+            },
             "wwo_watch": {
                 "endpoint": WWO_GRID_ENDPOINT,
                 "widgets": WWO_WIDGETS,

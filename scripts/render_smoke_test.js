@@ -152,6 +152,13 @@ Promise.resolve().then(function () {
   assert.ok(els.verified.className.indexOf("stale") !== -1, "stale snapshot uses warning styling");
   assert.ok(/21 if-necessary game possibilities across 13 dates/.test(els.verified.textContent),
     "the snapshot banner summarizes conditional games separately");
+  assert.ok(/Now, by estimate/.test(els.nownext.innerHTML),
+    "the top strip answers the now question without claiming a live check");
+  assert.ok(/<b>Next<\/b>/.test(els.nownext.innerHTML), "the top strip names what is next");
+  assert.ok(els.nownext.innerHTML.indexOf("data-jump=") !== -1,
+    "the next listing in the strip is reachable by click");
+  assert.ok(/not a live check|No listed window covers this minute/.test(els.nownext.innerHTML),
+    "the strip carries its own caveat");
   assert.ok(els["flags-limitation"].innerHTML.indexOf("<details") !== -1, "known gaps render as disclosures");
   assert.ok(els["flags-review"].innerHTML.indexOf("<details") !== -1, "review flags render as disclosures");
 
@@ -164,7 +171,19 @@ Promise.resolve().then(function () {
     assert.ok(els["day-title"].textContent.indexOf(String(L.parseISO(iso).y)) !== -1, "day title for " + iso);
     if (els.log.innerHTML.indexOf("<table") !== -1) withTable++;
   });
-  assert.strictEqual(withTable, 83, "every day with a listing or conditional possibility shows a table");
+  assert.strictEqual(withTable, 99, "every day with a listing or conditional possibility shows a table");
+  /* Opening night was a conditional-only date until the NBA's ESPN Radio
+     schedule was added; it is now a listing day that still shows the
+     if-necessary postseason possibility beside it. */
+  fire("cal:click", fakeEvent("data-date", "2026-10-20"));
+  assert.ok(/1 scheduled listing/.test(els.answer.innerHTML),
+    "October 20 gains a non-conditional listing from the NBA schedule");
+  assert.ok(/listed only if necessary and not confirmed/.test(els.answer.innerHTML),
+    "October 20 still shows the postseason possibility, not as a confirmed game");
+  assert.ok(els.log.innerHTML.indexOf("NBA on ESPN Radio: Philadelphia at New York") !== -1,
+    "the NBA row renders with the PDF's own matchup strings");
+  assert.ok(els.log.innerHTML.indexOf("Listed start 16:00 PT, converted from the 7:00 PM ET") !== -1,
+    "the NBA row shows the conversion it came from");
   fire("cal:click", fakeEvent("data-date", "2026-09-29"));
   assert.ok(els.log.innerHTML.indexOf("MLB schedule slots (not per-game 1050 clearance)") !== -1,
     "MLB matchup details are clearly distinguished from per-game station clearance");
@@ -173,7 +192,7 @@ Promise.resolve().then(function () {
 
   /* Conditional-only postseason dates stay visible, but neither get counted as
      scheduled days nor contribute estimated broadcast minutes. */
-  ["2026-10-09", "2026-10-20", "2026-10-30"].forEach(function (iso) {
+  ["2026-10-09", "2026-10-30"].forEach(function (iso) {
     fire("cal:click", fakeEvent("data-date", iso));
     assert.ok(/No non-conditional listing/.test(els.answer.innerHTML), iso + " is a possibility, not a non-conditional listing");
     assert.ok(/estimated broadcast time.*0m of 12h/i.test(els.answer.innerHTML), iso + " contributes no minutes");
@@ -196,6 +215,49 @@ Promise.resolve().then(function () {
         "mixed group does not create a conflict warning");
     }
   });
+
+  /* The calendar export must be built from the same rows the page shows, must
+     convert Pacific wall clocks with the right offset for the date, and must
+     carry the caveats, because a calendar entry outlives the page. */
+  fire("cal:click", fakeEvent("data-date", "2026-10-04"));
+  assert.ok(/download="radiosf-2026-10-04\.ics"/.test(els.ics.innerHTML),
+    "a day with listings offers a calendar file named for the day");
+  var icsHref = els.ics.innerHTML.match(/href="([^"]+)"/);
+  assert.ok(icsHref && icsHref[1].indexOf("data:text/calendar;charset=utf-8,") === 0,
+    "the calendar file is a self-contained data link, so it works from a static page");
+  var ics = decodeURIComponent(icsHref[1].replace(/^data:text\/calendar;charset=utf-8,/, ""));
+  /* Content lines are folded, so read them the way a calendar client would. */
+  var unfolded = ics.replace(/\r\n[ ]/g, "");
+  assert.ok(/^BEGIN:VCALENDAR\r\n/.test(ics), "the calendar file starts with a calendar");
+  assert.ok(/END:VCALENDAR\r\n$/.test(ics), "the calendar file ends with a calendar");
+  assert.strictEqual(ics.match(/BEGIN:VEVENT/g).length, ics.match(/END:VEVENT/g).length,
+    "every event in the calendar file is closed");
+  assert.ok(/DTSTART:20261004T202500Z/.test(unfolded),
+    "the 1:25 PM Pacific kickoff on October 4 is 8:25 PM UTC while daylight time is in force");
+  assert.ok(/DTEND:20261004T234000Z/.test(unfolded),
+    "the event ends one estimated NFL length (3h 15m) later");
+  assert.ok(/SUMMARY:Denver Broncos at San Francisco 49ers/.test(unfolded), "the event names the game");
+  assert.ok(/LOCATION:Levi's Stadium/.test(unfolded), "the event carries the venue the source printed");
+  assert.ok(/Confidence: official/.test(unfolded) && /not a live station log/.test(unfolded),
+    "the event carries its confidence and the caveat");
+  assert.ok(/https:\/\/www\.49ers\.com\/schedule\//.test(unfolded), "the event carries its source link");
+  assert.ok(ics.split("\r\n").every(function (line) { return Buffer.byteLength(line, "utf8") <= 75; }),
+    "every calendar line is folded inside the 75-octet limit, measured in bytes");
+  assert.ok(unfolded.indexOf("SUMMARY:Denver Broncos at San Francisco 49ers") !== -1,
+    "folding does not break up the content it wraps");
+
+  /* A day whose listings have no published time exports an all-day event rather
+     than inventing a start. */
+  fire("cal:click", fakeEvent("data-date", "2027-01-16"));
+  var allDay = decodeURIComponent(els.ics.innerHTML.match(/href="([^"]+)"/)[1]
+    .replace(/^data:text\/calendar;charset=utf-8,/, ""));
+  assert.ok(/DTSTART;VALUE=DATE:20270116/.test(allDay),
+    "a playoff window day with no published kickoff exports as an all-day event");
+  assert.ok(allDay.indexOf("DTSTART:") === -1 || !/DTSTART:\d/.test(allDay),
+    "no clock time is invented for it");
+  /* A day outside the snapshot offers no file at all. */
+  fire("cal:click", fakeEvent("data-date", "2027-03-15"));
+  assert.strictEqual(els.ics.innerHTML, "", "a day outside the snapshot offers no calendar file");
 
   /* days either side of the window must not throw and must say so */
   fire("cal:click", fakeEvent("data-date", L.addDays(feed.meta.window_start, -1)));

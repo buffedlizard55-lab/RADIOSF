@@ -127,6 +127,34 @@
     return minutes(b.start_pt) + b.duration_est_min;
   }
 
+  /* Pacific wall clock for an absolute instant, so a conversion is verified by
+     converting back rather than by trusting an offset table. */
+  function pacificWallClock(date) {
+    var fmt = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Los_Angeles",
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+    });
+    var parts = {};
+    fmt.formatToParts(date).forEach(function (p) { parts[p.type] = p.value; });
+    return { iso: parts.year + "-" + parts.month + "-" + parts.day, hhmm: parts.hour + ":" + parts.minute };
+  }
+
+  /* Every clock time in the feed is a Pacific wall clock. An .ics file needs an
+     absolute instant, and Pacific is UTC-7 or UTC-8 depending on the date, so
+     try both and keep whichever one reads back as the requested wall clock.
+     Returns null rather than guessing a time that does not resolve. */
+  function ptToUtcIso(iso, hhmm) {
+    var base = Date.parse(iso + "T" + hhmm + ":00Z");
+    if (isNaN(base)) return null;
+    for (var offset = 7; offset <= 8; offset++) {
+      var candidate = new Date(base + offset * 3600000);
+      var wall = pacificWallClock(candidate);
+      if (wall.iso === iso && wall.hhmm === hhmm) return candidate.toISOString();
+    }
+    return null;
+  }
+
   function rangesOverlap(a0, a1, b0, b1) {
     return a0 < b1 && b0 < a1;
   }
@@ -384,6 +412,8 @@
     fromMinutes: fromMinutes,
     label12: label12,
     etToPt: etToPt,
+    pacificWallClock: pacificWallClock,
+    ptToUtcIso: ptToUtcIso,
     endMinutes: endMinutes,
     rangesOverlap: rangesOverlap,
     sharedStations: sharedStations,

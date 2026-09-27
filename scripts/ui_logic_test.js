@@ -10,6 +10,21 @@ assert.strictEqual(L.etToPt("19:30").hhmm, "16:30");
 assert.strictEqual(L.etToPt("19:30").dayShift, 0);
 assert.strictEqual(L.etToPt("09:15").hhmm, "06:15");
 assert.strictEqual(L.etToPt("14:30").hhmm, "11:30");
+
+/* The calendar export needs an absolute instant for a Pacific wall clock, and
+   Pacific is UTC-7 in summer and UTC-8 in winter. Both sides of the changeover
+   are checked, and a wall clock that does not exist is refused rather than
+   guessed. */
+assert.strictEqual(L.ptToUtcIso("2026-10-20", "16:00"), "2026-10-20T23:00:00.000Z");
+assert.strictEqual(L.ptToUtcIso("2026-10-04", "13:25"), "2026-10-04T20:25:00.000Z");
+assert.strictEqual(L.ptToUtcIso("2026-12-25", "09:00"), "2026-12-25T17:00:00.000Z");
+assert.strictEqual(L.ptToUtcIso("2027-02-28", "12:30"), "2027-02-28T20:30:00.000Z");
+assert.strictEqual(L.ptToUtcIso("2026-10-31", "12:00"), "2026-10-31T19:00:00.000Z",
+  "the last day before the changeover is still UTC-7");
+assert.strictEqual(L.ptToUtcIso("2026-11-02", "12:00"), "2026-11-02T20:00:00.000Z",
+  "the day after the changeover is UTC-8");
+assert.strictEqual(L.ptToUtcIso("2027-03-14", "02:30"), null,
+  "a wall clock that daylight time skips must be refused, never guessed");
 assert.strictEqual(L.etToPt("22:00").hhmm, "19:00");
 assert.strictEqual(L.etToPt("02:00").hhmm, "23:00");
 assert.strictEqual(L.etToPt("02:00").dayShift, -1);
@@ -266,17 +281,22 @@ feed.broadcasts.forEach(function (row) {
 
 /* the band claim in the README must match what the data actually says */
 var real = L.bandSummary(feed.broadcasts, feed.meta.window_start, feed.meta.window_end, 10 * 60, 22 * 60);
-assert.strictEqual(real.daysWithListings, 80, "non-conditional listing-day count");
+assert.strictEqual(real.daysWithListings, 97, "non-conditional listing-day count");
 assert.strictEqual(real.daysWithPossibilities, 13, "conditional possibility-day count, including mixed postseason rows");
 assert.strictEqual(real.conditionalGames, 21, "conditional game count");
-assert.strictEqual(real.daysConditionalOnly, 3, "conditional-only date count");
+assert.strictEqual(real.daysConditionalOnly, 2, "conditional-only date count");
 assert.strictEqual(real.daysMajority, 18, "non-conditional estimated-window majority count");
-assert.strictEqual(L.formatDuration(real.meanCovered), "1h 47m");
-assert.strictEqual(L.formatDuration(real.meanCoveredOnListingDays), "3h 28m");
+assert.strictEqual(L.formatDuration(real.meanCovered), "2h 2m");
+assert.strictEqual(L.formatDuration(real.meanCoveredOnListingDays), "3h 15m");
 assert.deepStrictEqual(real.byWeekday.map(function (day) {
   return day.days ? L.formatDuration(Math.round(day.covered / day.days)) : "0m";
-}), ["3h 40m", "2h 13m", "16m", "20m", "2h 20m", "41m", "2h 56m"],
+}), ["3h 53m", "2h 20m", "23m", "20m", "2h 48m", "1h 3m", "3h 24m"],
   "weekday coverage in the README matches the snapshot");
+/* The 20 NBA rows are transcribed from one official PDF. They bought 17 more
+   listing days, which is why the mean on listing days fell while the mean across
+   all dates rose: a 150-minute evening game on a previously empty date. */
+assert.strictEqual(L.formatDuration(real.busiest.covered), "9h 45m",
+  "Christmas Day is the busiest date in the snapshot");
 
 function scenario(durationFor) {
   var rows = feed.broadcasts.map(function (row) {
@@ -297,11 +317,11 @@ var sensitivity = [
 assert.deepStrictEqual(sensitivity.map(function (s) {
   return [s.daysWithListings, s.daysMajority, L.formatDuration(s.meanCovered), L.formatDuration(s.meanCoveredOnListingDays)];
 }), [
-  [80, 0, "52m", "1h 41m"],
-  [80, 5, "1h 31m", "2h 56m"],
-  [80, 18, "1h 47m", "3h 28m"],
-  [80, 18, "2h 17m", "4h 26m"],
-  [80, 18, "2h 13m", "4h 18m"]
+  [97, 0, "1h 1m", "1h 38m"],
+  [97, 5, "1h 43m", "2h 44m"],
+  [97, 18, "2h 2m", "3h 15m"],
+  [97, 18, "2h 37m", "4h 11m"],
+  [97, 18, "2h 35m", "4h 8m"]
 ], "README sensitivity figures match the logic");
 /* NFL playoff rows are round windows, not games. They must never grow a time, a
    venue, a game count or the 49ers FM flagship, because no source publishes one. */
@@ -324,6 +344,54 @@ assert.ok(feed.flags.some(function (f) { return f.id === "NFL_POSTSEASON_WINDOWS
   "the corrected postseason flag is shipped");
 assert.ok(!feed.flags.some(function (f) { return f.id === "WWO_POSTSEASON_UNDATED"; }),
   "the flag that called the official round dates unofficial is gone");
+
+/* NBA rows come from one official PDF, so hold them to what that PDF prints:
+   the printed ET time minus three hours, 1050, "indicated", and nothing more.
+   The three Emirates NBA Cup slots are the only rows allowed to lack a time. */
+var nba = feed.broadcasts.filter(function (row) { return row.id.indexOf("nba-espn-") === 0; });
+assert.strictEqual(nba.length, 20, "the NBA ESPN Radio schedule has 20 in-window rows");
+assert.strictEqual(nba.filter(function (row) { return !row.start_pt; }).length, 3,
+  "only the two Cup semifinal slots and the championship may lack a printed time");
+nba.forEach(function (row) {
+  assert.deepStrictEqual(row.stations, ["1050"], row.id + " is an ESPN Radio row on KTCT");
+  assert.strictEqual(row.confidence, "indicated", row.id + " is a network row, not a clearance");
+  assert.strictEqual(row.network, "ESPN Radio", row.id + " network");
+  assert.strictEqual(row.league, "NBA", row.id + " league");
+  assert.ok(row.date >= feed.meta.window_start && row.date <= feed.meta.window_end,
+    row.id + " is inside the window");
+  assert.ok(row.sources.some(function (s) { return s.url.indexOf("2026-27-ESPN-Radio-Schedule.pdf") !== -1; }),
+    row.id + " must cite the NBA's own ESPN Radio schedule PDF");
+  assert.ok(row.sources[0].url.indexOf("2026-27-ESPN-Radio-Schedule.pdf") !== -1,
+    row.id + " must lead with the PDF that printed it");
+  assert.ok(row.flag_ids.indexOf("ESPN_RADIO_NBA") !== -1,
+    row.id + " must carry the network-versus-clearance flag");
+  var slot = row.id.match(/cup-(semifinal-[12]|championship)$/);
+  if (slot) {
+    assert.ok(row.flag_ids.indexOf("NBA_CUP_TBD") !== -1, row.id + " must flag the unpublished detail");
+    assert.strictEqual(row.start_pt, null, row.id + " has no published tip-off time");
+    return;
+  }
+  assert.ok(row.start_pt, row.id + " is a dated PDF row and must keep its time");
+  /* The row note is generated from the PDF's own ET string. Re-do the conversion
+     from the note and fail if the two ever disagree. */
+  var printed = row.notes.match(/converted from the (\d+:\d{2} [AP]M) ET/);
+  assert.ok(printed, row.id + " note must name the printed ET time it came from");
+  var et = printed[1], etMinutes = L.minutes(L.fromMinutes(
+    (function () {
+      var p = et.split(" ")[0].split(":");
+      var h = parseInt(p[0], 10) % 12;
+      if (et.indexOf("PM") !== -1) h += 12;
+      return h * 60 + parseInt(p[1], 10);
+    })()
+  ));
+  assert.strictEqual(L.minutes(row.start_pt), etMinutes - 180,
+    row.id + " start_pt must be the printed ET time minus three hours");
+  /* The NBA's own Christmas Day and Cup dates, cross-checked against the release. */
+  if (row.date === "2026-12-25") {
+    assert.ok(["09:00", "11:30"].indexOf(row.start_pt) !== -1,
+      "the two Christmas Day ESPN Radio games print noon and 2:30 p.m. ET");
+  }
+});
 
 assert.ok(real.daysMajority < real.dayCount / 2,
   "if most days ever do fill 10-10, update the README finding instead of this assertion");
