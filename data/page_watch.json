@@ -28,8 +28,8 @@
     },
     {
       "id": "stanford-espn-schedule",
-      "label": "ESPN Stanford football schedule (the source of every Stanford kickoff time)",
-      "url": "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal",
+      "label": "ESPN Stanford football schedule feed (same data as the ESPN schedule page each Stanford row cites; the HTML page answers automated requests with HTTP 202)",
+      "url": "https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams/24/schedule",
       "rows": "stanford-* (7 rows)",
       "expect": [
         {"text": "Wake Forest", "why": "Oct 3 opponent"},
