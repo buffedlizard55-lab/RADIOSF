@@ -8,10 +8,22 @@
       "url": "https://www.49ers.com/schedule/",
       "rows": "niners-* (15 rows)",
       "expect": [
-        {"text": "KSFO 810 AM / KSAN 107.7 FM", "why": "Week 3 radio line"},
-        {"text": "KSAN 107.7 FM / KNBR 104.5 FM / 680 AM", "why": "Week 4 onward radio line"},
-        {"text": "Estadio Banorte", "why": "Week 11 venue as printed by the club"},
-        {"text": "State Farm Stadium", "why": "Week 18 venue; that game is still TBD"}
+        {
+          "text": "KSFO 810 AM / KSAN 107.7 FM",
+          "why": "Week 3 radio line"
+        },
+        {
+          "text": "KSAN 107.7 FM / KNBR 104.5 FM / 680 AM",
+          "why": "Week 4 onward radio line"
+        },
+        {
+          "text": "Estadio Banorte",
+          "why": "Week 11 venue as printed by the club"
+        },
+        {
+          "text": "State Farm Stadium",
+          "why": "Week 18 venue; that game is still TBD"
+        }
       ],
       "alert_if_present": []
     },
@@ -21,8 +33,14 @@
       "url": "https://calbears.com/sports/football/schedule",
       "rows": "cal-* (8 rows) and the Big Game review row",
       "expect": [
-        {"text": "Radio: KSFO 810 AM", "why": "Radio column on the non-Big-Game rows"},
-        {"text": "KNBR 104.5 FM / 680 AM", "why": "Radio column on the Nov 21 Stanford row"}
+        {
+          "text": "Radio: KSFO 810 AM",
+          "why": "Radio column on the non-Big-Game rows"
+        },
+        {
+          "text": "KNBR 104.5 FM / 680 AM",
+          "why": "Radio column on the Nov 21 Stanford row"
+        }
       ],
       "alert_if_present": []
     },
@@ -32,13 +50,34 @@
       "url": "https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams/24/schedule",
       "rows": "stanford-* (7 rows)",
       "expect": [
-        {"text": "Wake Forest", "why": "Oct 3 opponent"},
-        {"text": "Notre Dame", "why": "Oct 10 opponent"},
-        {"text": "Elon", "why": "Oct 17 opponent"},
-        {"text": "NC State", "why": "Oct 23 opponent"},
-        {"text": "Louisville", "why": "Oct 31 opponent, time TBD"},
-        {"text": "Virginia Tech", "why": "Nov 14 opponent, time TBD"},
-        {"text": "SMU", "why": "Nov 28 opponent, time TBD"}
+        {
+          "text": "Wake Forest",
+          "why": "Oct 3 opponent"
+        },
+        {
+          "text": "Notre Dame",
+          "why": "Oct 10 opponent"
+        },
+        {
+          "text": "Elon",
+          "why": "Oct 17 opponent"
+        },
+        {
+          "text": "NC State",
+          "why": "Oct 23 opponent"
+        },
+        {
+          "text": "Louisville",
+          "why": "Oct 31 opponent, time TBD"
+        },
+        {
+          "text": "Virginia Tech",
+          "why": "Nov 14 opponent, time TBD"
+        },
+        {
+          "text": "SMU",
+          "why": "Nov 28 opponent, time TBD"
+        }
       ],
       "alert_if_present": []
     },
@@ -48,7 +87,10 @@
       "url": "https://www.thesportsleader.com/stanfordfootball/",
       "rows": "stanford-* (7 rows)",
       "expect": [
-        {"text": "KNBR 1050 is your home for Stanford Cardinal football", "why": "station statement for every Stanford row"}
+        {
+          "text": "KNBR 1050 is your home for Stanford Cardinal football",
+          "why": "station statement for every Stanford row"
+        }
       ],
       "alert_if_present": []
     },
@@ -58,12 +100,24 @@
       "url": "https://www.sjearthquakes.com/news/news-earthquakes-announce-radio-stations-for-2026-mls-season",
       "rows": "quakes-* (7 rows)",
       "expect": [
-        {"text": "810 / 1370", "why": "radio column for every remaining match"},
-        {"text": "Saturday, Oct. 31, 2026", "why": "Oct 31 Real Salt Lake row (the one marked review)"},
-        {"text": "Saturday, Nov. 7, 2026", "why": "Decision Day, the last row in the table"}
+        {
+          "text": "810 / 1370",
+          "why": "radio column for every remaining match"
+        },
+        {
+          "text": "Saturday, Oct. 31, 2026",
+          "why": "Oct 31 Real Salt Lake row (the one marked review)"
+        },
+        {
+          "text": "Saturday, Nov. 7, 2026",
+          "why": "Decision Day, the last row in the table"
+        }
       ],
       "alert_if_present": [
-        {"text": "Playoffs", "why": "a playoff radio plan would add November/December matches"}
+        {
+          "text": "Playoffs",
+          "why": "a playoff radio plan would add November/December matches"
+        }
       ]
     },
     {
@@ -72,7 +126,10 @@
       "url": "https://www.thesportsleader.com/knbr1050shows/",
       "rows": "flag NO_STANDING_10_TO_10 and the KNBR grid limitation",
       "expect": [
-        {"text": "MONDAY 8-31", "why": "the grid has been frozen on the week of Aug 31; if this disappears the grid was refreshed and the 10-to-10 finding can be re-measured"}
+        {
+          "text": "MONDAY 8-31",
+          "why": "the grid has been frozen on the week of Aug 31; if this disappears the grid was refreshed and the 10-to-10 finding can be re-measured"
+        }
       ],
       "alert_if_present": []
     },
@@ -82,10 +139,51 @@
       "url": "https://usfdons.com/sports/mens-basketball/schedule/text",
       "rows": "none yet — the basketball gap (flag MBB_NO_RADIO_ROWS)",
       "expect": [
-        {"text": "2026-27 Men's Basketball Schedule", "why": "confirms the current-season page is being read"}
+        {
+          "text": "2026-27 Men's Basketball Schedule",
+          "why": "confirms the current-season page is being read"
+        }
       ],
       "alert_if_present": [
-        {"text": "KNBR", "why": "a station name on the schedule would be the first current-season radio listing for USF"}
+        {
+          "text": "KNBR",
+          "why": "a station name on the schedule would be the first current-season radio listing for USF"
+        }
+      ]
+    },
+    {
+      "id": "nfl-important-dates",
+      "label": "NFL 2026-2027 important dates (as published on seahawks.com)",
+      "url": "https://www.seahawks.com/news/nfl-announces-important-dates-for-2026-2027",
+      "rows": "nfl-post-* and super-bowl-lxi (7 playoff window rows)",
+      "expect": [
+        {
+          "text": "Wild Card weekend, January 16-18",
+          "why": "the Wild Card window rows"
+        },
+        {
+          "text": "Super Bowl LXI",
+          "why": "the Super Bowl row"
+        }
+      ],
+      "alert_if_present": []
+    },
+    {
+      "id": "nfl-postseason-grid",
+      "label": "nfl.com 2026 postseason schedule URL (currently redirects to the regular season)",
+      "url": "https://www.nfl.com/schedules/2026/POST",
+      "rows": "nfl-post-* (split the window rows into per-game rows once a grid exists)",
+      "expect": [
+        {
+          "text": "NFL Schedules",
+          "why": "confirms nfl.com answered at all"
+        }
+      ],
+      "alert_if_present": [
+        {
+          "text": "Wild Card Weekend",
+          "why": "a published postseason grid would give matchups and kickoffs per day"
+        }
       ]
     }
   ]
