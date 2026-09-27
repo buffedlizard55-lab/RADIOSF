@@ -17,5 +17,7 @@ jobs:
         run: |
           python3 scripts/build_feed.py
           git diff --exit-code -- data/broadcasts.json docs/LINE_BY_LINE.md
-      - name: UI logic
+      - name: UI logic and feed invariants
         run: node scripts/ui_logic_test.js
+      - name: Render the real page against the real feed
+        run: node scripts/render_smoke_test.js

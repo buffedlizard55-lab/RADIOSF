@@ -100,22 +100,47 @@
     return shared.length ? shared.join(", ") : null;
   }
 
+  function conflictTitle(b) {
+    return b.title ? "\u201c" + b.title + "\u201d" : b.id;
+  }
+
+  function conflictEntry(b) {
+    return conflictTitle(b) + (b.start_pt ? " at " + label12(b.start_pt) : " (start time TBD)");
+  }
+
+  /* Overlaps stay pairwise, because each pair is a different clash and the two
+     titles are what the reader needs. TBD warnings are collapsed to one per
+     station: a day with three TBD listings on 1050 produced three identical
+     pairwise warnings before, which buried the real overlaps. */
   function sameDayConflicts(list) {
     var out = [];
-    var i, j, a, b, station, aEnd, bEnd;
+    var tbdOrder = [];
+    var tbdByStation = {};
+    var i, j, k, a, b, shared, station, group, aEnd, bEnd;
+
+    function noteTbd(station, b) {
+      var g = tbdByStation[station];
+      if (g.ids.indexOf(b.id) !== -1) return;
+      g.ids.push(b.id);
+      g.entries.push(conflictEntry(b));
+    }
+
     for (i = 0; i < list.length; i++) {
       for (j = i + 1; j < list.length; j++) {
         a = list[i];
         b = list[j];
-        station = shareStation(a, b);
-        if (!station) continue;
+        shared = sharedStations(a, b);
+        if (!shared.length) continue;
         if (!a.start_pt || !b.start_pt) {
-          out.push({
-            kind: "tbd",
-            station: station,
-            ids: [a.id, b.id],
-            text: "Both are listed on " + station + " and at least one kickoff is still TBD, so a conflict cannot be ruled out."
-          });
+          for (k = 0; k < shared.length; k++) {
+            station = shared[k];
+            if (!tbdByStation[station]) {
+              tbdByStation[station] = { ids: [], entries: [] };
+              tbdOrder.push(station);
+            }
+            noteTbd(station, a);
+            noteTbd(station, b);
+          }
           continue;
         }
         aEnd = endMinutes(a);
@@ -124,12 +149,28 @@
         if (rangesOverlap(minutes(a.start_pt), aEnd, minutes(b.start_pt), bEnd)) {
           out.push({
             kind: "overlap",
-            station: station,
+            station: shared.join(", "),
             ids: [a.id, b.id],
-            text: "Estimated windows overlap on " + station + ". A local game usually keeps the station; Westwood One says not every affiliate airs every broadcast."
+            text: "Estimated windows overlap on " + shared.join(", ") + ": " +
+              conflictEntry(a) + " and " + conflictEntry(b) +
+              ". A local game usually keeps the station; Westwood One says not every " +
+              "affiliate airs every broadcast."
           });
         }
       }
+    }
+
+    for (i = 0; i < tbdOrder.length; i++) {
+      station = tbdOrder[i];
+      group = tbdByStation[station];
+      out.push({
+        kind: "tbd",
+        station: station,
+        ids: group.ids.slice(),
+        text: group.ids.length + " listings share " + station +
+          " this day and at least one start time is still TBD, so an overlap cannot be " +
+          "ruled out: " + group.entries.join("; ") + "."
+      });
     }
     return out;
   }
@@ -204,7 +245,83 @@
     return m + "m";
   }
 
+  /* Every ISO date from start through end, inclusive. */
+  function eachDate(start, end) {
+    var out = [];
+    var cursor = start;
+    var guard = 0;
+    while (cursor <= end && guard < 2000) {
+      out.push(cursor);
+      cursor = addDays(cursor, 1);
+      guard++;
+    }
+    return out;
+  }
+
+  /* Minutes of the lo..hi band that a single station is estimated to be carrying a game. */
+  function stationMinutes(list, stationId, lo, hi) {
+    return unionMinutes(list.filter(function (b) {
+      return b.stations.indexOf(stationId) !== -1;
+    }), lo, hi);
+  }
+
+  /*
+   * Measures the user's "10 AM to 10 PM is mostly live sports" hunch against the data
+   * instead of assuming it. Returns per-day coverage plus aggregates, all in minutes.
+   * Days whose only entries have no kickoff time count as zero covered minutes and are
+   * reported separately, so a TBD-heavy day is never mistaken for a quiet one.
+   */
+  function bandSummary(list, start, end, lo, hi) {
+    var span = hi - lo;
+    var dates = eachDate(start, end);
+    var byWeekday = [];
+    var i;
+    for (i = 0; i < 7; i++) byWeekday.push({ days: 0, covered: 0, withGames: 0 });
+    var days = dates.map(function (iso) {
+      var rows = byDate(list, iso);
+      var covered = unionMinutes(rows, lo, hi);
+      var timed = rows.filter(function (b) { return b.start_pt; }).length;
+      var w = byWeekday[weekdayIndex(iso)];
+      w.days++;
+      w.covered += covered;
+      if (rows.length) w.withGames++;
+      return {
+        date: iso,
+        rows: rows.length,
+        timed: timed,
+        tbd: rows.length - timed,
+        covered: covered,
+        share: span ? covered / span : 0
+      };
+    });
+    var withGames = days.filter(function (d) { return d.rows > 0; });
+    var majority = days.filter(function (d) { return d.covered * 2 > span; });
+    var totalCovered = days.reduce(function (acc, d) { return acc + d.covered; }, 0);
+    var busiest = days.slice().sort(function (a, b) {
+      return b.covered - a.covered || (a.date < b.date ? -1 : 1);
+    })[0] || null;
+    return {
+      lo: lo,
+      hi: hi,
+      span: span,
+      days: days,
+      dayCount: days.length,
+      daysWithGames: withGames.length,
+      daysMajority: majority.length,
+      daysEmpty: days.length - withGames.length,
+      meanCovered: days.length ? Math.round(totalCovered / days.length) : 0,
+      meanCoveredOnGameDays: withGames.length
+        ? Math.round(withGames.reduce(function (acc, d) { return acc + d.covered; }, 0) / withGames.length)
+        : 0,
+      byWeekday: byWeekday,
+      busiest: busiest
+    };
+  }
+
   return {
+    eachDate: eachDate,
+    stationMinutes: stationMinutes,
+    bandSummary: bandSummary,
     WEEKDAYS: WEEKDAYS,
     MONTHS: MONTHS,
     parseISO: parseISO,
