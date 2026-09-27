@@ -160,7 +160,7 @@ Even assigning a generous four-hour estimate to every timed non-conditional list
 
 ## Monitoring, rebuild and tests
 
-A scheduled, read-only GitHub Action (`source watch`, daily) runs **five** monitors and opens or refreshes one review issue when anything moves:
+A scheduled, read-only GitHub Action (`source watch`, daily) runs **six** monitors and opens or refreshes one review issue when anything moves:
 
 | Monitor | Source | What it watches | Rows covered |
 | --- | --- | --- | ---: |
@@ -174,12 +174,13 @@ A scheduled, read-only GitHub Action (`source watch`, daily) runs **five** monit
 | `page_watch.py` | NFL important-dates article and the nfl.com POST schedule URL | round-date text; alert when a postseason grid is published | 7 |
 | `page_watch.py` | KNBR 1050 weekly grid, USF 2026-27 basketball schedule | alert when the frozen grid refreshes or a station name appears on the USF schedule | 0 (gap watch) |
 | `espn_radio_week_watch.py` | espn.com/espnradio/schedule weekly grid | dates the undated week from ESPN's scoreboard, then reports any future in-window game the snapshot does not name | 0 (gap watch) |
+| `tbd_time_watch.py` | Cal's football schedule in its text view, 49ers.com | the eight rows whose kickoff is still TBD, and nothing else: it reports the first clock time that appears where the snapshot has none | 8 |
 
-That is **171 of the 173 rows** under a daily watch, plus one gap-watch on the weekly ESPN Radio grid — a source of games the snapshot does not yet list, not extra coverage of existing rows. The other two rows are the Giants and Athletics finales on the snapshot date itself. **Confirmed live on 2026-09-27** from GitHub's runners (the development sandbox cannot reach these hosts): MLB clear, all four Westwood One grids clear, all nine pages clear, NBA PDF clear. The weekly-grid monitor is new this pass; its first live run is the source-watch preview on this pull request. A week it cannot date reports `unavailable`, never `clear`, and never produces a date. Every pull request also runs the `source watch preview` workflow, which runs all five monitors live and keeps one sticky PR comment with the reports, so a reviewer sees the current source state before merging.
+That is **171 of the 173 rows** under a daily watch, plus one gap-watch on the weekly ESPN Radio grid — a source of games the snapshot does not yet list, not extra coverage of existing rows. The other two rows are the Giants and Athletics finales on the snapshot date itself. The TBD-kickoff watch adds no row to that count, because every row it watches is already watched by another monitor; what it adds is the thing none of the others can see. A page watcher can tell that a string moved, and the MLB monitor can tell that `startTimeTBD` flipped, but nothing could tell that Cal or the 49ers had *published a kickoff* for a game the snapshot lists without one. It reads the one row it was given — matched on the date cell **and** the opponent column, or on the anchor plus the row's own identity strings, with the search ending at the next game's printed date so a kickoff published for the following game is never read as this one's — and reports one of three things: still TBD, **published**, or unknown. A row it cannot locate is `unavailable`, never "still TBD", and an unreadable row is never reported as a change. Its eight watch entries cover eight rows across two pages, including the 49ers' Week 18 row, whose date and kickoff no other monitor can see at all. **Confirmed live on 2026-09-27** from GitHub's runners (the development sandbox cannot reach these hosts): MLB clear, all four Westwood One grids clear, all nine pages clear, NBA PDF clear, weekly grid `unavailable` because ESPN answers automation with HTTP 202, TBD-kickoff watch clear on both of its pages. The TBD-kickoff monitor is new this pass; its first live run is the source watch preview on this pull request, and it is that run which showed gostanford.com builds its ticker in the browser. A week it cannot date reports `unavailable`, never `clear`, and never produces a date. Every pull request also runs the `source watch preview` workflow, which runs all six monitors live and keeps one sticky PR comment with the reports, so a reviewer sees the current source state before merging.
 
 **Monitor fixes:** the MLB monitor first read `startTimeTBD` from the top level of each game, but the API nests it inside `status`; that was fixed and covered by a real-response regression fixture. This pass found another blind spot: the monitor compared dates/counts/descriptions/time-TBD but not opponent labels or `ifNecessary`, so it could report clear while the matchups changed. The monitor now validates and compares all four game identity/status fields: description, away team, home team and conditional status. The feed and UI expose the verified API matchup labels while preserving unresolved seed placeholders and TBD starts. Regression tests cover matchup and conditional drift.
 
-The page watcher does **not** parse schedules. Each `expect` string in `data/page_watch.json` was read on the live page; if one disappears, the page changed and the listed rows need a human re-read. Each `alert_if_present` string was absent; if it appears, new information may have been published. A page that cannot be fetched is **unavailable**, never "unchanged". ESPN's HTML schedule answers automated requests with HTTP 202, so the watcher reads ESPN's schedule feed for the same data.
+The page watcher does **not** parse schedules. Each `expect` string in `data/page_watch.json` was read on the live page; if one disappears, the page changed and the listed rows need a human re-read. Each `alert_if_present` string was absent; if it appears, new information may have been published. A page that cannot be fetched is **unavailable**, never "unchanged". ESPN's HTML schedule answers automated requests with HTTP 202, so the watcher reads ESPN's schedule feed for the same data. **gostanford.com's football schedule builds its 2026 ticker in the browser**, so a plain request receives a page without it: the first live run of an entry for it reported every expected string missing, and the entry was removed. The school page stays cited on every Stanford row for a human to open, and Stanford dates, opponents and kickoffs stay watched through ESPN's feed.
 
 Two failure modes are kept strictly apart throughout: **changed** (a real difference) and **unavailable** (state unknown). A parser that silently matched nothing must never look like a source that had not changed.
 
@@ -192,6 +193,7 @@ python3 scripts/espn_watch_test.py   # offline tests for the NBA ESPN Radio moni
 python3 scripts/espn_radio_week_watch_test.py  # offline tests for the weekly ESPN Radio grid monitor
 python3 scripts/wwo_watch_test.py    # offline tests for the Westwood One grid monitor
 python3 scripts/page_watch_test.py   # offline tests for the page watcher
+python3 scripts/tbd_time_watch_test.py # offline tests for the TBD-kickoff watcher (51 tests, incl. three saved pages)
 node scripts/ui_logic_test.js        # date, conditional, band-math and feed invariants
 node scripts/render_smoke_test.js    # real inline page script over all 155 dates
 python3 scripts/source_watch.py      # live MLB check; exit 0=clear, 2=drift, 3=unavailable
@@ -199,9 +201,10 @@ python3 scripts/espn_watch.py        # live NBA PDF check; same exit codes (need
 python3 scripts/espn_radio_week_watch.py  # live weekly-grid check; same exit codes
 python3 scripts/wwo_watch.py         # live grid check; same exit codes
 python3 scripts/page_watch.py        # live page check; same exit codes
+python3 scripts/tbd_time_watch.py    # live TBD-kickoff check; same exit codes
 ```
 
-All five watchers take `--input` so they can run against saved responses without a network. Do not add a row to the JSON by hand: add it in `scripts/build_feed.py` after a fresh source check, then rebuild. The `verify` Action regenerates the feed, rejects drift, and runs all offline suites plus the UI and page-render tests.
+All six watchers take `--input` so they can run against saved responses without a network. Do not add a row to the JSON by hand: add it in `scripts/build_feed.py` after a fresh source check, then rebuild. The `verify` Action regenerates the feed, rejects drift, and runs all offline suites plus the UI and page-render tests.
 
 ## Docs
 

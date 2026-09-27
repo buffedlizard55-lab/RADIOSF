@@ -63,9 +63,20 @@ jobs:
             --report "$RUNNER_TEMP/espn-week-source-watch.md" \
             --github-output "$GITHUB_OUTPUT"
 
+      # Kickoffs that are still TBD in the snapshot. The other monitors compare
+      # what a source prints against what the snapshot already carries; this one
+      # watches for the first appearance of a time the snapshot does not have.
+      - name: Watch the pages whose kickoffs are still listed as TBD
+        id: tbd
+        continue-on-error: true
+        run: |
+          python3 scripts/tbd_time_watch.py \
+            --report "$RUNNER_TEMP/tbd-source-watch.md" \
+            --github-output "$GITHUB_OUTPUT"
+
       # A monitor that could not run is never allowed to read as "no drift", so an
       # empty output defaults to unavailable rather than clear.
-      - name: Combine all five monitors into one status
+      - name: Combine all six monitors into one status
         id: combined
         if: always()
         env:
@@ -74,15 +85,17 @@ jobs:
           PAGE_STATUS: ${{ steps.pages.outputs.page_status }}
           ESPN_STATUS: ${{ steps.espn.outputs.espn_status }}
           ESPN_WEEK_STATUS: ${{ steps.espnweek.outputs.espn_week_status }}
+          TBD_STATUS: ${{ steps.tbd.outputs.tbd_status }}
         run: |
           mlb="${MLB_STATUS:-unavailable}"
           wwo="${WWO_STATUS:-unavailable}"
           pages="${PAGE_STATUS:-unavailable}"
           espn="${ESPN_STATUS:-unavailable}"
           espnweek="${ESPN_WEEK_STATUS:-unavailable}"
-          if [ "$mlb" = "changed" ] || [ "$wwo" = "changed" ] || [ "$pages" = "changed" ] || [ "$espn" = "changed" ] || [ "$espnweek" = "changed" ]; then
+          tbd="${TBD_STATUS:-unavailable}"
+          if [ "$mlb" = "changed" ] || [ "$wwo" = "changed" ] || [ "$pages" = "changed" ] || [ "$espn" = "changed" ] || [ "$espnweek" = "changed" ] || [ "$tbd" = "changed" ]; then
             overall="changed"
-          elif [ "$mlb" = "unavailable" ] || [ "$wwo" = "unavailable" ] || [ "$pages" = "unavailable" ] || [ "$espn" = "unavailable" ] || [ "$espnweek" = "unavailable" ]; then
+          elif [ "$mlb" = "unavailable" ] || [ "$wwo" = "unavailable" ] || [ "$pages" = "unavailable" ] || [ "$espn" = "unavailable" ] || [ "$espnweek" = "unavailable" ] || [ "$tbd" = "unavailable" ]; then
             overall="unavailable"
           else
             overall="clear"
@@ -94,13 +107,14 @@ jobs:
             echo "pages=$pages"
             echo "espn=$espn"
             echo "espnweek=$espnweek"
+            echo "tbd=$tbd"
           } >> "$GITHUB_OUTPUT"
-          echo "MLB postseason: $mlb / Westwood One grids: $wwo / pages: $pages / ESPN Radio NBA: $espn / ESPN Radio week: $espnweek / overall: $overall"
+          echo "MLB postseason: $mlb / Westwood One grids: $wwo / pages: $pages / ESPN Radio NBA: $espn / ESPN Radio week: $espnweek / TBD kickoffs: $tbd / overall: $overall"
 
       - name: Add every source-watch report to the run summary
         if: always()
         run: |
-          for report in mlb-source-watch.md wwo-source-watch.md page-source-watch.md espn-source-watch.md espn-week-source-watch.md; do
+          for report in mlb-source-watch.md wwo-source-watch.md page-source-watch.md espn-source-watch.md espn-week-source-watch.md tbd-source-watch.md; do
             if [ -f "$RUNNER_TEMP/$report" ]; then
               cat "$RUNNER_TEMP/$report" >> "$GITHUB_STEP_SUMMARY"
               printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
@@ -119,11 +133,13 @@ jobs:
           PAGE_STATUS: ${{ steps.combined.outputs.pages }}
           ESPN_STATUS: ${{ steps.combined.outputs.espn }}
           ESPN_WEEK_STATUS: ${{ steps.combined.outputs.espnweek }}
+          TBD_STATUS: ${{ steps.combined.outputs.tbd }}
           PAGE_REPORT: ${{ runner.temp }}/page-source-watch.md
           MLB_REPORT: ${{ runner.temp }}/mlb-source-watch.md
           WWO_REPORT: ${{ runner.temp }}/wwo-source-watch.md
           ESPN_REPORT: ${{ runner.temp }}/espn-source-watch.md
           ESPN_WEEK_REPORT: ${{ runner.temp }}/espn-week-source-watch.md
+          TBD_REPORT: ${{ runner.temp }}/tbd-source-watch.md
         with:
           script: |
             const fs = require('fs');
@@ -135,6 +151,7 @@ jobs:
             const pages = process.env.PAGE_STATUS || 'unavailable';
             const espn = process.env.ESPN_STATUS || 'unavailable';
             const espnweek = process.env.ESPN_WEEK_STATUS || 'unavailable';
+            const tbd = process.env.TBD_STATUS || 'unavailable';
             const sections = [
               read(process.env.MLB_REPORT,
                 'The MLB monitor did not produce a report. Check the failed workflow run; that source is unknown.'),
@@ -146,6 +163,8 @@ jobs:
                 'The ESPN Radio NBA monitor did not produce a report. Check the failed workflow run; the NBA rows are unknown.'),
               read(process.env.ESPN_WEEK_REPORT,
                 'The ESPN Radio weekly-grid monitor did not produce a report. Check the failed workflow run; that grid is unknown.'),
+              read(process.env.TBD_REPORT,
+                'The TBD-kickoff monitor did not produce a report. Check the failed workflow run; those kickoffs are unknown.'),
             ];
             const title = '[Automated source watch] Schedule sources need review';
             const { owner, repo } = context.repo;
@@ -155,7 +174,7 @@ jobs:
             const existing = openIssues.find(issue => !issue.pull_request && issue.title === title);
             const body = `${sections.join('\n\n---\n\n')}\n\nOverall monitor status: **${overall}** ` +
               `(MLB postseason: **${mlb}**, Westwood One grids: **${wwo}**, pages: **${pages}**, ` +
-              `ESPN Radio NBA: **${espn}**, ESPN Radio week: **${espnweek}**). ` +
+              `ESPN Radio NBA: **${espn}**, ESPN Radio week: **${espnweek}**, TBD kickoffs: **${tbd}**). ` +
               `This automation never edits or publishes the static feed.`;
             // Ignore the timestamp and comparison-date lines, which differ on every
             // run and would otherwise rewrite the issue daily with no new information.

@@ -22,6 +22,7 @@ jobs:
           python3 scripts/source_watch_test.py
           python3 scripts/wwo_watch_test.py
           python3 scripts/page_watch_test.py
+          python3 scripts/tbd_time_watch_test.py
           python3 scripts/espn_watch_test.py
           python3 scripts/espn_radio_week_watch_test.py
       - name: UI logic and feed invariants

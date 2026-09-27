@@ -82,6 +82,9 @@ STANFORD_TSL = "https://www.thesportsleader.com/stanfordfootball/"
 STANFORD_ESPN = "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
 GOSTANFORD_SCHED = "https://gostanford.com/sports/football/schedule"
 CAL = "https://calbears.com/sports/football/schedule"
+# The same schedule in its text view: one table, one row per game, and the page
+# scripts/tbd_time_watch.py reads for the seven kickoffs that are still TBD.
+CAL_TEXT = "https://calbears.com/sports/football/schedule/text"
 CAL_ESPN = "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
 CAL_MBB = "https://calbears.com/sports/mens-basketball/schedule"
 USF_MBB = "https://usfdons.com/sports/mens-basketball/schedule"
@@ -450,16 +453,23 @@ FLAGS = [
         "url": CAL,
     },
     {
-        "id": "GOSTANFORD_2025",
-        "severity": "review",
-        "title": "gostanford.com serves last season's football schedule",
+        "id": "STANFORD_SCHEDULE_TWO_SEASONS",
+        "severity": "note",
+        "title": "The Stanford schedule page leads with last season's results",
         "detail": (
-            "Fetched 2026-09-27, gostanford.com/sports/football/schedule returns 2025 rows and "
-            "/schedule/2026 returns 404. Stanford dates and kickoffs in this feed therefore come from "
-            "ESPN's 2026 Stanford schedule, converted from Eastern to Pacific. The station, 1050 AM, "
-            "comes from Stanford's own radio release and from the KNBR 1050 weekly grid, which shows "
-            "\"Stanford Pre-Game with Jack Loder\" followed by a \"STANFORD FOOTBALL\" block. "
-            "Re-check the school site once it rolls over to 2026."
+            "Read 2026-09-27, gostanford.com/sports/football/schedule opens with the completed 2025 "
+            "results and only then shows a 2026 schedule ticker. An earlier pass read the first list, "
+            "concluded the site served 2025 and took every Stanford date and kickoff from ESPN; that "
+            "conclusion was wrong and is corrected here. The 2026 ticker prints the same eight dates "
+            "as ESPN and gives the Pacific kickoff for the four games that have one - Oct 3 9:00 AM "
+            "PDT, Oct 10 12:30 PM PDT, Oct 17 4:30 PM PDT and Fri Oct 23 7:30 PM PDT - and TBA for "
+            "Oct 31, Nov 14, Nov 21 and Nov 28. Every Stanford row now cites the school page as well "
+            "as ESPN, and the two agree. The station, 1050 AM, comes from Stanford's own radio "
+            "release and from the KNBR 1050 weekly grid, which shows \"Stanford Pre-Game with Jack "
+            "Loder\" followed by a \"STANFORD FOOTBALL\" block. The page cannot be watched by "
+            "automation - the ticker is built in the browser, so a plain request receives a page "
+            "without it - so those four TBA kickoffs are the one gap in the TBD-kickoff watch and "
+            "are re-read by hand each session."
         ),
         "url": GOSTANFORD_SCHED,
     },
@@ -1355,28 +1365,39 @@ def local_rows() -> list[dict]:
         stations=["107.7", "104.5", "680"],
         confidence="official",
         sources=[src("49ers.com schedule, Week 18, date TBD, radio line printed", NINERS)],
-        notes="Date and kickoff are TBD on the club page. Not placed on a guessed day.",
+        notes=("Date and kickoff are TBD on the club page. Not placed on a guessed day. "
+               "scripts/tbd_time_watch.py reads the club page daily and reports the first printed "
+               "date or kickoff."),
         flag_ids=["WEEK18_UNPLACED"],
     ))
 
-    # Stanford: dates and kickoffs from ESPN because the school site still serves 2025.
+    # Stanford: dates and kickoffs. The school's own schedule page prints them in
+    # Pacific already; ESPN is cited beside it and the two agree, so the Eastern
+    # conversion is a cross-check rather than the only source.
     stanford = [
         ("2026-10-03", "09:00", "Stanford at Wake Forest", "Winston-Salem",
-         "ESPN prints Sat Oct 3, 12:00 PM ET, which is 9:00 AM PT."),
+         "ESPN prints Sat Oct 3, 12:00 PM ET, which is 9:00 AM PT.",
+         "Stanford schedule ticker: \"Sat, Oct 3/9:00 AM PDT\" at Wake Forest"),
         ("2026-10-10", "12:30", "Stanford at Notre Dame", "Notre Dame Stadium",
-         "ESPN prints Sat Oct 10, 3:30 PM ET on NBC, which is 12:30 PM PT."),
+         "ESPN prints Sat Oct 10, 3:30 PM ET on NBC, which is 12:30 PM PT.",
+         "Stanford schedule ticker: \"Sat, Oct 10/12:30 PM PDT\" at Notre Dame"),
         ("2026-10-17", "16:30", "Elon at Stanford", "Stanford Stadium",
-         "ESPN prints Sat Oct 17, 7:30 PM ET, which is 4:30 PM PT."),
+         "ESPN prints Sat Oct 17, 7:30 PM ET, which is 4:30 PM PT.",
+         "Stanford schedule ticker: \"Sat, Oct 17/4:30 PM PDT\" vs Elon"),
         ("2026-10-23", "19:30", "NC State at Stanford", "Stanford Stadium",
-         "ESPN prints Fri Oct 23, 10:30 PM ET, which is 7:30 PM PT. This is the Friday night game."),
+         "ESPN prints Fri Oct 23, 10:30 PM ET, which is 7:30 PM PT. This is the Friday night game.",
+         "Stanford schedule ticker: \"Fri, Oct 23/7:30 PM PDT\" vs NC State"),
         ("2026-10-31", None, "Stanford at Louisville", "Louisville",
-         "ESPN prints Sat Oct 31 with kickoff TBD."),
+         "ESPN prints Sat Oct 31 with kickoff TBD.",
+         "Stanford schedule ticker: \"Sat, Oct 31/TBA\" at Louisville"),
         ("2026-11-14", None, "Stanford at Virginia Tech", "Blacksburg",
-         "ESPN prints Sat Nov 14 with kickoff TBD."),
+         "ESPN prints Sat Nov 14 with kickoff TBD.",
+         "Stanford schedule ticker: \"Sat, Nov 14/TBA\" at Virginia Tech"),
         ("2026-11-28", None, "SMU at Stanford", "Stanford Stadium",
-         "ESPN prints Sat Nov 28 with kickoff TBD."),
+         "ESPN prints Sat Nov 28 with kickoff TBD.",
+         "Stanford schedule ticker: \"Sat, Nov 28/TBA\" vs SMU"),
     ]
-    for date, start, title, venue, notes in stanford:
+    for date, start, title, venue, notes, school_time in stanford:
         rows.append(game(
             id=f"stanford-{date}",
             date=date,
@@ -1388,6 +1409,7 @@ def local_rows() -> list[dict]:
             stations=["1050"],
             confidence="official",
             sources=[
+                src(school_time, GOSTANFORD_SCHED),
                 src("ESPN 2026 Stanford schedule (dates and kickoffs, Eastern)", STANFORD_ESPN),
                 src("Stanford radio release: the broadcast is on KNBR/KTCT 1050 AM", STANFORD_RADIO),
                 src("Stanford football on The Sports Leader (KNBR/KTCT)", STANFORD_TSL),
@@ -1395,9 +1417,10 @@ def local_rows() -> list[dict]:
             ],
             notes=(
                 notes + " \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680. The school's own "
-                "schedule page was serving 2025 rows when checked, so the date and time come from ESPN."
+                "schedule page prints the same date and kickoff in Pacific; ESPN is cited beside it "
+                "and the two agree."
             ),
-            flag_ids=["GOSTANFORD_2025", "DURATION_ESTIMATE"],
+            flag_ids=["STANFORD_SCHEDULE_TWO_SEASONS", "DURATION_ESTIMATE"],
         ))
 
     rows.append(game(
@@ -1413,12 +1436,15 @@ def local_rows() -> list[dict]:
         sources=[
             src("Cal schedule: Radio \"KNBR 104.5 FM / 680 AM\" on the Nov 21 row", CAL),
             src("Stanford radio release: KNBR/KTCT 1050 AM for the football season", STANFORD_RADIO),
+            src("Stanford schedule ticker: \"Sat, Nov 21/TBA\" at California", GOSTANFORD_SCHED),
+            src("Cal football schedule, text view (the TBD-kickoff watch reads this page)", CAL_TEXT),
             src("ESPN Stanford schedule: Nov 21 at California, kickoff TBD", STANFORD_ESPN),
         ],
         notes=(
             "One game, two station claims, both shown. Cal's Radio column prints KNBR 104.5 FM / 680 AM "
             "for this row and KSFO 810 AM for every other 2026 row, so 810 is not assumed here. "
-            "Kickoff TBD on both schedules."
+            "Kickoff TBD on both schedules; scripts/tbd_time_watch.py reads Cal's text view daily and "
+            "reports the first printed kickoff."
         ),
         flag_ids=["BIG_GAME_STATIONS", "DURATION_ESTIMATE"],
     ))
@@ -1428,17 +1454,21 @@ def local_rows() -> list[dict]:
         ("2026-10-03", "12:30", "California at UNLV", "Allegiant Stadium, Las Vegas",
          "Cal's schedule prints Oct 3, 12:30 PM PT at UNLV on CBSSN — the only 2026 row with a kickoff. Radio column: KSFO 810."),
         ("2026-10-10", None, "Virginia Tech at California", "California Memorial Stadium",
-         "Radio column: KSFO 810. Kickoff not yet set on the schedule or on ESPN."),
+         "Radio column: KSFO 810. Kickoff not yet set on the schedule or on ESPN; "
+         "scripts/tbd_time_watch.py reads the text view daily and reports the first printed kickoff."),
         ("2026-10-17", None, "Wake Forest at California", "California Memorial Stadium",
-         "Radio column: KSFO 810. Kickoff not yet set. This row was missing from the previous snapshot and is now read directly from the Radio column."),
+         "Radio column: KSFO 810. Kickoff not yet set. This row was missing from the previous snapshot "
+         "and is now read directly from the Radio column; the TBD-kickoff watch reads the text view daily."),
         ("2026-10-24", None, "California at SMU", "Gerald J. Ford Stadium, Dallas",
-         "Radio column: KSFO 810. Kickoff not yet set."),
+         "Radio column: KSFO 810. Kickoff not yet set; watched daily by scripts/tbd_time_watch.py."),
         ("2026-10-31", None, "California at NC State", "Carter-Finley Stadium, Raleigh",
-         "Radio column: KSFO 810. Kickoff not yet set."),
+         "Radio column: KSFO 810. Kickoff not yet set; watched daily by scripts/tbd_time_watch.py."),
         ("2026-11-14", None, "California at Virginia", "Scott Stadium, Charlottesville",
-         "Radio column: KSFO 810. Kickoff not yet set. Cal's bye week is Nov 7."),
+         "Radio column: KSFO 810. Kickoff not yet set. Cal's bye week is Nov 7. Watched daily by "
+         "scripts/tbd_time_watch.py."),
         ("2026-11-28", None, "Pittsburgh at California", "California Memorial Stadium",
-         "Radio column: KSFO 810. Kickoff not yet set. Season finale."),
+         "Radio column: KSFO 810. Kickoff not yet set. Season finale. Watched daily by "
+         "scripts/tbd_time_watch.py."),
     ]
     for date, start, title, venue, notes in cal:
         rows.append(game(
@@ -1453,6 +1483,7 @@ def local_rows() -> list[dict]:
             confidence="official",
             sources=[
                 src("Cal football schedule, Radio column", CAL),
+                src("Cal football schedule, text view (the TBD-kickoff watch reads this page)", CAL_TEXT),
                 src("ESPN Cal schedule, date and time cross-check", CAL_ESPN),
             ],
             notes=notes,
