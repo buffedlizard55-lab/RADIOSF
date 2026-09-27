@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 """Build the verified radio feed. Source of truth for data/broadcasts.json.
 
-Every row below was transcribed from a page fetched on 2026-09-26.
+Every row below was transcribed from a page fetched on 2026-09-27.
 Do not add a game that is not in this file. Re-fetch before editing.
+
+Rules this file enforces:
+  * only the six receivable stations may appear;
+  * every row carries at least one source link that a person can open;
+  * a row is only "official" when a club, school, league API or rights holder
+    printed both the game and the station;
+  * anything a source did not print is a flag, not a guess.
 """
 from __future__ import annotations
 
@@ -14,13 +21,19 @@ OUT = ROOT / "data" / "broadcasts.json"
 LINE = ROOT / "docs" / "LINE_BY_LINE.md"
 
 ALLOWED = ["680", "810", "960", "1050", "104.5", "107.7"]
-WINDOW_START = "2026-09-26"
+WINDOW_START = "2026-09-27"
 WINDOW_END = "2027-02-28"
-SNAPSHOT = "2026-09-26"
+SNAPSHOT = "2026-09-27"
 
 WWO_NFL_STATIONS = ["680", "104.5", "1050"]
+WWO_NCAAF_STATIONS = ["680", "104.5", "1050"]
+WWO_SOCCER_STATIONS = ["1050"]
+
+# --- sources -----------------------------------------------------------------
 WWO_NFL_URL = "https://www.westwoodonesports.com/nfl-schedule/"
 WWO_NCAAF_URL = "https://www.westwoodonesports.com/ncaa-football/"
+WWO_NCAAB_URL = "https://www.westwoodonesports.com/ncaa-basketball/"
+WWO_SOCCER_URL = "https://www.westwoodonesports.com/us-soccer/"
 WWO_FINDER = "https://www.westwoodonesports.com/station-finder/"
 PRESS = (
     "https://www.globenewswire.com/news-release/2026/09/09/3358684/9032/en/"
@@ -31,19 +44,31 @@ PRESS = (
 NINERS = "https://www.49ers.com/schedule/"
 GIANTS_RADIO = "https://www.mlb.com/giants/schedule/tv"
 ATH_RADIO = "https://www.mlb.com/athletics/schedule/affiliates"
+MLB_POST_PRESS = "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
+MLB_POST_API = "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
 QUAKES = "https://www.sjearthquakes.com/news/news-earthquakes-announce-radio-stations-for-2026-mls-season"
+QUAKES_PDF = "https://images.mlssoccer.com/image/upload/v1766018474/assets/sje/schedule/2026%20Schedule.pdf"
 STANFORD_RADIO = "https://gostanford.com/news/2026/07/30/2026-football-radio-broadcast-team-announced"
-STANFORD_DATES = "https://gostanford.com/news/2026/1/26/complete-2026-schedule-unveiled"
+STANFORD_TSL = "https://www.thesportsleader.com/stanfordfootball/"
 STANFORD_ESPN = "https://www.espn.com/college-football/team/schedule/_/id/24/stanford-cardinal"
+GOSTANFORD_SCHED = "https://gostanford.com/sports/football/schedule"
 CAL = "https://calbears.com/sports/football/schedule"
 CAL_ESPN = "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
+CAL_MBB = "https://calbears.com/sports/mens-basketball/schedule"
+USF_MBB = "https://usfdons.com/sports/mens-basketball/schedule"
 KNBR_SHOWS = "https://www.thesportsleader.com/shows/"
-KNBR_FM = "https://en.wikipedia.org/wiki/KNBR-FM"
+KNBR_1050_SHOWS = "https://www.thesportsleader.com/knbr1050shows/"
+KTCT_WIKI = "https://en.wikipedia.org/wiki/KTCT"
+KNEW_WIKI = "https://en.wikipedia.org/wiki/KNEW_(AM)"
+NFL_SEASON_WIKI = "https://en.wikipedia.org/wiki/2026_NFL_season"
+NFL_SCHEDULES = "https://www.nfl.com/schedules/"
 
-DUR = {"MLB": 165, "NFL": 195, "NCAAF": 204, "MLS": 120, "NFL-TBD": 195}
+DUR = {"MLB": 165, "MLB-POST": 210, "NFL": 195, "NCAAF": 204, "MLS": 120, "SOCCER": 120}
+LEAGUE_DUR = {"MLB": 165, "NFL": 195, "NCAAF": 204, "MLS": 120, "SOCCER": 120}
 
 
 def et_to_pt(hhmm: str) -> str:
+    """Convert a printed Eastern clock time to Pacific. Refuses to wrap a day."""
     h, m = (int(x) for x in hhmm.split(":"))
     total = h * 60 + m - 180
     if total < 0 or total >= 24 * 60:
@@ -64,12 +89,14 @@ def game(**kw) -> dict:
         "start_pt": kw.get("start_pt"),
         "title": kw["title"],
         "league": kw["league"],
+        "network": kw.get("network") or "",
         "venue": kw.get("venue") or "",
         "status": kw.get("status", "scheduled"),
+        "conditional": bool(kw.get("conditional")),
         "result": kw.get("result"),
         "stations": kw["stations"],
         "confidence": kw["confidence"],
-        "duration_est_min": kw.get("duration_est_min") or DUR[kw["league"]],
+        "duration_est_min": kw.get("duration_est_min") or LEAGUE_DUR[kw["league"]],
         "sources": kw["sources"],
         "notes": kw.get("notes") or "",
         "flag_ids": kw.get("flag_ids") or [],
@@ -77,10 +104,18 @@ def game(**kw) -> dict:
     bad = [s for s in row["stations"] if s not in ALLOWED]
     if bad:
         raise SystemExit(f"{row['id']} bad station {bad}")
+    if not row["stations"]:
+        raise SystemExit(f"{row['id']} has no station")
     if not row["sources"]:
         raise SystemExit(f"{row['id']} needs a source")
+    if row["confidence"] not in ("official", "indicated", "review"):
+        raise SystemExit(f"{row['id']} bad confidence {row['confidence']}")
+    if row["status"] not in ("scheduled", "tba", "final", "pregame", "if-necessary"):
+        raise SystemExit(f"{row['id']} bad status {row['status']}")
     if row["date"] and not (WINDOW_START <= row["date"] <= WINDOW_END):
         raise SystemExit(f"{row['id']} date {row['date']} outside window")
+    if row["start_pt"] and not row["date"]:
+        raise SystemExit(f"{row['id']} has a time but no date")
     return row
 
 
@@ -98,35 +133,54 @@ FLAGS = [
         "severity": "limitation",
         "title": "10 AM–10 PM is not a verified live-game block",
         "detail": (
-            "KNBR's own weekly grid (thesportsleader.com/shows, week of Aug 31–Sep 7, 2026) "
-            "fills late morning with sports talk (Fair & Biased), not play-by-play. "
-            "KNEW 960's published weekday lineup is Fox Sports Radio talk, and KTCT 1050 "
-            "is an ESPN Radio pass-through plus The Jim Rome Show. Those are not games. "
-            "No official source lists a standing live-game feed from 10 AM to 10 PM on these stations."
+            "Re-checked 2026-09-27. KNBR's own weekly grid (thesportsleader.com/shows) fills "
+            "6 AM to 6 PM with local talk — Murph & Markus, Fair & Biased, Dirty Work — and adds one "
+            "three-to-four-hour game block on most days, not a continuous one. The KNBR 1050 grid "
+            "(thesportsleader.com/knbr1050shows) is the ESPN Radio network schedule on weekdays "
+            "with game blocks mainly Friday, Saturday and Sunday. KNEW 960's weekday daypart is "
+            "Fox Sports Radio talk. So the 10-to-10 band is mostly talk on a weekday and mostly "
+            "games on an autumn weekend. The day view measures that instead of assuming it."
         ),
         "url": KNBR_SHOWS,
     },
     {
         "id": "KNBR_GRID_STALE",
         "severity": "review",
-        "title": "KNBR weekly grid on the site is not the current week",
+        "title": "Both KNBR weekly grids are frozen on the week of Aug 31 – Sep 7",
         "detail": (
-            "Fetched 2026-09-26, thesportsleader.com/shows still prints Monday 8-31 through "
-            "Monday 9-7. It is evidence of the format (talk vs Giants vs Westwood One), not "
-            "a current-day clearance log. Do not treat those clock times as this week's schedule."
+            "Re-fetched 2026-09-27: thesportsleader.com/shows and thesportsleader.com/knbr1050shows "
+            "both still print Monday 8-31 through Monday 9-7, about four weeks stale. They are "
+            "evidence of format (which dayparts are talk and which are play-by-play), not a "
+            "current-week clearance log. No clock time on those grids is used as a broadcast row here."
         ),
-        "url": KNBR_SHOWS,
+        "url": KNBR_1050_SHOWS,
     },
     {
         "id": "WWO_PREEMPTION",
         "severity": "review",
         "title": "Westwood One affiliates do not air every game",
         "detail": (
-            "Station finder, fetched 2026-09-26: \"Because of local blackouts and/or programming "
+            "Station finder, re-fetched 2026-09-27: \"Because of local blackouts and/or programming "
             "conflicts, not every affiliate can air every Westwood One Sports broadcast.\" "
-            "San Francisco NFL affiliates on that page: KNBR-AM, KNBR-FM, KTCT-AM, and KNBR-F2. "
-            "KNBR-F2 is an HD subchannel and is not counted. A local Giants, 49ers, or Stanford "
-            "broadcast can preempt the national feed on the station it occupies."
+            "San Francisco rows: NFL — KNBR-AM, KNBR-F2, KNBR-FM, KTCT-AM. NCAA Football — the same "
+            "four. Soccer — KTCT-AM only. KNBR-F2 is an HD subchannel and is not counted. A local "
+            "Giants, 49ers, Stanford or Earthquakes broadcast can preempt the national feed on the "
+            "station it occupies, which is why these rows are \"indicated\" and never \"official\"."
+        ),
+        "url": WWO_FINDER,
+    },
+    {
+        "id": "FINDER_2025_LABEL",
+        "severity": "review",
+        "title": "Station-finder tables are labelled \"(2025)\" on the live 2026 pages",
+        "detail": (
+            "Every affiliate table on westwoodonesports.com/station-finder carries a season label in "
+            "its footer: \"NFL Regular Season (2025)\", \"NCAA Football Season (2025)\", "
+            "\"USA Soccer (2025)\". The pages are the ones linked from the live 2026 schedule, and "
+            "no 2026-labelled list exists on the site, so they are used as the best available "
+            "affiliate list. Treat any single call sign as last season's line-up until Cumulus "
+            "re-publishes. NCAA Basketball, Baseball, Softball, Lacrosse, Hockey and Golf tabs are "
+            "placeholder \"check back\" text with no stations at all."
         ),
         "url": WWO_FINDER,
     },
@@ -135,127 +189,197 @@ FLAGS = [
         "severity": "review",
         "title": "Westwood One printed time is a listed start, not a confirmed kickoff",
         "detail": (
-            "Event 548494 prints \"Sun Sep 27, 2026 7:30 PM – 11:59 PM (EDT).\" "
-            "11:59 PM is a placeholder end, not a real ending. 49ers.com kickoffs for the four "
-            "49ers games that Westwood One also lists are 45 to 75 minutes later than the "
-            "Westwood One printed start. This feed converts the printed Eastern time to Pacific "
-            "and labels it a listed start. It does not invent a kickoff."
+            "Event 548494 prints \"Sun Sep 27, 2026 7:30 PM – 11:59 PM (EDT).\" 11:59 PM is a "
+            "placeholder end, not a real ending. 49ers.com kickoffs for the four 49ers games that "
+            "Westwood One also lists are 45 to 75 minutes later than the Westwood One printed start. "
+            "This feed converts the printed Eastern time to Pacific and labels it a listed start. "
+            "It does not invent a kickoff."
         ),
         "url": "https://www.westwoodonesports.com/events/548494",
     },
     {
         "id": "WWO_EIGHT_VS_SEVEN",
-        "severity": "review",
-        "title": "Press release says eight international games; the schedule page lists seven",
+        "severity": "note",
+        "title": "Press release counts eight international games; seven are still ahead",
         "detail": (
-            "Cumulus release 2026-09-09 says the package includes eight International Games. "
-            "The nfl-schedule page fetched 2026-09-26 lists seven: London Oct 4, Oct 11, Oct 18; "
-            "Paris Oct 25; Madrid Nov 8; Munich Nov 15; Mexico City Nov 22. The eighth was not "
-            "on that page. It is not added here."
+            "The Cumulus release of 2026-09-09 says the package includes eight International Games "
+            "for the whole season. The Upcoming list on the schedule page, fully read in four chunks "
+            "on 2026-09-27, holds seven: London Oct 4, Oct 11 and Oct 18; Paris Oct 25; Madrid Nov 8; "
+            "Munich Nov 15; Mexico City Nov 22. The NFL's 2026 international slate began in September, "
+            "before this snapshot opens, so the eighth is a game that has already been played. "
+            "Nothing is missing from the forward-looking list."
         ),
         "url": PRESS,
     },
     {
         "id": "WWO_POSTSEASON_UNDATED",
         "severity": "limitation",
-        "title": "NFL postseason games are promised but not dated on the schedule page",
+        "title": "NFL postseason rounds are promised but not dated by an official source",
         "detail": (
-            "The same release says Westwood One carries every NFL postseason game through "
-            "Super Bowl LXI on February 14, 2027 at SoFi Stadium. The nfl-schedule page fetched "
-            "2026-09-26 ends at Week 18 TBA windows. Wild-card, divisional, and conference "
-            "championship dates are not on that page, so they are not placed on the calendar. "
-            "Only Super Bowl LXI is placed, and only as date / stadium / time TBD."
+            "The Cumulus release says Westwood One carries every NFL postseason game through "
+            "Super Bowl LXI on February 14, 2027 at SoFi Stadium. The Westwood One schedule page ends "
+            "at the Week 18 TBA windows, and nfl.com/schedules/2026/POST redirected to the "
+            "regular-season page when fetched on 2026-09-27, so the league has not published a "
+            "postseason grid yet. Secondary write-ups say Wild Card Jan 16–18, Divisional Jan 23–24 "
+            "and Conference Championships Jan 31, 2027; those are not official and are not placed on "
+            "this calendar. Only Super Bowl LXI is placed, and only as date and stadium, time TBD."
         ),
-        "url": PRESS,
+        "url": NFL_SEASON_WIKI,
     },
     {
-        "id": "NCAAF_FINDER_TAB",
+        "id": "MLB_POSTSEASON_ESPN",
         "severity": "review",
-        "title": "NCAA football clearance uses the NFL affiliate row, not a separate tab extract",
+        "title": "MLB postseason is an ESPN Radio network row, not a Bay Area per-game clearance",
         "detail": (
-            "The station-finder NFL table, fetched 2026-09-26, lists San Francisco as "
-            "KNBR-AM, KNBR-FM, KTCT-AM. The NCAA Football tab of that page was not separately "
-            "extracted in this session. NCAA games are marked indicated, not per-game confirmed. "
-            "KNBR's own grid does list a daypart called Westwood One Sports."
+            "MLB's own postseason release says \"ESPN Radio will provide live national coverage of "
+            "all 2026 MLB Postseason games.\" KTCT 1050 AM is a full-time ESPN Radio affiliate: its "
+            "published weekly grid is the ESPN Radio network schedule, and its station record lists "
+            "ESPN Radio as the network. No Cumulus or ESPN page publishes a game-by-game Bay Area "
+            "clearance list, so these rows are \"indicated\". Three further caveats. There is one "
+            "ESPN Radio feed, so on a day with two or four scheduled games only one of them can be "
+            "on 1050 at a time. Start times were still TBD in the Stats API on 2026-09-27 — every "
+            "game carries a placeholder 07:33 UTC with startTimeTBD true — so no clock time is shown. "
+            "And Stanford football, Earthquakes soccer and Westwood One college football all preempt "
+            "1050 on autumn weekends. Neither the Giants nor the Athletics are in this field."
         ),
-        "url": WWO_FINDER,
+        "url": MLB_POST_PRESS,
+    },
+    {
+        "id": "NO_LOCAL_MLB_AFTER_0927",
+        "severity": "note",
+        "title": "Local baseball ends September 27",
+        "detail": (
+            "The MLB Stats API returned exactly one remaining Giants game and one remaining "
+            "Athletics game when queried on 2026-09-27 for 2026-09-27 through 2026-11-15. Both clubs "
+            "finish that afternoon and neither appears in the postseason bracket. After September 27 "
+            "there is no Giants call on 680/104.5 and no Athletics call on 960 in this window."
+        ),
+        "url": MLB_POST_API,
+    },
+    {
+        "id": "KNBR_MLB_FILLER",
+        "severity": "review",
+        "title": "KNBR 680 carries national baseball on idle Giants days, with no published list",
+        "detail": (
+            "The stale KNBR grid shows blocks such as \"Sun 9-6 3:20–6:00p JIP @ first pitch – MLB: "
+            "TWINS @ WHITE SOX\" and \"Mon 9-7 9:30a–1:00p MLB: BRAVES @ PHILLIES\" on days the Giants "
+            "were not playing. That proves 680 fills with somebody's national baseball feed, but no "
+            "2026 source names the network or lists which games clear. No such row is invented here."
+        ),
+        "url": KNBR_SHOWS,
     },
     {
         "id": "BIG_GAME_STATIONS",
         "severity": "review",
         "title": "Nov 21 Big Game station claims disagree",
         "detail": (
-            "gostanford.com on 2026-07-30 says the football radio team is on KNBR/KTCT 1050 AM. "
-            "calbears.com/sports/football/schedule prints \"Radio: KNBR 104.5 FM / 680 AM\" on the "
-            "Nov 21 Stanford row, and does not print KSFO on that row in the rendered index. "
-            "Both claims are shown. Neither is dropped."
+            "calbears.com/sports/football/schedule, re-read 2026-09-27, prints "
+            "\"KNBR 104.5 FM / 680 AM\" in the Radio column of the Nov 21 Stanford row — the only "
+            "2026 Cal row that is not KSFO 810. Stanford's own football radio release puts the "
+            "Cardinal broadcast on KNBR/KTCT 1050 AM all season. One game, two station claims, and "
+            "both are shown. Neither is dropped and 810 is not assumed."
         ),
         "url": CAL,
     },
     {
-        "id": "CAL_RADIO_INDEX",
+        "id": "GOSTANFORD_2025",
         "severity": "review",
-        "title": "Cal radio column was read from the rendered schedule index",
+        "title": "gostanford.com serves last season's football schedule",
         "detail": (
-            "A non-JavaScript fetch of calbears.com/sports/football/schedule on 2026-09-26 "
-            "returned the scoreboard, not the radio table. Radio rows used here are the ones "
-            "present in the rendered index of that same official URL (page index dated 2026-09-25). "
-            "Open the schedule page and check the Radio column before relying on a row."
+            "Fetched 2026-09-27, gostanford.com/sports/football/schedule returns 2025 rows and "
+            "/schedule/2026 returns 404. Stanford dates and kickoffs in this feed therefore come from "
+            "ESPN's 2026 Stanford schedule, converted from Eastern to Pacific. The station, 1050 AM, "
+            "comes from Stanford's own radio release and from the KNBR 1050 weekly grid, which shows "
+            "\"Stanford Pre-Game with Jack Loder\" followed by a \"STANFORD FOOTBALL\" block. "
+            "Re-check the school site once it rolls over to 2026."
         ),
-        "url": CAL,
-    },
-        {
-            "id": "SFT_RADIO_DIFF",
-            "severity": "review",
-            "title": "This site and ScheduleFreeTime do not list the same radio games",
-            "detail": "On 2026-09-26 ScheduleFreeTime did not put a radio icon on Athletics games. The club affiliates page lists 960 AM KNEW, Bay Area, with no home-only asterisk, so those two games are here. ScheduleFreeTime also lists KZSF 1370 AM on Earthquakes broadcasts. 1370 is not one of the six stations, so it is omitted. Oklahoma at Georgia is 12:00 PM PT here because Westwood One lists 3:00 PM ET. ScheduleFreeTime's table showed 12:30 PM PT, which is the 3:30 PM ET kickoff.",
-            "url": "https://www.mlb.com/athletics/schedule/affiliates",
-        },
-        {
-            "id": "CAL_WAKE_ROW",
-        "severity": "review",
-        "title": "Oct 17 Cal vs Wake Forest radio row was not in the captured excerpt",
-        "detail": (
-            "The scoreboard fetch shows Oct 17 vs Wake Forest in Berkeley with no time. "
-            "ESPN also has the date and kickoff TBD. The rendered-index excerpts quoted KSFO 810 AM "
-            "on the other 2026 rows and KNBR on the Big Game, but did not quote the Wake Forest row. "
-            "810 AM is shown with a review badge, not as a fully quoted row."
-        ),
-        "url": CAL,
+        "url": GOSTANFORD_SCHED,
     },
     {
-        "id": "STANFORD_OCT17_TIME",
+        "id": "SFT_RADIO_DIFF",
         "severity": "review",
-        "title": "Stanford vs Elon kickoff is from ESPN, not the school excerpt",
+        "title": "This site and ScheduleFreeTime do not list the same radio games",
         "detail": (
-            "ESPN's Stanford schedule prints Sat Oct 17, 7:30 PM, which is 4:30 PM PT. "
-            "The gostanford.com news release lists Elon on Oct 17 with no kickoff. "
-            "The rendered schedule index excerpt captured this session did not include that kickoff. "
-            "Station 1050 AM is from the July 30 school release, not from ESPN."
+            "ScheduleFreeTime does not put a radio icon on Athletics games. The club affiliates page "
+            "lists 960 AM KNEW, Bay Area, with no home-only asterisk, so the remaining A's game is "
+            "here. ScheduleFreeTime also lists KZSF 1370 AM on Earthquakes broadcasts; 1370 is not "
+            "one of the six stations, so it is omitted. ScheduleFreeTime carries no Westwood One "
+            "national rows and no ESPN Radio postseason rows at all."
         ),
-        "url": STANFORD_ESPN,
+        "url": ATH_RADIO,
     },
     {
         "id": "QUAKES_SUBJECT_TO_CHANGE",
         "severity": "review",
         "title": "Earthquakes radio table is dated Feb 16, 2026 and says times can change",
         "detail": (
-            "The club's radio release is the only per-game English-station table found. "
-            "It says \"All times and dates are subject to change.\" The live schedule widget "
-            "did not render in a text fetch on 2026-09-26, so later kickoff moves would not "
-            "be visible here until the next verification pass. Spanish 1370 AM is not one of "
-            "the six stations and is not listed as a station you get."
+            "The club's radio release is the only per-game English-station table published. It says "
+            "\"All times and dates are subject to change.\" The live schedule widget at "
+            "sjearthquakes.com/schedule renders client-side and returned no match data on "
+            "2026-09-27, so a later kickoff move would not be visible here until the next pass. "
+            "The release names KSFO 810 AM as the English flagship and KZSF 1370 AM as the Spanish "
+            "flagship; 1370 is not one of the six stations."
         ),
         "url": QUAKES,
+    },
+    {
+        "id": "QUAKES_OCT31_TIME",
+        "severity": "review",
+        "title": "Oct 31 Earthquakes kickoff: the club's two documents disagree",
+        "detail": (
+            "The February radio release prints 2:00 PM for Real Salt Lake at San Jose on Saturday "
+            "October 31. The club's own printable 2026 schedule PDF prints TBD for the same match. "
+            "2:00 PM is used because it is the only stated time, the row is marked review, and both "
+            "documents are linked. Check the club schedule before planning around it."
+        ),
+        "url": QUAKES_PDF,
+    },
+    {
+        "id": "QUAKES_ALT_STATION",
+        "severity": "review",
+        "title": "Some Earthquakes matches move to 1050 instead of 810",
+        "detail": (
+            "The radio release says \"Select games may appear on alternative stations for English "
+            "radio\" and its legend covers KNBR 680, KTCT 1050, KSFO 810 and KZSF 1370. The KNBR 1050 "
+            "weekly grid independently shows a \"SAN JOSE EARTHQUAKES @ AUSTIN FC\" block on 1050. "
+            "This feed lists the station printed in the per-game table, which is 810 for every "
+            "remaining match, but a move to 1050 or 680 is possible and would not be announced here."
+        ),
+        "url": QUAKES,
+    },
+    {
+        "id": "QUAKES_PLAYOFFS",
+        "severity": "limitation",
+        "title": "MLS Cup Playoff radio plans are not published",
+        "detail": (
+            "The Earthquakes radio release covers the 34-match regular season and stops at Decision "
+            "Day, November 7. No fetched page says which station would carry an Audi MLS Cup Playoffs "
+            "match in November or December 2026. Nothing is placed for the playoffs."
+        ),
+        "url": QUAKES,
+    },
+    {
+        "id": "SOCCER_FINDER_ONLY",
+        "severity": "review",
+        "title": "U.S. Soccer clearance on 1050 is a station-finder row, not a per-match confirmation",
+        "detail": (
+            "Westwood One's U.S. Soccer page lists five upcoming national-team broadcasts with times "
+            "and announcers. The Soccer tab of the station finder lists exactly one Bay Area "
+            "affiliate — San Francisco, CA, KTCT-AM — under a footer reading \"USA Soccer (2025)\". "
+            "Two of the five matches are labelled \"TNT Sports Broadcast - Audio Only Simulcast\" "
+            "rather than an original Westwood One call. No Cumulus page confirms these specific "
+            "matches on 1050, so all five are indicated, not official."
+        ),
+        "url": WWO_FINDER,
     },
     {
         "id": "WEEK18_UNPLACED",
         "severity": "review",
         "title": "49ers Week 18 has stations but no date",
         "detail": (
-            "49ers.com/schedule prints Week 18 at Arizona Cardinals, State Farm Stadium, "
-            "TV TBD, radio KSAN 107.7 / KNBR 104.5 / 680, and no date. It is not placed on "
-            "Jan 9 or Jan 10. Those days have separate Westwood One \"teams TBA\" windows."
+            "49ers.com/schedule prints Week 18 at Arizona Cardinals, State Farm Stadium, TV TBD, "
+            "radio KSAN 107.7 / KNBR 104.5 / 680, and no date. It is not placed on Jan 9 or Jan 10. "
+            "Those days already carry separate Westwood One \"teams TBA\" windows."
         ),
         "url": NINERS,
     },
@@ -264,20 +388,38 @@ FLAGS = [
         "severity": "review",
         "title": "Nov 22 venue name disagrees",
         "detail": (
-            "49ers.com prints Estadio Banorte. Westwood One event 548491 prints Estadio Azteca. "
-            "Both names are kept. Kickoff used here is the club time, 5:20 PM PT."
+            "49ers.com prints Estadio Banorte. Westwood One event 548491 prints \u201cEst\u00e1dio Azteca, "
+            "Mexico City, Mexico\u201d, transcribed here exactly as printed, accent and all. "
+            "Both names are kept. Kickoff used here is the club time, 5:20 PM PT. The national "
+            "Westwood One listing for the same game is merged into this row rather than duplicated."
         ),
         "url": NINERS,
+    },
+    {
+        "id": "WWO_VENUE_STRINGS",
+        "severity": "note",
+        "title": "Westwood One prints the same stadium two different ways",
+        "detail": (
+            "Venues on the NFL grid are copied character for character, so the inconsistencies on "
+            "the source page survive into this feed. Denver is \u201cEmpower Field at Mile High, "
+            "Denver, CO\u201d on Sep 27 and Dec 25 but \u201cMile High Stadium, Denver, CO\u201d on Oct 15. "
+            "Detroit is \u201cFord Field, Detroit, MI, USA\u201d on Nov 26 and \u201cFord Field, Detroit, "
+            "Michigan\u201d on Dec 28. Charlotte carries a trailing \u201c, USA\u201d that no other domestic "
+            "row has. The four Saturday and Sunday \u201cTBA\u201d placeholders print no venue at all, so "
+            "their venue is empty here rather than guessed. Nothing was normalised, because "
+            "normalising is how a wrong venue would get laundered into a confident one."
+        ),
+        "url": WWO_NFL_URL,
     },
     {
         "id": "NINERS_BOILERPLATE",
         "severity": "review",
         "title": "Week 1–3 listen articles say \"all games\" are on KSFO; the schedule page switches in October",
         "detail": (
-            "Ways-to-listen articles for Weeks 1–3 (latest fetched: Week 3, published Sep 23, 2026) "
-            "say all games can be heard on KSFO 810 / KSAN 107.7. The live schedule page, fetched "
-            "2026-09-26, prints KSFO/KSAN for Week 3 and KSAN plus KNBR 104.5/680 from Week 4 on. "
-            "This feed follows the per-game line on the schedule page."
+            "Ways-to-listen articles for Weeks 1–3 say all games can be heard on KSFO 810 / "
+            "KSAN 107.7. The live schedule page, re-read 2026-09-27, prints KSFO/KSAN for Week 3 and "
+            "KSAN plus KNBR 104.5 / 680 from Week 4 on. This feed follows the per-game line on the "
+            "schedule page, which is why 810 appears once and then stops."
         ),
         "url": "https://www.49ers.com/news/ways-to-watch-and-listen-cardinals-vs-49ers-week-3-x8427",
     },
@@ -286,43 +428,49 @@ FLAGS = [
         "severity": "limitation",
         "title": "HD subchannels are not counted as the stations you get",
         "detail": (
-            "Westwood One lists KNBR-F2. KSAN's HD3 simulcasts KTCT. A standard AM/FM radio "
-            "does not decode those. Only 680, 810, 960, 1050, 104.5, and 107.7 are listed."
+            "Westwood One lists KNBR-F2. KSAN's HD3 simulcasts KTCT. A standard AM/FM radio does not "
+            "decode those. Only 680, 810, 960, 1050, 104.5 and 107.7 are listed."
         ),
         "url": WWO_FINDER,
     },
     {
         "id": "TALK_NOT_GAMES",
         "severity": "limitation",
-        "title": "ESPN Radio and Fox Sports Radio game clearances are not published per affiliate",
+        "title": "Network talk fills most of the weekday; only rights-holder rows are listed as games",
         "detail": (
-            "KTCT is mainly ESPN Radio. KNEW's weekday daypart is Fox Sports Radio talk "
-            "(Dan Patrick, Colin Cowherd, and the rest of that announced lineup), then Premiere talk. "
-            "No 2026 per-game list was found that says which national play-by-play, if any, "
-            "clears on 1050 or 960 besides Athletics baseball on 960. Those games are not invented."
+            "KTCT 1050 is mainly an ESPN Radio pass-through plus The Jim Rome Show. KNEW 960's "
+            "weekday daypart is Fox Sports Radio talk. Those are not games. The one network-wide "
+            "clearance this feed does assert is MLB postseason on 1050, because MLB itself names "
+            "ESPN Radio as the carrier of every postseason game and 1050 is an ESPN Radio affiliate. "
+            "No equivalent statement exists for NBA, NHL, golf or NASCAR on these stations in this "
+            "window, so none of those are listed."
         ),
-        "url": "https://en.wikipedia.org/wiki/KNEW_(AM)",
+        "url": KNEW_WIKI,
     },
     {
         "id": "MBB_NO_RADIO_ROWS",
         "severity": "limitation",
-        "title": "2026-27 Cal men's basketball page has no radio rows in the fetch",
+        "title": "No basketball rows could be verified for the 2026-27 season",
         "detail": (
-            "calbears.com/sports/mens-basketball/schedule fetched 2026-09-26 is the 2026-27 "
-            "schedule. The scoreboard lists games from Nov 2 with TBD times and no radio column. "
-            "Basketball is not added. Stanford basketball was not re-verified onto 1050 this session "
-            "and is not added."
+            "Three checks on 2026-09-27, all negative. Westwood One's NCAA Basketball page says "
+            "\"No upcoming events\", so there is no national college hoops grid to transcribe. "
+            "calbears.com men's basketball lists games from Nov 2 with TBD times and no radio column. "
+            "usfdons.com men's basketball lists TV logos (ESPN+, CBS Sports Network) and no radio "
+            "column, even though KTCT's station record names the San Francisco Dons as an affiliate. "
+            "Stanford basketball was not re-verified onto 1050. Basketball is therefore absent from "
+            "November to February, which is a gap in this feed, not a quiet radio dial."
         ),
-        "url": "https://calbears.com/sports/mens-basketball/schedule",
+        "url": WWO_NCAAB_URL,
     },
     {
         "id": "ATHLETICS_SACRAMENTO",
         "severity": "note",
         "title": "Athletics home games are in Sacramento; 960 AM still carries them",
         "detail": (
-            "mlb.com/athletics/schedule/affiliates lists 960 AM KNEW, Bay Area, with no "
-            "home-only asterisk. Flagship is 650 AM KSTE in Sacramento. Home venue in the "
-            "Stats API is Sutter Health Park."
+            "mlb.com/athletics/schedule/affiliates, re-read 2026-09-27, lists 960 AM KNEW, Bay Area, "
+            "with no home-only asterisk — the asterisks on that table mark the Spanish and Las Vegas "
+            "outlets. Flagship is 650 AM KSTE in Sacramento. Home venue in the Stats API is "
+            "Sutter Health Park."
         ),
         "url": ATH_RADIO,
     },
@@ -331,42 +479,32 @@ FLAGS = [
         "severity": "note",
         "title": "Spanish calls are not on the six stations",
         "detail": (
-            "Giants Spanish is KSFN 1510 / KXZM 93.7. Earthquakes Spanish is KZSF 1370. "
-            "49ers Spanish in the Week 3 listen article is the 49ers app and 49ers.com/esp, "
-            "not these six stations. Those calls are omitted."
+            "Giants Spanish is KSFN 1510 / KXZM 93.7. Earthquakes Spanish is KZSF 1370. 49ers Spanish "
+            "is the club app and 49ers.com/esp. MLB's postseason Spanish audio is Univision Radio. "
+            "None of those are among the six stations, so those calls are omitted."
         ),
         "url": GIANTS_RADIO,
     },
     {
-        "id": "WWO_CHUNK_MISSING",
-        "severity": "review",
-        "title": "The opening chunk of the Westwood One NFL schedule was not returned",
+        "id": "OTHER_TEAMS_EXCLUDED",
+        "severity": "note",
+        "title": "Warriors, Valkyries and Sharks are deliberately absent",
         "detail": (
-            "On 2026-09-26 the nfl-schedule page was fetched from the middle of the list forward. "
-            "Rows that appeared only in the unread opening chunk are not in this file. "
-            "A thin Thursday, Sunday night, or Monday before November is a fetch gap, not a verified quiet night. "
-            "Re-fetch https://www.westwoodonesports.com/nfl-schedule/ and add a game only if the line is on the page."
+            "Golden State Warriors and Valkyries broadcasts are on 95.7 FM and San Jose Sharks games "
+            "are on 98.5 FM. Neither frequency is one of the six you asked about, so those teams are "
+            "out of scope rather than missing. KTCT carried Warriors overflow until 2016 and no "
+            "longer does."
         ),
-        "url": "https://www.westwoodonesports.com/nfl-schedule/",
-    },
-    {
-        "id": "WWO_SPLIT_LINE",
-        "severity": "review",
-        "title": "Oct 26 Cowboys at Eagles was split across two fetches",
-        "detail": (
-            "The first fetched chunk ended on Dallas at Philadelphia, Oct 26, 7:00 PM ET. "
-            "The next chunk opened on event 548539. The row is kept because both fragments match, and marked review."
-        ),
-        "url": "https://www.westwoodonesports.com/events/548539/",
+        "url": KTCT_WIKI,
     },
     {
         "id": "SNAPSHOT_START",
         "severity": "limitation",
-        "title": "This snapshot starts September 26, 2026",
+        "title": "This snapshot starts September 27, 2026",
         "detail": (
-            "Earlier September games were on these stations. They are not in this file, "
-            "so days before Sep 26 are marked \"before this snapshot\" instead of \"no game.\" "
-            "Extending backward needs another line-by-line pass."
+            "Earlier September games were on these stations. They are not in this file, so days "
+            "before Sep 27 are marked \"before this snapshot\" instead of \"no game.\" Extending "
+            "backward needs another line-by-line pass."
         ),
         "url": GIANTS_RADIO,
     },
@@ -375,69 +513,88 @@ FLAGS = [
         "severity": "note",
         "title": "End times are estimates",
         "detail": (
-            "No source publishes a per-game radio sign-off. The timeline uses typical lengths "
-            "(MLB 2:45, NFL 3:15, college football 3:24, MLS 2:00) and labels them estimates. "
-            "They are not official endings. Pregame length is not added; the Sep 1–6 KNBR grid "
-            "started some Giants blocks an hour before first pitch, but that was one stale week."
+            "No source publishes a per-game radio sign-off. The timeline uses typical lengths — "
+            "MLB 2:45, MLB postseason 3:30, NFL 3:15, college football 3:24, soccer 2:00 — and labels "
+            "them estimates. They are not official endings. Pregame length is not added, even though "
+            "the KNBR grids show a one-hour pregame before Giants and Stanford blocks."
         ),
         "url": KNBR_SHOWS,
     },
 ]
 
 
+# --- Westwood One NFL ---------------------------------------------------------
 def wwo_nfl_rows() -> list[dict]:
-    """Schedule-grid rows fetched from westwoodonesports.com/nfl-schedule on 2026-09-26.
-    Four 49ers games are omitted here and attached to the club rows instead. Sixteen lines that were not on a returned page chunk are not included.
+    """Every Upcoming row on westwoodonesports.com/nfl-schedule, read in four chunks
+    on 2026-09-27. Four games the 49ers also play are omitted here and attached to the
+    club rows instead, so the national feed is never double counted.
     """
-    # event_id, date, et 24h or None, title, venue, extra note
+    # Transcribed verbatim from the Upcoming list: event id, date, printed ET,
+    # printed title, printed venue string, printed slot label after the "//".
     raw = [
-        ("548494", "2026-09-27", "19:30", "Los Angeles Rams at Denver Broncos", "Empower Field at Mile High", "Sunday Night Football"),
-        ("548532", "2026-09-28", "19:00", "Philadelphia Eagles at Chicago Bears", "Soldier Field", "Monday Night Football"),
-        ("548485", "2026-10-04", "09:15", "Indianapolis Colts vs Washington Commanders", "Tottenham Hotspur Stadium, London", "International"),
-        ("548535", "2026-10-05", "19:00", "Atlanta Falcons at New Orleans Saints", "Caesars Superdome", "Monday Night Football"),
-        ("548486", "2026-10-11", "09:15", "Philadelphia Eagles vs Jacksonville Jaguars", "Tottenham Hotspur Stadium, London", "International"),
-        ("548537", "2026-10-12", "19:00", "Buffalo Bills at Los Angeles Rams", "SoFi Stadium", "Monday Night Football"),
-        ("548487", "2026-10-18", "09:15", "Houston Texans vs Jacksonville Jaguars", "Wembley Stadium, London", "International"),
-        ("548488", "2026-10-25", "09:15", "Pittsburgh Steelers vs New Orleans Saints", "Stade de France, Paris", "International"),
-        ("548539", "2026-10-26", "19:00", "Dallas Cowboys at Philadelphia Eagles", "Lincoln Financial Field", "Monday Night Football"),
-        ("548499", "2026-11-01", "19:30", "Philadelphia Eagles at Washington Commanders", "Northwest Stadium", "Sunday Night Football"),
-        ("548561", "2026-11-05", "19:30", "Jacksonville Jaguars at Baltimore Ravens", "M&T Bank Stadium", "Thursday Night Football"),
-        ("548500", "2026-11-08", "19:30", "Tampa Bay Buccaneers at Chicago Bears", "Soldier Field", "Sunday Night Football"),
-        ("548562", "2026-11-12", "19:30", "Washington Commanders at New York Giants", "MetLife Stadium", "Thursday Night Football"),
-        ("548501", "2026-11-15", "19:30", "Pittsburgh Steelers at Cincinnati Bengals", "Paycor Stadium", "Sunday Night Football"),
-        ("548564", "2026-11-19", "19:30", "Indianapolis Colts at Houston Texans", "NRG Stadium", "Thursday Night Football"),
-        ("548543", "2026-11-23", "19:00", "Cincinnati Bengals at Washington Commanders", "Northwest Stadium", "Monday Night Football"),
-        ("548512", "2026-11-26", "12:30", "Chicago Bears at Detroit Lions", "Ford Field", "Thanksgiving"),
-        ("548514", "2026-11-26", "20:00", "Kansas City Chiefs at Buffalo Bills", "New Highmark Stadium", "Thanksgiving"),
-        ("548515", "2026-11-27", "14:30", "Denver Broncos at Pittsburgh Steelers", "Acrisure Stadium", "Black Friday"),
-        ("548502", "2026-11-29", "19:30", "New England Patriots at Los Angeles Chargers", "SoFi Stadium", "Sunday Night Football"),
-        ("548544", "2026-11-30", "19:00", "Carolina Panthers at Tampa Bay Buccaneers", "Raymond James Stadium", "Monday Night Football"),
-        ("548566", "2026-12-03", "19:30", "Kansas City Chiefs at Los Angeles Rams", "SoFi Stadium", "Thursday Night Football"),
-        ("548503", "2026-12-06", "19:30", "Houston Texans at Pittsburgh Steelers", "Acrisure Stadium", "Sunday Night Football"),
-        ("548545", "2026-12-07", "19:00", "Dallas Cowboys at Seattle Seahawks", "Lumen Field", "Monday Night Football"),
-        ("548567", "2026-12-10", "19:30", "Minnesota Vikings at New England Patriots", "Gillette Stadium", "Thursday Night Football"),
-        ("548505", "2026-12-13", "19:30", "Buffalo Bills at Green Bay Packers", "Lambeau Field", "Sunday Night Football"),
-        ("548546", "2026-12-14", "19:00", "Pittsburgh Steelers at Jacksonville Jaguars", "EverBank Stadium", "Monday Night Football"),
-        ("548517", "2026-12-19", "16:30", "Seattle Seahawks at Philadelphia Eagles", "Lincoln Financial Field", "Week 15 Saturday"),
-        ("548518", "2026-12-19", "20:00", "Chicago Bears at Buffalo Bills", "New Highmark Stadium", "Week 15 Saturday"),
-        ("548506", "2026-12-20", "19:30", "Detroit Lions at Minnesota Vikings", "U.S. Bank Stadium", "Sunday Night Football"),
-        ("548548", "2026-12-21", "19:00", "New England Patriots at Kansas City Chiefs", "GEHA Field at Arrowhead Stadium", "Monday Night Football"),
-        ("548569", "2026-12-24", "19:30", "Houston Texans at Philadelphia Eagles", "Lincoln Financial Field", "Thursday Night Football"),
-        ("548528", "2026-12-25", "12:30", "Green Bay Packers at Chicago Bears", "Soldier Field", "Christmas"),
-        ("548531", "2026-12-25", "16:15", "Buffalo Bills at Denver Broncos", "Empower Field at Mile High", "Christmas"),
-        ("548534", "2026-12-25", "20:00", "Los Angeles Rams at Seattle Seahawks", "Lumen Field", "Christmas"),
-        ("548519", "2026-12-26", "16:00", "Week 16 Saturday game — teams TBA", "", "Teams TBA"),
-        ("548520", "2026-12-26", "20:00", "Week 16 Saturday game — teams TBA", "", "Teams TBA"),
-        ("548507", "2026-12-27", "19:30", "Jacksonville Jaguars at Dallas Cowboys", "AT&T Stadium", "Sunday Night Football"),
-        ("548550", "2026-12-28", "19:00", "New York Giants at Detroit Lions", "Ford Field", "Monday Night Football"),
-        ("548570", "2026-12-31", "19:30", "Baltimore Ravens at Cincinnati Bengals", "Paycor Stadium", "Thursday Night Football"),
-        ("548521", "2027-01-02", "16:00", "Week 17 Saturday game — teams TBA", "", "Teams TBA"),
-        ("548522", "2027-01-02", "20:00", "Week 17 Saturday game — teams TBA", "", "Teams TBA"),
-        ("548552", "2027-01-04", "19:00", "Houston Texans at Green Bay Packers", "Lambeau Field", "Monday Night Football"),
-        ("548523", "2027-01-09", "12:30", "Week 18 Saturday game — teams TBA", "", "Teams TBA"),
-        ("548524", "2027-01-09", "16:15", "Week 18 Saturday game — teams TBA", "", "Teams TBA"),
-        ("548526", "2027-01-09", "20:00", "Week 18 Saturday game — teams TBA", "", "Teams TBA"),
-        ("548510", "2027-01-10", "19:30", "Week 18 Sunday Night Football — teams TBA", "", "Teams TBA"),
+        ("548494", "2026-09-27", "19:30", "Los Angeles Rams at Denver Broncos", "Empower Field at Mile High, Denver, CO", "Sunday Night Football"),
+        ("548532", "2026-09-28", "19:00", "Philadelphia Eagles at Chicago Bears", "Soldier Field, Chicago, IL", "Monday Night Football"),
+        ("548554", "2026-10-01", "19:30", "Pittsburgh Steelers at Cleveland Browns", "Huntington Bank Field, Cleveland, OH", "Thursday Night Football"),
+        ("548485", "2026-10-04", "09:15", "Indianapolis Colts vs Washington Commanders", "Tottenham Hotspur Stadium, London, UK", "2026 NFL London Games"),
+        ("548495", "2026-10-04", "19:30", "Detroit Lions at Carolina Panthers", "Bank of America Stadium, Charlotte, NC, USA", "Sunday Night Football"),
+        ("548535", "2026-10-05", "19:00", "Atlanta Falcons at New Orleans Saints", "Caesars Superdome, New Orleans, LA", "Monday Night Football"),
+        ("548556", "2026-10-08", "19:30", "Tampa Bay Buccaneers at Dallas Cowboys", "AT&T Stadium, Arlington, TX", "Thursday Night Football"),
+        ("548486", "2026-10-11", "09:15", "Philadelphia Eagles vs Jacksonville Jaguars", "Tottenham Hotspur Stadium, London, UK", "2026 NFL London Games"),
+        ("548496", "2026-10-11", "19:30", "Baltimore Ravens at Atlanta Falcons", "Mercedes-Benz Stadium, Atlanta, GA", "Sunday Night Football"),
+        ("548537", "2026-10-12", "19:00", "Buffalo Bills at Los Angeles Rams", "SoFi Stadium, Inglewood, CA", "Monday Night Football"),
+        ("548557", "2026-10-15", "19:30", "Seattle Seahawks at Denver Broncos", "Mile High Stadium, Denver, CO", "Thursday Night Football"),
+        ("548487", "2026-10-18", "09:15", "Houston Texans vs Jacksonville Jaguars", "Wembley Stadium, London, UK", "2026 NFL London Games"),
+        ("548497", "2026-10-18", "19:30", "Dallas Cowboys at Green Bay Packers", "Lambeau Field, Green Bay, WI", "Sunday Night Football"),
+        ("548558", "2026-10-22", "19:30", "New England Patriots at Chicago Bears", "Soldier Field, Chicago, IL", "Thursday Night Football"),
+        ("548488", "2026-10-25", "09:15", "Pittsburgh Steelers vs New Orleans Saints", "Stade de France, Paris, France", "2026 NFL Paris Game"),
+        ("548498", "2026-10-25", "19:30", "Kansas City Chiefs at Seattle Seahawks", "Lumen Field, Seattle, WA", "Sunday Night Football"),
+        ("548539", "2026-10-26", "19:00", "Dallas Cowboys at Philadelphia Eagles", "Lincoln Financial Field, Philadelphia, PA", "Monday Night Football"),
+        ("548560", "2026-10-29", "19:30", "Carolina Panthers at Green Bay Packers", "Lambeau Field, Green Bay, WI", "Thursday Night Football"),
+        ("548499", "2026-11-01", "19:30", "Philadelphia Eagles at Washington Commanders", "Northwest Stadium, Landover, MD", "Sunday Night Football"),
+        ("548540", "2026-11-02", "19:00", "Chicago Bears at Seattle Seahawks", "Lumen Field, Seattle, WA", "Monday Night Football"),
+        ("548561", "2026-11-05", "19:30", "Jacksonville Jaguars at Baltimore Ravens", "M&T Bank Stadium, Baltimore, MD", "Thursday Night Football"),
+        ("548489", "2026-11-08", "09:15", "Cincinnati Bengals vs Atlanta Falcons", "Bernab\u00e9u, Madrid, Spain", "2026 NFL Madrid Game"),
+        ("548500", "2026-11-08", "19:30", "Tampa Bay Buccaneers at Chicago Bears", "Soldier Field, Chicago, IL", "Sunday Night Football"),
+        ("548541", "2026-11-09", "19:00", "Buffalo Bills at Minnesota Vikings", "U.S. Bank Stadium, Minneapolis, MN", "Monday Night Football"),
+        ("548562", "2026-11-12", "19:30", "Washington Commanders at New York Giants", "MetLife Stadium, East Rutherford, NJ", "Thursday Night Football"),
+        ("548490", "2026-11-15", "09:15", "New England Patriots vs Detroit Lions", "Allianz Arena, Munich, Germany", "2026 NFL Munich Game"),
+        ("548501", "2026-11-15", "19:30", "Pittsburgh Steelers at Cincinnati Bengals", "Paycor Stadium, Cincinnati, OH", "Sunday Night Football"),
+        ("548542", "2026-11-16", "19:00", "Los Angeles Chargers at Baltimore Ravens", "M&T Bank Stadium, Baltimore, MD", "Monday Night Football"),
+        ("548564", "2026-11-19", "19:30", "Indianapolis Colts at Houston Texans", "NRG Stadium, Houston, TX", "Thursday Night Football"),
+        ("548543", "2026-11-23", "19:00", "Cincinnati Bengals at Washington Commanders", "Northwest Stadium, Landover, MD", "Monday Night Football"),
+        ("548511", "2026-11-25", "19:30", "Green Bay Packers at Los Angeles Rams", "SoFi Stadium, Inglewood, CA", "Thanksgiving Wednesday"),
+        ("548512", "2026-11-26", "12:30", "Chicago Bears at Detroit Lions", "Ford Field, Detroit, MI, USA", "NFL Thanksgiving Day Tripleheader"),
+        ("548513", "2026-11-26", "16:15", "Philadelphia Eagles at Dallas Cowboys", "AT&T Stadium, Arlington, TX", "NFL Thanksgiving Day Tripleheader"),
+        ("548514", "2026-11-26", "20:00", "Kansas City Chiefs at Buffalo Bills", "New Highmark Stadium, Orchard Park, NY", "NFL Thanksgiving Day Tripleheader"),
+        ("548515", "2026-11-27", "14:30", "Denver Broncos at Pittsburgh Steelers", "Acrisure Stadium, Pittsburgh, PA", "NFL Black Friday Game"),
+        ("548502", "2026-11-29", "19:30", "New England Patriots at Los Angeles Chargers", "SoFi Stadium, Inglewood, CA", "Sunday Night Football"),
+        ("548544", "2026-11-30", "19:00", "Carolina Panthers at Tampa Bay Buccaneers", "Raymond James Stadium, Tampa, FL", "Monday Night Football"),
+        ("548566", "2026-12-03", "19:30", "Kansas City Chiefs at Los Angeles Rams", "SoFi Stadium, Inglewood, CA", "Thursday Night Football"),
+        ("548503", "2026-12-06", "19:30", "Houston Texans at Pittsburgh Steelers", "Acrisure Stadium, Pittsburgh, PA", "Sunday Night Football"),
+        ("548545", "2026-12-07", "19:00", "Dallas Cowboys at Seattle Seahawks", "Lumen Field, Seattle, WA", "Monday Night Football"),
+        ("548567", "2026-12-10", "19:30", "Minnesota Vikings at New England Patriots", "Gillette Stadium, Foxborough, MA", "Thursday Night Football"),
+        ("548505", "2026-12-13", "19:30", "Buffalo Bills at Green Bay Packers", "Lambeau Field, Green Bay, WI", "Sunday Night Football"),
+        ("548546", "2026-12-14", "19:00", "Pittsburgh Steelers at Jacksonville Jaguars", "EverBank Stadium, Jacksonville, FL", "Monday Night Football"),
+        ("548517", "2026-12-19", "16:30", "Seattle Seahawks at Philadelphia Eagles", "Lincoln Financial Field, Philadelphia, PA", "Week 15 Saturday NFL Doubleheader"),
+        ("548518", "2026-12-19", "20:00", "Chicago Bears at Buffalo Bills", "New Highmark Stadium, Orchard Park, NY", "Week 15 Saturday NFL Doubleheader"),
+        ("548506", "2026-12-20", "19:30", "Detroit Lions at Minnesota Vikings", "U.S. Bank Stadium, Minneapolis, MN", "Sunday Night Football"),
+        ("548548", "2026-12-21", "19:00", "New England Patriots at Kansas City Chiefs", "GEHA Field at Arrowhead Stadium, Kansas City, MO", "Monday Night Football"),
+        ("548569", "2026-12-24", "19:30", "Houston Texans at Philadelphia Eagles", "Lincoln Financial Field, Philadelphia, PA", "Thursday Night Football"),
+        ("548528", "2026-12-25", "12:30", "Green Bay Packers at Chicago Bears", "Soldier Field, Chicago, IL", "Christmas Day NFL Tripleheader"),
+        ("548531", "2026-12-25", "16:15", "Buffalo Bills at Denver Broncos", "Empower Field at Mile High, Denver, CO", "Christmas Day NFL Tripleheader"),
+        ("548534", "2026-12-25", "20:00", "Los Angeles Rams at Seattle Seahawks", "Lumen Field, Seattle, WA", "Christmas Day NFL Tripleheader"),
+        ("548519", "2026-12-26", "16:00", "Week 16 Saturday Doubleheader TBA", "", "Week 16 Saturday NFL Doubleheader"),
+        ("548520", "2026-12-26", "20:00", "Week 16 Saturday Doubleheader TBA", "", "Week 16 Saturday NFL Doubleheader"),
+        ("548507", "2026-12-27", "19:30", "Jacksonville Jaguars at Dallas Cowboys", "AT&T Stadium, Arlington, TX", "Sunday Night Football"),
+        ("548550", "2026-12-28", "19:00", "New York Giants at Detroit Lions", "Ford Field, Detroit, Michigan", "Monday Night Football"),
+        ("548570", "2026-12-31", "19:30", "Baltimore Ravens at Cincinnati Bengals", "Paycor Stadium, Cincinnati, OH", "Thursday Night Football"),
+        ("548521", "2027-01-02", "16:00", "Week 17 Saturday Doubleheader TBA", "", "Week 17 Saturday NFL Doubleheader"),
+        ("548522", "2027-01-02", "20:00", "Week 17 Saturday NFL Doubleheader TBA", "", "Week 17 Saturday NFL Doubleheader"),
+        ("548552", "2027-01-04", "19:00", "Houston Texans at Green Bay Packers", "Lambeau Field, Green Bay, WI", "Monday Night Football"),
+        ("548523", "2027-01-09", "12:30", "Week 18 Saturday Tripleheader TBA", "", "Week 18 Saturday NFL Tripleheader"),
+        ("548524", "2027-01-09", "16:15", "Week 18 Saturday Tripleheader TBA", "", "Week 18 Saturday NFL Tripleheader"),
+        ("548526", "2027-01-09", "20:00", "Week 18 Saturday Tripleheader TBA", "", "Week 18 Saturday NFL Tripleheader"),
+        ("548510", "2027-01-10", "19:30", "Week 18 Sunday Night Football - Teams TBA", "", "Sunday Night Football"),
     ]
     rows = []
     for event_id, date, et, title, venue, slot in raw:
@@ -448,29 +605,30 @@ def wwo_nfl_rows() -> list[dict]:
             start_pt=et_to_pt(et),
             title=f"Westwood One: {title}",
             league="NFL",
+            network="Westwood One",
             venue=venue,
             status="tba" if tba else "scheduled",
             stations=WWO_NFL_STATIONS[:],
-            confidence="review" if event_id == "548539" else "indicated",
+            confidence="indicated",
             sources=[
                 src(f"Westwood One event {event_id}", wwo_event(event_id)),
                 src("Westwood One NFL schedule", WWO_NFL_URL),
-                src("Station finder: San Francisco KNBR-AM, KNBR-FM, KTCT-AM", WWO_FINDER),
+                src("Station finder, NFL tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM", WWO_FINDER),
             ],
             notes=(
                 f"{slot}. Listed start {et_to_pt(et)} PT, converted from {et} ET printed on the "
                 "schedule grid. Not a confirmed kickoff. Clearance on 680 / 104.5 / 1050 is the "
-                "NFL affiliate row plus the station-finder preemption caveat, not a per-game confirmation."
-                + (" This line was split across two fetches: chunk 1 ended on Dallas at Philadelphia, Oct 26, 7:00 PM ET, and the next chunk opened on this event URL. Re-check the schedule page." if event_id == "548539" else "")
+                "NFL affiliate row plus the station-finder preemption caveat, not a per-game "
+                "confirmation."
             ),
-            flag_ids=["WWO_PREEMPTION", "WWO_LISTED_START"] + (["WWO_SPLIT_LINE"] if event_id == "548539" else []),
+            flag_ids=["WWO_PREEMPTION", "WWO_LISTED_START", "FINDER_2025_LABEL", "WWO_VENUE_STRINGS"],
         ))
     return rows
 
 
+# --- Westwood One college football -------------------------------------------
 def wwo_ncaaf_rows() -> list[dict]:
     raw = [
-        ("557136", "2026-09-26", "15:00", "Oklahoma at Georgia", "Sanford Stadium, Athens"),
         ("557137", "2026-10-03", None, "Notre Dame at North Carolina", "Kenan Stadium, Chapel Hill"),
         ("557139", "2026-10-10", None, "Indiana at Nebraska", "Memorial Stadium, Lincoln"),
         ("557140", "2026-10-17", None, "Penn State at Michigan", "Michigan Stadium, Ann Arbor"),
@@ -484,7 +642,7 @@ def wwo_ncaaf_rows() -> list[dict]:
         ("557132", "2026-12-12", "14:00", "Army vs Navy", "MetLife Stadium"),
     ]
     more = (
-        "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=0&limit=20"
+        "https://www.westwoodonesports.com/more/eventGrid?id=47030&range=current&offset=10&limit=10"
         "&timezone=America/New_York&widgetTitle=Upcoming+NCAA+Football+Broadcasts"
     )
     rows = []
@@ -495,45 +653,161 @@ def wwo_ncaaf_rows() -> list[dict]:
             start_pt=et_to_pt(et) if et else None,
             title=f"Westwood One: {title}",
             league="NCAAF",
+            network="Westwood One",
             venue=venue,
             status="scheduled" if et else "tba",
-            stations=WWO_NFL_STATIONS[:],
+            stations=WWO_NCAAF_STATIONS[:],
             confidence="indicated",
             sources=[
                 src(f"Westwood One event {event_id}", wwo_event(event_id)),
-                src("NCAA football grid, including the More endpoint (ends \"No more events\")", more),
+                src("Westwood One NCAA football schedule", WWO_NCAAF_URL),
+                src("More endpoint, offset 10 (returns \"No more events\")", more),
+                src("Station finder, NCAA Football tab: San Francisco KNBR-AM, KNBR-FM, KTCT-AM", WWO_FINDER),
             ],
             notes=(
                 ("Air time TBD on the Westwood One grid." if not et else
-                f"Listed start {et_to_pt(et)} PT from {et} ET on the grid. "
-                "NCAA station-finder tab was not separately extracted; stations are the confirmed NFL affiliate row.")
-                + (" ScheduleFreeTime's public table showed 12:30 PM PT on 2026-09-26, which matches the 3:30 PM ET kickoff, not this 3:00 PM ET listed start." if event_id == "557136" else "")
+                 f"Listed start {et_to_pt(et)} PT, converted from {et} ET on the grid.")
+                + " The NCAA Football tab of the station finder was read on 2026-09-27 and lists the "
+                "same San Francisco affiliates as the NFL tab. The KNBR 1050 weekly grid independently "
+                "shows a \"WW1 CFB\" college football block, which is what this row would occupy."
             ),
-            flag_ids=["WWO_PREEMPTION", "WWO_LISTED_START", "NCAAF_FINDER_TAB"] + (["SFT_RADIO_DIFF"] if event_id == "557136" else []),
+            flag_ids=["WWO_PREEMPTION", "WWO_LISTED_START", "FINDER_2025_LABEL"],
         ))
     return rows
 
 
+# --- Westwood One U.S. Soccer -------------------------------------------------
+def wwo_soccer_rows() -> list[dict]:
+    raw = [
+        ("570239", "2026-09-29", "19:45", "USMNT vs. Chile", "Energizer Park, St. Louis, MO",
+         "Announcers: Callum Williams and Cobi Jones."),
+        ("570240", "2026-10-03", "22:00", "USMNT vs. Mexico", "State Farm Stadium, Glendale, AZ",
+         "Listed as \"TNT Sports Broadcast - Audio Only Simulcast\", not an original Westwood One call."),
+        ("570241", "2026-10-06", "19:45", "USMNT vs. Canada", "Allianz Field, Saint Paul, MN",
+         "Announcers: Callum Williams and Jamie Watson."),
+        ("570247", "2026-10-10", "14:30", "USWNT vs. Spain", "Audi Field, Washington, DC",
+         "Listed as \"TNT Sports Broadcast - Audio Only Simulcast\", not an original Westwood One call."),
+        ("570250", "2026-10-13", "18:45", "USWNT vs. Spain", "Subaru Park, Chester, PA",
+         "Announcers: Mark Rogondino and Saskia Webber."),
+    ]
+    rows = []
+    for event_id, date, et, title, venue, extra in raw:
+        rows.append(game(
+            id=f"wwo-soccer-{event_id}",
+            date=date,
+            start_pt=et_to_pt(et),
+            title=f"Westwood One: {title}",
+            league="SOCCER",
+            network="Westwood One",
+            venue=venue,
+            stations=WWO_SOCCER_STATIONS[:],
+            confidence="indicated",
+            sources=[
+                src(f"Westwood One event {event_id}", wwo_event(event_id)),
+                src("Westwood One U.S. Soccer schedule", WWO_SOCCER_URL),
+                src("Station finder, Soccer tab: San Francisco, CA — KTCT-AM", WWO_FINDER),
+            ],
+            notes=(
+                f"Listed start {et_to_pt(et)} PT, converted from the {et} ET printed on the U.S. Soccer "
+                f"page. {extra} The Soccer tab of the station finder lists exactly one Bay Area "
+                "affiliate, KTCT-AM, so 1050 is the only station shown."
+            ),
+            flag_ids=["SOCCER_FINDER_ONLY", "WWO_PREEMPTION", "WWO_LISTED_START", "FINDER_2025_LABEL"],
+        ))
+    return rows
+
+
+# --- MLB postseason on ESPN Radio --------------------------------------------
+def mlb_postseason_rows() -> list[dict]:
+    """One row per scheduled postseason date from the MLB Stats API postseason endpoint,
+    fetched 2026-09-27. Every game on that endpoint carries startTimeTBD true, so no row
+    gets a clock time. MLB's own release puts every game on ESPN Radio; KTCT 1050 is a
+    full-time ESPN Radio affiliate. That is a network row, not a per-game clearance.
+    """
+    # date, round label for the title, list of exact Stats API descriptions, if-necessary count
+    raw = [
+        ("2026-09-29", "Wild Card Series, Game 1",
+         ["AL Wild Card 'A' Game 1", "AL Wild Card 'B' Game 1", "NL Wild Card 'A' Game 1", "NL Wild Card 'B' Game 1"], 0),
+        ("2026-09-30", "Wild Card Series, Game 2",
+         ["AL Wild Card 'A' Game 2", "AL Wild Card 'B' Game 2", "NL Wild Card 'A' Game 2", "NL Wild Card 'B' Game 2"], 0),
+        ("2026-10-01", "Wild Card Series, Game 3",
+         ["AL Wild Card 'A' Game 3", "AL Wild Card 'B' Game 3", "NL Wild Card 'A' Game 3", "NL Wild Card 'B' Game 3"], 4),
+        ("2026-10-03", "Division Series, Game 1",
+         ["ALDS 'A' Game 1", "ALDS 'B' Game 1", "NLDS 'A' Game 1", "NLDS 'B' Game 1"], 0),
+        ("2026-10-04", "NL Division Series, Game 2",
+         ["NLDS 'A' Game 2", "NLDS 'B' Game 2"], 0),
+        ("2026-10-05", "AL Division Series, Game 2",
+         ["ALDS 'A' Game 2", "ALDS 'B' Game 2"], 0),
+        ("2026-10-06", "NL Division Series, Game 3",
+         ["NLDS 'A' Game 3", "NLDS 'B' Game 3"], 0),
+        ("2026-10-07", "AL Division Series Game 3, NL Division Series Game 4",
+         ["ALDS 'A' Game 3", "ALDS 'B' Game 3", "NLDS 'A' Game 4", "NLDS 'B' Game 4"], 2),
+        ("2026-10-08", "AL Division Series, Game 4",
+         ["ALDS 'A' Game 4", "ALDS 'B' Game 4"], 2),
+        ("2026-10-09", "NL Division Series, Game 5",
+         ["NLDS 'A' Game 5", "NLDS 'B' Game 5"], 2),
+        ("2026-10-10", "AL Division Series, Game 5",
+         ["ALDS 'A' Game 5", "ALDS 'B' Game 5"], 2),
+        ("2026-10-11", "NLCS Game 1", ["NLCS Game 1"], 0),
+        ("2026-10-12", "ALCS Game 1, NLCS Game 2", ["ALCS Game 1", "NLCS Game 2"], 0),
+        ("2026-10-13", "ALCS Game 2", ["ALCS Game 2"], 0),
+        ("2026-10-14", "NLCS Game 3", ["NLCS Game 3"], 0),
+        ("2026-10-15", "ALCS Game 3, NLCS Game 4", ["ALCS Game 3", "NLCS Game 4"], 0),
+        ("2026-10-16", "ALCS Game 4, NLCS Game 5", ["ALCS Game 4", "NLCS Game 5"], 1),
+        ("2026-10-17", "ALCS Game 5", ["ALCS Game 5"], 1),
+        ("2026-10-18", "NLCS Game 6", ["NLCS Game 6"], 1),
+        ("2026-10-19", "ALCS Game 6, NLCS Game 7", ["ALCS Game 6", "NLCS Game 7"], 2),
+        ("2026-10-20", "ALCS Game 7", ["ALCS Game 7"], 1),
+        ("2026-10-23", "World Series Game 1", ["World Series Game 1"], 0),
+        ("2026-10-24", "World Series Game 2", ["World Series Game 2"], 0),
+        ("2026-10-26", "World Series Game 3", ["World Series Game 3"], 0),
+        ("2026-10-27", "World Series Game 4", ["World Series Game 4"], 0),
+        ("2026-10-28", "World Series Game 5", ["World Series Game 5"], 1),
+        ("2026-10-30", "World Series Game 6", ["World Series Game 6"], 1),
+        ("2026-10-31", "World Series Game 7", ["World Series Game 7"], 1),
+    ]
+    rows = []
+    for date, label, descriptions, if_nec in raw:
+        n = len(descriptions)
+        all_conditional = if_nec == n
+        suffix = " (if necessary)" if all_conditional else (f" — {if_nec} of them if necessary" if if_nec else "")
+        rows.append(game(
+            id=f"mlb-post-{date}",
+            date=date,
+            start_pt=None,
+            title=f"MLB Postseason on ESPN Radio — {label}{suffix}",
+            league="MLB",
+            network="ESPN Radio",
+            venue="",
+            status="if-necessary" if all_conditional else "tba",
+            conditional=all_conditional,
+            stations=["1050"],
+            confidence="indicated",
+            duration_est_min=DUR["MLB-POST"],
+            sources=[
+                src("MLB: \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games\"", MLB_POST_PRESS),
+                src(f"MLB Stats API postseason endpoint, {date}: {n} game(s), startTimeTBD true", MLB_POST_API),
+                src("KNBR 1050 weekly grid — the ESPN Radio network schedule", KNBR_1050_SHOWS),
+                src("KTCT station record: network ESPN Radio", KTCT_WIKI),
+            ],
+            notes=(
+                f"Stats API descriptions for this date: {'; '.join(descriptions)}. "
+                "First pitch was still TBD on every postseason game when the endpoint was read on "
+                "2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a "
+                f"{n}-game day at most one of these can be on 1050 at a time"
+                + (", and Stanford football, the Earthquakes or Westwood One college football can take the station instead. "
+                   if date <= "2026-11-07" else ". ")
+                + "Neither the Giants nor the Athletics are in this field."
+            ),
+            flag_ids=["MLB_POSTSEASON_ESPN", "TALK_NOT_GAMES", "SPANISH_EXCLUDED", "DURATION_ESTIMATE"],
+        ))
+    return rows
+
+
+# --- local clubs and schools --------------------------------------------------
 def local_rows() -> list[dict]:
     rows = []
-    rows.append(game(
-        id="giants-2026-09-26",
-        date="2026-09-26",
-        start_pt="13:05",
-        title="Los Angeles Dodgers at San Francisco Giants",
-        league="MLB",
-        venue="Oracle Park",
-        status="final",
-        result="Dodgers 4, Giants 3",
-        stations=["680", "104.5"],
-        confidence="official",
-        sources=[
-            src("MLB Stats API gamePk 823165, first pitch 2026-09-26T20:05:00Z", mlb_game(823165)),
-            src("Giants English radio: KNBR 680 AM & 104.5 FM", GIANTS_RADIO),
-        ],
-        notes="Final when fetched. 20:05 UTC is 1:05 PM PDT. English call only.",
-        flag_ids=["SPANISH_EXCLUDED", "DURATION_ESTIMATE"],
-    ))
+
     rows.append(game(
         id="giants-2026-09-27",
         date="2026-09-27",
@@ -548,25 +822,12 @@ def local_rows() -> list[dict]:
             src("MLB Stats API gamePk 823164, first pitch 2026-09-27T19:05:00Z", mlb_game(823164)),
             src("Giants English radio: KNBR 680 AM & 104.5 FM", GIANTS_RADIO),
         ],
-        notes="Last Giants game returned by the Stats API through 2026-10-02. No later Giants game is added.",
-        flag_ids=["SPANISH_EXCLUDED", "DURATION_ESTIMATE"],
-    ))
-    rows.append(game(
-        id="athletics-2026-09-26",
-        date="2026-09-26",
-        start_pt="18:40",
-        title="Houston Astros at Athletics",
-        league="MLB",
-        venue="Sutter Health Park, Sacramento",
-        status="pregame",
-        stations=["960"],
-        confidence="official",
-        sources=[
-            src("MLB Stats API gamePk 824949, first pitch 2026-09-27T01:40:00Z", mlb_game(824949)),
-            src("A's Radio Network: 960 AM KNEW, Bay Area", ATH_RADIO),
-        ],
-        notes="Status was Pre-Game when fetched. Home games are in Sacramento. 960 has no home-only asterisk on the affiliate page. ScheduleFreeTime did not mark this game as Bay Area radio; this row follows the club affiliates page.",
-        flag_ids=["ATHLETICS_SACRAMENTO", "SFT_RADIO_DIFF", "DURATION_ESTIMATE"],
+        notes=(
+            "Season finale. The Stats API returned no Giants game after this one when queried on "
+            "2026-09-27 through 2026-11-15, and the club is not in the postseason field. "
+            "19:05 UTC is 12:05 PM PDT. English call only."
+        ),
+        flag_ids=["NO_LOCAL_MLB_AFTER_0927", "SPANISH_EXCLUDED", "DURATION_ESTIMATE"],
     ))
     rows.append(game(
         id="athletics-2026-09-27",
@@ -582,8 +843,12 @@ def local_rows() -> list[dict]:
             src("MLB Stats API gamePk 824948, first pitch 2026-09-27T19:05:00Z", mlb_game(824948)),
             src("A's Radio Network: 960 AM KNEW, Bay Area", ATH_RADIO),
         ],
-        notes="Last Athletics game returned by the Stats API through 2026-10-05. No postseason Athletics game is added. ScheduleFreeTime did not mark Athletics games as Bay Area radio; this row follows the club affiliates page.",
-        flag_ids=["ATHLETICS_SACRAMENTO", "SFT_RADIO_DIFF", "DURATION_ESTIMATE"],
+        notes=(
+            "Season finale. No later Athletics game was returned by the Stats API and the club is not "
+            "in the postseason field. ScheduleFreeTime does not mark Athletics games as Bay Area "
+            "radio; this row follows the club affiliates page."
+        ),
+        flag_ids=["NO_LOCAL_MLB_AFTER_0927", "ATHLETICS_SACRAMENTO", "SFT_RADIO_DIFF", "DURATION_ESTIMATE"],
     ))
 
     niners = [
@@ -603,27 +868,34 @@ def local_rows() -> list[dict]:
         ("2027-01-03", "17:20", "Philadelphia Eagles at San Francisco 49ers", "Levi's Stadium", ["107.7", "104.5", "680"], "Week 17", "NBC", []),
     ]
     wwo_same = {
-        "2026-10-19": "Westwood One event 548538 prints 7:00 PM ET (4:00 PM PT) for this game. Club kickoff is 5:15 PM PT. Local call is the one on the stations below.",
-        "2026-11-22": "Westwood One event 548491 prints 7:30 PM ET (4:30 PM PT) and Estadio Azteca. Club kickoff is 5:20 PM PT at Estadio Banorte.",
-        "2026-12-17": "Westwood One event 548568 prints 7:30 PM ET (4:30 PM PT). Club kickoff is 5:15 PM PT.",
-        "2027-01-03": "Westwood One event 548509 prints 7:30 PM ET (4:30 PM PT). Club kickoff is 5:20 PM PT.",
+        "2026-10-19": ("548538", "Westwood One event 548538 prints 7:00 PM ET (4:00 PM PT) for this game. "
+                                 "Club kickoff is 5:15 PM PT. The national listing is merged into this row, not duplicated."),
+        "2026-11-22": ("548491", "Westwood One event 548491 prints 7:30 PM ET (4:30 PM PT) and Estadio Azteca. "
+                                 "Club kickoff is 5:20 PM PT at Estadio Banorte. Merged, not duplicated."),
+        "2026-12-17": ("548568", "Westwood One event 548568 prints 7:30 PM ET (4:30 PM PT). Club kickoff is "
+                                 "5:15 PM PT. Merged, not duplicated."),
+        "2027-01-03": ("548509", "Westwood One event 548509 prints 7:30 PM ET (4:30 PM PT). Club kickoff is "
+                                 "5:20 PM PT. Merged, not duplicated."),
     }
     week3 = "https://www.49ers.com/news/ways-to-watch-and-listen-cardinals-vs-49ers-week-3-x8427"
     for date, start, title, venue, stations, week, tv, extra_flags in niners:
-        sources = [
-            src(f"49ers.com schedule, {week}, radio line as printed", NINERS),
-        ]
+        sources = [src(f"49ers.com schedule, {week}, radio line as printed", NINERS)]
         if date == "2026-09-27":
             sources.append(src("Week 3 ways to listen, 1:05 PM PT, KSFO 810 / KSAN 107.7", week3))
         notes = f"{week}. TV on the schedule page: {tv}. Times are the PT clock printed by 49ers.com."
+        network = ""
         if date in wwo_same:
-            notes += " " + wwo_same[date]
+            event_id, text = wwo_same[date]
+            notes += " " + text
+            network = "Westwood One also carries it nationally"
+            sources.append(src(f"Westwood One event {event_id} (same game, national feed)", wwo_event(event_id)))
         rows.append(game(
             id=f"niners-{date}",
             date=date,
             start_pt=start,
             title=title,
             league="NFL",
+            network=network,
             venue=venue,
             stations=stations,
             confidence="official",
@@ -646,55 +918,24 @@ def local_rows() -> list[dict]:
         flag_ids=["WEEK18_UNPLACED"],
     ))
 
+    # Stanford: dates and kickoffs from ESPN because the school site still serves 2025.
     stanford = [
-        ("2026-09-26", "19:30", "Georgia Tech at Stanford", "Stanford Stadium", "official",
-         "7:30 PM PDT on the rendered gostanford schedule index; ESPN prints 10:30 PM ET.",
-         [src("ESPN Stanford schedule, 10:30 PM ET = 7:30 PM PT", STANFORD_ESPN),
-          src("2026 dates, Georgia Tech on Sep 26", STANFORD_DATES),
-          src("Radio team on KNBR/KTCT 1050 AM", STANFORD_RADIO)],
-         []),
-        ("2026-10-03", "09:00", "Stanford at Wake Forest", "Winston-Salem", "official",
-         "9:00 AM PDT on the rendered schedule index; ESPN prints 12:00 PM ET.",
-         [src("ESPN Stanford schedule, 12:00 PM ET = 9:00 AM PT", STANFORD_ESPN),
-          src("Radio team on KNBR/KTCT 1050 AM", STANFORD_RADIO)],
-         []),
-        ("2026-10-10", "12:30", "Stanford at Notre Dame", "Notre Dame Stadium", "official",
-         "12:30 PM on the rendered schedule index; ESPN prints 3:30 PM ET on NBC.",
-         [src("ESPN Stanford schedule, 3:30 PM ET = 12:30 PM PT", STANFORD_ESPN),
-          src("2026 dates, at Notre Dame on Oct 10", STANFORD_DATES),
-          src("Radio team on KNBR/KTCT 1050 AM", STANFORD_RADIO)],
-         []),
-        ("2026-10-17", "16:30", "Elon at Stanford", "Stanford Stadium", "review",
-         "Kickoff is ESPN's 7:30 PM ET converted to 4:30 PM PT. School excerpt did not include this kickoff.",
-         [src("ESPN Stanford schedule, Oct 17, 7:30 PM", STANFORD_ESPN),
-          src("School release lists Elon on Oct 17, no kickoff", STANFORD_DATES),
-          src("Radio team on KNBR/KTCT 1050 AM", STANFORD_RADIO)],
-         ["STANFORD_OCT17_TIME"]),
-        ("2026-10-23", "19:30", "NC State at Stanford", "Stanford Stadium", "official",
-         "Friday 7:30 PM PDT on the rendered schedule index; ESPN prints 10:30 PM ET.",
-         [src("ESPN Stanford schedule, 10:30 PM ET = 7:30 PM PT", STANFORD_ESPN),
-          src("Radio team on KNBR/KTCT 1050 AM", STANFORD_RADIO)],
-         []),
-        ("2026-10-31", None, "Stanford at Louisville", "Louisville", "official",
-         "Date is on the school release and ESPN. Kickoff TBD on ESPN.",
-         [src("ESPN Stanford schedule, Oct 31 TBD", STANFORD_ESPN),
-          src("School release, at Louisville Oct 31", STANFORD_DATES),
-          src("Radio team on KNBR/KTCT 1050 AM", STANFORD_RADIO)],
-         []),
-        ("2026-11-14", None, "Stanford at Virginia Tech", "Blacksburg", "official",
-         "Date is on the school release and ESPN. Kickoff TBD.",
-         [src("ESPN Stanford schedule, Nov 14 TBD", STANFORD_ESPN),
-          src("School release, at Virginia Tech Nov 14", STANFORD_DATES),
-          src("Radio team on KNBR/KTCT 1050 AM", STANFORD_RADIO)],
-         []),
-        ("2026-11-28", None, "SMU at Stanford", "Stanford Stadium", "official",
-         "Date is on the school release and ESPN. Kickoff TBD.",
-         [src("ESPN Stanford schedule, Nov 28 TBD", STANFORD_ESPN),
-          src("School release, SMU on Nov 28", STANFORD_DATES),
-          src("Radio team on KNBR/KTCT 1050 AM", STANFORD_RADIO)],
-         []),
+        ("2026-10-03", "09:00", "Stanford at Wake Forest", "Winston-Salem",
+         "ESPN prints Sat Oct 3, 12:00 PM ET, which is 9:00 AM PT."),
+        ("2026-10-10", "12:30", "Stanford at Notre Dame", "Notre Dame Stadium",
+         "ESPN prints Sat Oct 10, 3:30 PM ET on NBC, which is 12:30 PM PT."),
+        ("2026-10-17", "16:30", "Elon at Stanford", "Stanford Stadium",
+         "ESPN prints Sat Oct 17, 7:30 PM ET, which is 4:30 PM PT."),
+        ("2026-10-23", "19:30", "NC State at Stanford", "Stanford Stadium",
+         "ESPN prints Fri Oct 23, 10:30 PM ET, which is 7:30 PM PT. This is the Friday night game."),
+        ("2026-10-31", None, "Stanford at Louisville", "Louisville",
+         "ESPN prints Sat Oct 31 with kickoff TBD."),
+        ("2026-11-14", None, "Stanford at Virginia Tech", "Blacksburg",
+         "ESPN prints Sat Nov 14 with kickoff TBD."),
+        ("2026-11-28", None, "SMU at Stanford", "Stanford Stadium",
+         "ESPN prints Sat Nov 28 with kickoff TBD."),
     ]
-    for date, start, title, venue, confidence, notes, sources, flags in stanford:
+    for date, start, title, venue, notes in stanford:
         rows.append(game(
             id=f"stanford-{date}",
             date=date,
@@ -704,11 +945,20 @@ def local_rows() -> list[dict]:
             venue=venue,
             status="scheduled" if start else "tba",
             stations=["1050"],
-            confidence=confidence,
-            sources=sources,
-            notes=notes + " \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680.",
-            flag_ids=flags + ["DURATION_ESTIMATE"],
+            confidence="official",
+            sources=[
+                src("ESPN 2026 Stanford schedule (dates and kickoffs, Eastern)", STANFORD_ESPN),
+                src("Stanford radio release: the broadcast is on KNBR/KTCT 1050 AM", STANFORD_RADIO),
+                src("Stanford football on The Sports Leader (KNBR/KTCT)", STANFORD_TSL),
+                src("KNBR 1050 weekly grid: Stanford pre-game then STANFORD FOOTBALL block", KNBR_1050_SHOWS),
+            ],
+            notes=(
+                notes + " \"KNBR/KTCT 1050 AM\" is the 1050 station, not 680. The school's own "
+                "schedule page was serving 2025 rows when checked, so the date and time come from ESPN."
+            ),
+            flag_ids=["GOSTANFORD_2025", "DURATION_ESTIMATE"],
         ))
+
     rows.append(game(
         id="big-game-2026-11-21",
         date="2026-11-21",
@@ -720,29 +970,36 @@ def local_rows() -> list[dict]:
         stations=["1050", "680", "104.5"],
         confidence="review",
         sources=[
-            src("Cal schedule index: Radio KNBR 104.5 FM / 680 AM on the Nov 21 row", CAL),
+            src("Cal schedule: Radio \"KNBR 104.5 FM / 680 AM\" on the Nov 21 row", CAL),
             src("Stanford radio release: KNBR/KTCT 1050 AM for the football season", STANFORD_RADIO),
-            src("Both schools list Nov 21; ESPN kickoff TBD", STANFORD_ESPN),
+            src("ESPN Stanford schedule: Nov 21 at California, kickoff TBD", STANFORD_ESPN),
         ],
-        notes="One game, two station claims. 810 AM is not printed on the Cal Big Game row in the captured index. Kickoff TBD.",
-        flag_ids=["BIG_GAME_STATIONS", "CAL_RADIO_INDEX", "DURATION_ESTIMATE"],
+        notes=(
+            "One game, two station claims, both shown. Cal's Radio column prints KNBR 104.5 FM / 680 AM "
+            "for this row and KSFO 810 AM for every other 2026 row, so 810 is not assumed here. "
+            "Kickoff TBD on both schedules."
+        ),
+        flag_ids=["BIG_GAME_STATIONS", "DURATION_ESTIMATE"],
     ))
 
+    # Cal: full Radio column re-read from the official schedule on 2026-09-27.
     cal = [
-        ("2026-10-03", "12:30", "California at UNLV", "Allegiant Stadium, Las Vegas", "official",
-         "Scoreboard fetch prints Oct 3, 12:30 PM at UNLV. ESPN prints 3:30 PM ET on CBSSN, which is 12:30 PM PT. Radio KSFO quoted in the rendered index."),
-        ("2026-10-10", None, "Virginia Tech at California", "California Memorial Stadium", "official",
-         "Radio KSFO quoted in the rendered index. Kickoff not on the scoreboard fetch. ESPN TBD."),
-        ("2026-10-24", None, "California at SMU", "Gerald J. Ford Stadium, Dallas", "official",
-         "Radio KSFO quoted in the rendered index. Kickoff TBD on ESPN."),
-        ("2026-10-31", None, "California at NC State", "Carter-Finley Stadium, Raleigh", "official",
-         "Radio KSFO quoted in the rendered index. Kickoff TBD on ESPN."),
-        ("2026-11-14", None, "California at Virginia", "Scott Stadium, Charlottesville", "official",
-         "Radio KSFO quoted in the rendered index. Kickoff TBD on ESPN."),
-        ("2026-11-28", None, "Pittsburgh at California", "California Memorial Stadium", "official",
-         "Radio KSFO quoted in the rendered index. Kickoff TBD on ESPN."),
+        ("2026-10-03", "12:30", "California at UNLV", "Allegiant Stadium, Las Vegas",
+         "Cal's schedule prints Oct 3, 12:30 PM PT at UNLV on CBSSN — the only 2026 row with a kickoff. Radio column: KSFO 810."),
+        ("2026-10-10", None, "Virginia Tech at California", "California Memorial Stadium",
+         "Radio column: KSFO 810. Kickoff not yet set on the schedule or on ESPN."),
+        ("2026-10-17", None, "Wake Forest at California", "California Memorial Stadium",
+         "Radio column: KSFO 810. Kickoff not yet set. This row was missing from the previous snapshot and is now read directly from the Radio column."),
+        ("2026-10-24", None, "California at SMU", "Gerald J. Ford Stadium, Dallas",
+         "Radio column: KSFO 810. Kickoff not yet set."),
+        ("2026-10-31", None, "California at NC State", "Carter-Finley Stadium, Raleigh",
+         "Radio column: KSFO 810. Kickoff not yet set."),
+        ("2026-11-14", None, "California at Virginia", "Scott Stadium, Charlottesville",
+         "Radio column: KSFO 810. Kickoff not yet set. Cal's bye week is Nov 7."),
+        ("2026-11-28", None, "Pittsburgh at California", "California Memorial Stadium",
+         "Radio column: KSFO 810. Kickoff not yet set. Season finale."),
     ]
-    for date, start, title, venue, confidence, notes in cal:
+    for date, start, title, venue, notes in cal:
         rows.append(game(
             id=f"cal-{date}",
             date=date,
@@ -752,43 +1009,39 @@ def local_rows() -> list[dict]:
             venue=venue,
             status="scheduled" if start else "tba",
             stations=["810"],
-            confidence=confidence,
+            confidence="official",
             sources=[
-                src("Cal football schedule, radio column in the rendered index", CAL),
-                src("ESPN Cal schedule, time cross-check", CAL_ESPN),
+                src("Cal football schedule, Radio column", CAL),
+                src("ESPN Cal schedule, date and time cross-check", CAL_ESPN),
             ],
             notes=notes,
-            flag_ids=["CAL_RADIO_INDEX", "DURATION_ESTIMATE"],
+            flag_ids=["DURATION_ESTIMATE"],
         ))
-    rows.append(game(
-        id="cal-2026-10-17",
-        date="2026-10-17",
-        start_pt=None,
-        title="Wake Forest at California",
-        league="NCAAF",
-        venue="California Memorial Stadium",
-        status="tba",
-        stations=["810"],
-        confidence="review",
-        sources=[
-            src("Cal scoreboard fetch: Oct 17 vs Wake Forest, Berkeley, no time", CAL),
-            src("ESPN Cal schedule: Oct 17, kickoff TBD", CAL_ESPN),
-        ],
-        notes="Date is official. 810 AM is the pattern of the other quoted rows, not a quoted Wake Forest row. Review the Radio column.",
-        flag_ids=["CAL_WAKE_ROW", "CAL_RADIO_INDEX", "DURATION_ESTIMATE"],
-    ))
 
     quakes = [
-        ("2026-09-26", "19:30", "Portland Timbers at San Jose Earthquakes", "PayPal Park", "Home"),
-        ("2026-10-10", "18:30", "San Jose Earthquakes at Colorado Rapids", "", "Away"),
-        ("2026-10-14", "18:30", "San Jose Earthquakes at Real Salt Lake", "", "Away"),
-        ("2026-10-17", "19:30", "Nashville SC at San Jose Earthquakes", "PayPal Park", "Home"),
-        ("2026-10-24", "17:30", "San Jose Earthquakes at FC Dallas", "", "Away"),
-        ("2026-10-28", "19:30", "Colorado Rapids at San Jose Earthquakes", "PayPal Park", "Home"),
-        ("2026-10-31", "14:00", "Real Salt Lake at San Jose Earthquakes", "PayPal Park", "Home"),
-        ("2026-11-07", "16:00", "San Jose Earthquakes at Minnesota United FC", "", "Away"),
+        ("2026-10-10", "18:30", "San Jose Earthquakes at Colorado Rapids", "", "Away", "official", []),
+        ("2026-10-14", "18:30", "San Jose Earthquakes at Real Salt Lake", "", "Away", "official", []),
+        ("2026-10-17", "19:30", "Nashville SC at San Jose Earthquakes", "PayPal Park", "Home", "official", []),
+        ("2026-10-24", "17:30", "San Jose Earthquakes at FC Dallas", "", "Away", "official", []),
+        ("2026-10-28", "19:30", "Colorado Rapids at San Jose Earthquakes", "PayPal Park", "Home", "official", []),
+        ("2026-10-31", "14:00", "Real Salt Lake at San Jose Earthquakes", "PayPal Park", "Home", "review", ["QUAKES_OCT31_TIME"]),
+        ("2026-11-07", "16:00", "San Jose Earthquakes at Minnesota United FC", "", "Away", "official", []),
     ]
-    for date, start, title, venue, ha in quakes:
+    for date, start, title, venue, ha, confidence, extra in quakes:
+        sources = [src(f"Club radio release 2026-02-16, {ha} match, KSFO 810 English / KZSF 1370 Spanish", QUAKES)]
+        notes = (
+            "English station in the club's per-game table is 810. Spanish 1370 is not one of the six "
+            "stations. The release says all times and dates are subject to change."
+        )
+        if date == "2026-10-31":
+            sources.append(src("Club printable 2026 schedule PDF: same match printed TBD", QUAKES_PDF))
+            notes += (
+                " The February release prints 2:00 PM for this match and the club's printable PDF "
+                "prints TBD. 2:00 PM is used because it is the only stated time, and the row is "
+                "marked review."
+            )
+        if date == "2026-11-07":
+            notes += " Decision Day. The release's table ends here; no playoff radio plan is published."
         rows.append(game(
             id=f"quakes-{date}",
             date=date,
@@ -797,10 +1050,10 @@ def local_rows() -> list[dict]:
             league="MLS",
             venue=venue,
             stations=["810"],
-            confidence="official",
-            sources=[src(f"Club radio release 2026-02-16, {ha}, 810 / 1370", QUAKES)],
-            notes="English station in the table is 810. Spanish 1370 is not one of the six stations. Release says times can change. No playoff radio table was published in that release.",
-            flag_ids=["QUAKES_SUBJECT_TO_CHANGE", "SPANISH_EXCLUDED", "DURATION_ESTIMATE"],
+            confidence=confidence,
+            sources=sources,
+            notes=notes,
+            flag_ids=extra + ["QUAKES_SUBJECT_TO_CHANGE", "QUAKES_ALT_STATION", "SPANISH_EXCLUDED", "DURATION_ESTIMATE"],
         ))
 
     rows.append(game(
@@ -809,40 +1062,69 @@ def local_rows() -> list[dict]:
         start_pt=None,
         title="Super Bowl LXI — teams not announced on the Westwood One schedule page",
         league="NFL",
+        network="Westwood One",
         venue="SoFi Stadium, Inglewood",
         status="tba",
         stations=WWO_NFL_STATIONS[:],
         confidence="indicated",
         sources=[
             src("Cumulus release 2026-09-09: Super Bowl LXI, February 14, 2027, SoFi Stadium", PRESS),
-            src("NFL affiliate row: KNBR-AM, KNBR-FM, KTCT-AM", WWO_FINDER),
+            src("Station finder, NFL tab: KNBR-AM, KNBR-FM, KTCT-AM", WWO_FINDER),
         ],
-        notes="Date and stadium are from the release. Kickoff is not on the schedule page. Teams are not announced there. Not a confirmed clock time.",
+        notes=(
+            "Date and stadium are from the rights-holder release. Kickoff is not on the schedule page "
+            "and the teams are not known. The wild card, divisional and conference-championship rounds "
+            "are promised by the same release but carry no official date yet, so they are not placed."
+        ),
         flag_ids=["WWO_POSTSEASON_UNDATED", "WWO_PREEMPTION", "WWO_LISTED_START"],
     ))
     return rows
 
 
+# --- checks -------------------------------------------------------------------
 def validate(rows: list[dict]) -> None:
     ids = [r["id"] for r in rows]
     if len(ids) != len(set(ids)):
         raise SystemExit("duplicate ids")
-    wwo = [r for r in rows if r["id"].startswith("wwo-nfl-")]
-    if len(wwo) != 47:
-        raise SystemExit(f"expected 47 standalone WWO NFL rows, got {len(wwo)}")
-    ncaaf = [r for r in rows if r["id"].startswith("wwo-ncaaf-")]
-    if len(ncaaf) != 12:
-        raise SystemExit(f"expected 12 WWO NCAAF rows, got {len(ncaaf)}")
-    banned = {
-        "548554", "548495", "548556", "548496", "548557", "548497", "548558", "548498",
-        "548560", "548540", "548489", "548541", "548490", "548542", "548491", "548511", "548513",
+
+    flag_ids = {f["id"] for f in FLAGS}
+    if len(flag_ids) != len(FLAGS):
+        raise SystemExit("duplicate flag ids")
+    used = {fid for r in rows for fid in r["flag_ids"]}
+    unknown = used - flag_ids
+    if unknown:
+        raise SystemExit(f"rows reference undefined flags: {sorted(unknown)}")
+    for f in FLAGS:
+        if f["severity"] not in ("limitation", "review", "note"):
+            raise SystemExit(f"bad severity on {f['id']}")
+        if not f["url"].startswith("https://"):
+            raise SystemExit(f"bad flag url on {f['id']}")
+
+    def count(prefix: str) -> int:
+        return sum(1 for r in rows if r["id"].startswith(prefix))
+
+    expected = {
+        "wwo-nfl-": 63,
+        "wwo-ncaaf-": 11,
+        "wwo-soccer-": 5,
+        "mlb-post-": 28,
+        "stanford-": 7,
+        "cal-": 7,
+        "quakes-": 7,
+        "giants-": 1,
+        "athletics-": 1,
     }
+    for prefix, n in expected.items():
+        got = count(prefix)
+        if got != n:
+            raise SystemExit(f"expected {n} rows for {prefix}, got {got}")
+
+    # 49ers national duplicates must stay merged into the club row.
     merged = {"548538", "548491", "548568", "548509"}
-    present = {r["id"].split("-")[-1] for r in wwo}
-    if present & banned:
-        raise SystemExit(f"unfetched WWO events must not ship: {present & banned}")
+    present = {r["id"].split("-")[-1] for r in rows if r["id"].startswith("wwo-nfl-")}
     if present & merged:
         raise SystemExit(f"49ers WWO events duplicated: {present & merged}")
+
     niners = [r for r in rows if r["id"].startswith("niners-") and r["date"]]
     if len(niners) != 14:
         raise SystemExit("49ers dated count")
@@ -851,22 +1133,61 @@ def validate(rows: list[dict]) -> None:
             raise SystemExit(f"week 3 should not be on 680: {r['id']}")
         if r["date"] >= "2026-10-01" and "680" not in r["stations"]:
             raise SystemExit(f"week 4+ missing 680: {r['id']}")
-    giants = [r for r in rows if r["id"].startswith("giants-")]
-    for r in giants:
-        if r["stations"] != ["680", "104.5"]:
-            raise SystemExit("giants stations")
+        if "107.7" not in r["stations"]:
+            raise SystemExit(f"every listed 49ers game is on 107.7: {r['id']}")
+
     for r in rows:
-        if r["id"].startswith("athletics-") and r["stations"] != ["960"]:
+        rid = r["id"]
+        if rid.startswith("giants-") and r["stations"] != ["680", "104.5"]:
+            raise SystemExit("giants stations")
+        if rid.startswith("athletics-") and r["stations"] != ["960"]:
             raise SystemExit("athletics station")
-        if r["id"].startswith("quakes-") and r["stations"] != ["810"]:
+        if rid.startswith("quakes-") and r["stations"] != ["810"]:
             raise SystemExit("quakes station")
-        if r["id"].startswith("stanford-") and r["stations"] != ["1050"]:
+        if rid.startswith("stanford-") and r["stations"] != ["1050"]:
             raise SystemExit("stanford station")
+        if rid.startswith("cal-") and r["stations"] != ["810"]:
+            raise SystemExit("cal station")
+        if rid.startswith("mlb-post-"):
+            if r["stations"] != ["1050"]:
+                raise SystemExit("mlb postseason station")
+            if r["start_pt"] is not None:
+                raise SystemExit("mlb postseason times were TBD; do not invent one")
+            if r["confidence"] != "indicated":
+                raise SystemExit("mlb postseason rows are network-level, not official")
+        if rid.startswith("wwo-soccer-") and r["stations"] != ["1050"]:
+            raise SystemExit("soccer station is the finder's only Bay Area row")
+        if r["confidence"] == "official" and r["network"]:
+            # a club/school row may note a national simulcast, but must not claim it as its network
+            if r["network"] == "Westwood One":
+                raise SystemExit(f"{rid} cannot be both official-local and a Westwood One row")
+
     if any(r["id"] == "big-game-2026-11-21" and "810" in r["stations"] for r in rows):
         raise SystemExit("do not put 810 on the Big Game without a quoted row")
+
     unplaced = [r for r in rows if r["date"] is None]
     if len(unplaced) != 1 or unplaced[0]["id"] != "niners-week-18":
         raise SystemExit("unexpected unplaced rows")
+
+    # No station may be double-booked by two rows that both claim "official".
+    for r in rows:
+        for s in rows:
+            if r["id"] >= s["id"] or not r["date"] or r["date"] != s["date"]:
+                continue
+            if r["confidence"] != "official" or s["confidence"] != "official":
+                continue
+            if not (set(r["stations"]) & set(s["stations"])):
+                continue
+            if not r["start_pt"] or not s["start_pt"]:
+                continue
+            a0 = int(r["start_pt"][:2]) * 60 + int(r["start_pt"][3:])
+            b0 = int(s["start_pt"][:2]) * 60 + int(s["start_pt"][3:])
+            if a0 < b0 + s["duration_est_min"] and b0 < a0 + r["duration_est_min"]:
+                raise SystemExit(f"two official rows collide on a station: {r['id']} / {s['id']}")
+
+
+def sort_key(r: dict):
+    return (r["date"] or "9999-99-99", r["start_pt"] or "99:99", r["id"])
 
 
 def line_markdown(rows: list[dict], flags: list[dict]) -> str:
@@ -879,8 +1200,6 @@ def line_markdown(rows: list[dict], flags: list[dict]) -> str:
         "| Date | PT listed start | Stations | Confidence | Game | Sources |",
         "| --- | --- | --- | --- | --- | --- |",
     ]
-    def sort_key(r):
-        return (r["date"] or "9999", r["start_pt"] or "99:99", r["title"])
     for r in sorted(rows, key=sort_key):
         start = r["start_pt"] or "TBD"
         stations = ", ".join(r["stations"])
@@ -896,8 +1215,15 @@ def line_markdown(rows: list[dict], flags: list[dict]) -> str:
 
 
 def main() -> None:
-    rows = local_rows() + wwo_nfl_rows() + wwo_ncaaf_rows()
+    rows = (
+        local_rows()
+        + wwo_nfl_rows()
+        + wwo_ncaaf_rows()
+        + wwo_soccer_rows()
+        + mlb_postseason_rows()
+    )
     validate(rows)
+    rows.sort(key=sort_key)
     payload = {
         "meta": {
             "name": "RADIOSF",
@@ -905,16 +1231,39 @@ def main() -> None:
             "window_start": WINDOW_START,
             "window_end": WINDOW_END,
             "timezone": "America/Los_Angeles",
-            "verified_note": "Line-checked against pages fetched 2026-09-26. Not a live scrape. National NFL games that were only on the unread opening chunk of the Westwood One schedule are omitted.",
-            "duration_estimates_min": {"MLB": 165, "NFL": 195, "NCAAF": 204, "MLS": 120},
+            "verified_note": (
+                "Line-checked against pages fetched 2026-09-27. Not a live scrape. The Westwood One "
+                "NFL list was read end to end this pass, so there is no longer a missing-chunk gap."
+            ),
+            "duration_estimates_min": {"MLB": 165, "MLB postseason": 210, "NFL": 195, "NCAAF": 204, "MLS": 120, "SOCCER": 120},
             "band": {"start": "10:00", "end": "22:00", "label": "10 AM–10 PM, the window you asked about"},
+            "confidence_legend": [
+                {"id": "official", "label": "Official",
+                 "detail": "A club, school, league API or rights holder printed both the game and the station."},
+                {"id": "indicated", "label": "Indicated",
+                 "detail": "A network lists the game and its station finder lists a Bay Area affiliate. That is a network row, not a per-game clearance."},
+                {"id": "review", "label": "Needs review",
+                 "detail": "Two sources disagree, or the radio line was not quoted for that exact row. Open the links."},
+            ],
             "stations": [
-                {"id": "680", "label": "680 AM", "call": "KNBR", "brand": "KNBR 680", "role": "Giants flagship. 49ers from Week 4. Westwood One NFL affiliate.", "listen": "https://www.thesportsleader.com/"},
-                {"id": "104.5", "label": "104.5 FM", "call": "KNBR-FM", "brand": "KNBR 104.5", "role": "Full-time simulcast of 680 since 2019. Same games as 680 when a source lists both.", "listen": "https://www.thesportsleader.com/"},
-                {"id": "810", "label": "810 AM", "call": "KSFO", "brand": "810 KSFO", "role": "49ers Weeks 1–3. Cal football. Earthquakes English.", "listen": "https://www.ksfo.com/"},
-                {"id": "960", "label": "960 AM", "call": "KNEW", "brand": "960 KNEW", "role": "Athletics baseball. Otherwise Fox Sports Radio talk, not listed as games.", "listen": "https://www.mlb.com/athletics/schedule/affiliates"},
-                {"id": "1050", "label": "1050 AM", "call": "KTCT", "brand": "KNBR 1050", "role": "Stanford football. Westwood One NFL affiliate. ESPN Radio talk otherwise.", "listen": "https://www.thesportsleader.com/knbr1050shows"},
-                {"id": "107.7", "label": "107.7 FM", "call": "KSAN", "brand": "107.7 The Bone", "role": "49ers FM flagship, every listed regular-season game. Classic rock otherwise.", "listen": "https://www.49ers.com/schedule/"},
+                {"id": "680", "label": "680 AM", "call": "KNBR", "brand": "KNBR 680",
+                 "role": "Giants flagship. 49ers from Week 4. Westwood One NFL and college football affiliate. Cal only for the Big Game.",
+                 "listen": KNBR_SHOWS},
+                {"id": "104.5", "label": "104.5 FM", "call": "KNBR-FM", "brand": "KNBR 104.5",
+                 "role": "Full-time simulcast of 680 since 2019. Same games as 680 whenever a source lists both.",
+                 "listen": KNBR_SHOWS},
+                {"id": "810", "label": "810 AM", "call": "KSFO", "brand": "810 KSFO",
+                 "role": "49ers Weeks 1–3 only. Every Cal football game except the Big Game. Earthquakes English flagship, plus The Soccer Hour Wednesdays 7–8 PM.",
+                 "listen": QUAKES},
+                {"id": "960", "label": "960 AM", "call": "KNEW", "brand": "960 KNEW",
+                 "role": "Athletics baseball through the end of the regular season. Fox Sports Radio talk otherwise, which is not listed as games.",
+                 "listen": ATH_RADIO},
+                {"id": "1050", "label": "1050 AM", "call": "KTCT", "brand": "KNBR 1050",
+                 "role": "Stanford football. Westwood One NFL, college football and U.S. Soccer affiliate. Full-time ESPN Radio affiliate, which is how the MLB postseason reaches the Bay Area.",
+                 "listen": KNBR_1050_SHOWS},
+                {"id": "107.7", "label": "107.7 FM", "call": "KSAN", "brand": "107.7 The Bone",
+                 "role": "49ers FM flagship, every listed regular-season game. Classic rock otherwise.",
+                 "listen": NINERS},
             ],
             "counts": {
                 "broadcasts": len(rows),
@@ -923,6 +1272,7 @@ def main() -> None:
                 "official": sum(1 for r in rows if r["confidence"] == "official"),
                 "indicated": sum(1 for r in rows if r["confidence"] == "indicated"),
                 "review": sum(1 for r in rows if r["confidence"] == "review"),
+                "flags": len(FLAGS),
             },
         },
         "flags": FLAGS,
@@ -930,7 +1280,7 @@ def main() -> None:
     }
     OUT.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     LINE.write_text(line_markdown(rows, FLAGS), encoding="utf-8")
-    print(f"wrote {OUT} ({len(rows)} broadcasts) and {LINE}")
+    print(f"wrote {OUT} ({len(rows)} broadcasts, {len(FLAGS)} flags) and {LINE}")
 
 
 if __name__ == "__main__":
