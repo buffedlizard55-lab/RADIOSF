@@ -14,7 +14,7 @@ Snapshot 2026-09-27 (seventh pass, same snapshot date). 173 schedule entries: 16
 | Finding | Why it is not fixed yet |
 | --- | --- |
 | **The 680 grid shows national baseball on idle Giants days.** “3:20pm – 6:00pm JIP @ first pitch – MLB: TWINS @ WHITE SOX” and “9:30am – 1:00pm MLB: BRAVES @ PHILLIES”, both in the week of Aug 31 – Sep 7. Neither is inside this window, so no row was made. | The grid is four weeks stale and prints no network name. Making a row from it would be inventing a 2026 schedule from a September format snapshot. |
-| **The weekly-grid monitor's first live fetch has not run on GitHub's runners yet.** espn.com has answered other automated HTML requests with HTTP 202. | The PR preview for this pass is the first live run. A 202 is **unavailable**, never `clear`. If that is what the runners see, the next session needs a dated machine-readable path for the same grid, not a guess at the week. |
+| **The weekly-grid monitor cannot fetch espn.com/espnradio/schedule from GitHub's runners.** Confirmed live on this pull request, twice: the project's scripted User-Agent and a current Chrome desktop agent both received HTTP 202. The same page is readable through the session fetch tool. | A 202 is **unavailable**, never `clear`, and never a dated week. Next: find a dated machine-readable path for the same grid (the Stanford watcher already had to do this — ESPN's HTML schedule also answers automation with 202, so it reads `site.api.espn.com` instead). Do not guess the week. |
 
 ## Closed since the previous pass
 
