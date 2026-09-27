@@ -63,7 +63,18 @@ KNEW_WIKI = "https://en.wikipedia.org/wiki/KNEW_(AM)"
 NFL_SEASON_WIKI = "https://en.wikipedia.org/wiki/2026_NFL_season"
 NFL_SCHEDULES = "https://www.nfl.com/schedules/"
 
-DUR = {"MLB": 165, "MLB-POST": 210, "NFL": 195, "NCAAF": 204, "MLS": 120, "SOCCER": 120}
+# Every row belongs to a duration bucket. The minutes are estimates, not measured
+# broadcast lengths, so the page lets the reader change them and recompute; these
+# are only the starting values.
+DURATIONS = [
+    {"id": "MLB", "label": "MLB regular season", "minutes": 165},
+    {"id": "MLB-POST", "label": "MLB postseason", "minutes": 210},
+    {"id": "NFL", "label": "NFL", "minutes": 195},
+    {"id": "NCAAF", "label": "College football", "minutes": 204},
+    {"id": "MLS", "label": "MLS", "minutes": 120},
+    {"id": "SOCCER", "label": "International soccer", "minutes": 120},
+]
+DUR = {d["id"]: d["minutes"] for d in DURATIONS}
 LEAGUE_DUR = {"MLB": 165, "NFL": 195, "NCAAF": 204, "MLS": 120, "SOCCER": 120}
 
 
@@ -96,6 +107,7 @@ def game(**kw) -> dict:
         "result": kw.get("result"),
         "stations": kw["stations"],
         "confidence": kw["confidence"],
+        "duration_key": kw.get("duration_key") or kw["league"],
         "duration_est_min": kw.get("duration_est_min") or LEAGUE_DUR[kw["league"]],
         "sources": kw["sources"],
         "notes": kw.get("notes") or "",
@@ -116,6 +128,13 @@ def game(**kw) -> dict:
         raise SystemExit(f"{row['id']} date {row['date']} outside window")
     if row["start_pt"] and not row["date"]:
         raise SystemExit(f"{row['id']} has a time but no date")
+    if row["duration_key"] not in DUR:
+        raise SystemExit(f"{row['id']} duration_key {row['duration_key']} is not a known bucket")
+    if row["duration_est_min"] != DUR[row["duration_key"]]:
+        raise SystemExit(
+            f"{row['id']} duration {row['duration_est_min']} does not match bucket "
+            f"{row['duration_key']} ({DUR[row['duration_key']]}); the page recomputes by bucket"
+        )
     return row
 
 
@@ -224,7 +243,12 @@ FLAGS = [
             "and Conference Championships Jan 31, 2027; those are not official and are not placed on "
             "this calendar. Only Super Bowl LXI is placed, and only as date and stadium, time TBD."
         ),
-        "url": NFL_SEASON_WIKI,
+        "url": NFL_SCHEDULES,
+        "sources": [
+            src("NFL.com schedules \u2014 the official page; the 2026 POST tab still redirects", NFL_SCHEDULES),
+            src("Cumulus release: every playoff game and Super Bowl LXI on Westwood One", PRESS),
+            src("Secondary write-up of the round dates \u2014 not official, not used here", NFL_SEASON_WIKI),
+        ],
     },
     {
         "id": "MLB_POSTSEASON_ESPN",
@@ -461,6 +485,11 @@ FLAGS = [
             "November to February, which is a gap in this feed, not a quiet radio dial."
         ),
         "url": WWO_NCAAB_URL,
+        "sources": [
+            src("Westwood One NCAA Basketball: \u201cNo upcoming events\u201d", WWO_NCAAB_URL),
+            src("Cal men's basketball schedule: no radio column", CAL_MBB),
+            src("USF Dons men's basketball schedule: no radio column", USF_MBB),
+        ],
     },
     {
         "id": "ATHLETICS_SACRAMENTO",
@@ -783,6 +812,7 @@ def mlb_postseason_rows() -> list[dict]:
             conditional=all_conditional,
             stations=["1050"],
             confidence="indicated",
+            duration_key="MLB-POST",
             duration_est_min=DUR["MLB-POST"],
             sources=[
                 src("MLB: \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games\"", MLB_POST_PRESS),
@@ -1082,6 +1112,23 @@ def local_rows() -> list[dict]:
 
 
 # --- checks -------------------------------------------------------------------
+def validate_flags() -> None:
+    """Flags carry links a human is expected to click, so hold them to the row rules."""
+    seen = set()
+    for f in FLAGS:
+        if f["id"] in seen:
+            raise SystemExit(f"duplicate flag id {f['id']}")
+        seen.add(f["id"])
+        if f["severity"] not in ("limitation", "review", "note"):
+            raise SystemExit(f"{f['id']} bad severity {f['severity']}")
+        links = [f["url"]] + [x["url"] for x in f.get("sources", [])]
+        for url in links:
+            if not url.startswith("https://"):
+                raise SystemExit(f"{f['id']} link is not https: {url}")
+        if f.get("sources") and f["sources"][0]["url"] != f["url"]:
+            raise SystemExit(f"{f['id']} primary url must be the first of its sources")
+
+
 def validate(rows: list[dict]) -> None:
     ids = [r["id"] for r in rows]
     if len(ids) != len(set(ids)):
@@ -1222,6 +1269,7 @@ def main() -> None:
         + wwo_soccer_rows()
         + mlb_postseason_rows()
     )
+    validate_flags()
     validate(rows)
     rows.sort(key=sort_key)
     payload = {
@@ -1235,7 +1283,7 @@ def main() -> None:
                 "Line-checked against pages fetched 2026-09-27. Not a live scrape. The Westwood One "
                 "NFL list was read end to end this pass, so there is no longer a missing-chunk gap."
             ),
-            "duration_estimates_min": {"MLB": 165, "MLB postseason": 210, "NFL": 195, "NCAAF": 204, "MLS": 120, "SOCCER": 120},
+            "durations": DURATIONS,
             "band": {"start": "10:00", "end": "22:00", "label": "10 AM–10 PM, the window you asked about"},
             "confidence_legend": [
                 {"id": "official", "label": "Official",

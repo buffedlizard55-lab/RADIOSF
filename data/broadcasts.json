@@ -6,14 +6,38 @@
     "window_end": "2027-02-28",
     "timezone": "America/Los_Angeles",
     "verified_note": "Line-checked against pages fetched 2026-09-27. Not a live scrape. The Westwood One NFL list was read end to end this pass, so there is no longer a missing-chunk gap.",
-    "duration_estimates_min": {
-      "MLB": 165,
-      "MLB postseason": 210,
-      "NFL": 195,
-      "NCAAF": 204,
-      "MLS": 120,
-      "SOCCER": 120
-    },
+    "durations": [
+      {
+        "id": "MLB",
+        "label": "MLB regular season",
+        "minutes": 165
+      },
+      {
+        "id": "MLB-POST",
+        "label": "MLB postseason",
+        "minutes": 210
+      },
+      {
+        "id": "NFL",
+        "label": "NFL",
+        "minutes": 195
+      },
+      {
+        "id": "NCAAF",
+        "label": "College football",
+        "minutes": 204
+      },
+      {
+        "id": "MLS",
+        "label": "MLS",
+        "minutes": 120
+      },
+      {
+        "id": "SOCCER",
+        "label": "International soccer",
+        "minutes": 120
+      }
+    ],
     "band": {
       "start": "10:00",
       "end": "22:00",
@@ -144,7 +168,21 @@
       "severity": "limitation",
       "title": "NFL postseason rounds are promised but not dated by an official source",
       "detail": "The Cumulus release says Westwood One carries every NFL postseason game through Super Bowl LXI on February 14, 2027 at SoFi Stadium. The Westwood One schedule page ends at the Week 18 TBA windows, and nfl.com/schedules/2026/POST redirected to the regular-season page when fetched on 2026-09-27, so the league has not published a postseason grid yet. Secondary write-ups say Wild Card Jan 16\u201318, Divisional Jan 23\u201324 and Conference Championships Jan 31, 2027; those are not official and are not placed on this calendar. Only Super Bowl LXI is placed, and only as date and stadium, time TBD.",
-      "url": "https://en.wikipedia.org/wiki/2026_NFL_season"
+      "url": "https://www.nfl.com/schedules/",
+      "sources": [
+        {
+          "label": "NFL.com schedules \u2014 the official page; the 2026 POST tab still redirects",
+          "url": "https://www.nfl.com/schedules/"
+        },
+        {
+          "label": "Cumulus release: every playoff game and Super Bowl LXI on Westwood One",
+          "url": "https://www.globenewswire.com/news-release/2026/09/09/3358684/9032/en/cumulus-media-s-westwood-one-official-network-audio-partner-of-the-nfl-celebrates-40th-consecutive-season-and-reveals-2026-nfl-lineup-and-programming-highlights-from-nfl-kickoff-to.html"
+        },
+        {
+          "label": "Secondary write-up of the round dates \u2014 not official, not used here",
+          "url": "https://en.wikipedia.org/wiki/2026_NFL_season"
+        }
+      ]
     },
     {
       "id": "MLB_POSTSEASON_ESPN",
@@ -270,7 +308,21 @@
       "severity": "limitation",
       "title": "No basketball rows could be verified for the 2026-27 season",
       "detail": "Three checks on 2026-09-27, all negative. Westwood One's NCAA Basketball page says \"No upcoming events\", so there is no national college hoops grid to transcribe. calbears.com men's basketball lists games from Nov 2 with TBD times and no radio column. usfdons.com men's basketball lists TV logos (ESPN+, CBS Sports Network) and no radio column, even though KTCT's station record names the San Francisco Dons as an affiliate. Stanford basketball was not re-verified onto 1050. Basketball is therefore absent from November to February, which is a gap in this feed, not a quiet radio dial.",
-      "url": "https://www.westwoodonesports.com/ncaa-basketball/"
+      "url": "https://www.westwoodonesports.com/ncaa-basketball/",
+      "sources": [
+        {
+          "label": "Westwood One NCAA Basketball: \u201cNo upcoming events\u201d",
+          "url": "https://www.westwoodonesports.com/ncaa-basketball/"
+        },
+        {
+          "label": "Cal men's basketball schedule: no radio column",
+          "url": "https://calbears.com/sports/mens-basketball/schedule"
+        },
+        {
+          "label": "USF Dons men's basketball schedule: no radio column",
+          "url": "https://usfdons.com/sports/mens-basketball/schedule"
+        }
+      ]
     },
     {
       "id": "ATHLETICS_SACRAMENTO",
@@ -324,6 +376,7 @@
         "960"
       ],
       "confidence": "official",
+      "duration_key": "MLB",
       "duration_est_min": 165,
       "sources": [
         {
@@ -359,6 +412,7 @@
         "104.5"
       ],
       "confidence": "official",
+      "duration_key": "MLB",
       "duration_est_min": 165,
       "sources": [
         {
@@ -393,6 +447,7 @@
         "107.7"
       ],
       "confidence": "official",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -427,6 +482,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -467,6 +523,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -505,6 +562,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "SOCCER",
       "duration_est_min": 120,
       "sources": [
         {
@@ -543,6 +601,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -585,6 +644,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -629,6 +689,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -667,6 +728,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -709,6 +771,7 @@
         "1050"
       ],
       "confidence": "official",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -749,6 +812,7 @@
         "810"
       ],
       "confidence": "official",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -780,6 +844,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "SOCCER",
       "duration_est_min": 120,
       "sources": [
         {
@@ -818,6 +883,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -862,6 +928,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -905,6 +972,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -945,6 +1013,7 @@
         "680"
       ],
       "confidence": "official",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -975,6 +1044,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -1013,6 +1083,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -1057,6 +1128,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -1095,6 +1167,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -1137,6 +1210,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "SOCCER",
       "duration_est_min": 120,
       "sources": [
         {
@@ -1175,6 +1249,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -1217,6 +1292,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -1261,6 +1337,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -1299,6 +1376,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -1341,6 +1419,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -1383,6 +1462,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "SOCCER",
       "duration_est_min": 120,
       "sources": [
         {
@@ -1421,6 +1501,7 @@
         "1050"
       ],
       "confidence": "official",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -1461,6 +1542,7 @@
         "810"
       ],
       "confidence": "official",
+      "duration_key": "MLS",
       "duration_est_min": 120,
       "sources": [
         {
@@ -1491,6 +1573,7 @@
         "810"
       ],
       "confidence": "official",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -1522,6 +1605,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -1566,6 +1650,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -1609,6 +1694,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -1649,6 +1735,7 @@
         "680"
       ],
       "confidence": "official",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -1678,6 +1765,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -1716,6 +1804,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -1760,6 +1849,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -1798,6 +1888,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -1840,6 +1931,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "SOCCER",
       "duration_est_min": 120,
       "sources": [
         {
@@ -1878,6 +1970,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -1920,6 +2013,7 @@
         "810"
       ],
       "confidence": "official",
+      "duration_key": "MLS",
       "duration_est_min": 120,
       "sources": [
         {
@@ -1950,6 +2044,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -1994,6 +2089,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -2032,6 +2128,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -2074,6 +2171,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -2116,6 +2214,7 @@
         "1050"
       ],
       "confidence": "official",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -2156,6 +2255,7 @@
         "810"
       ],
       "confidence": "official",
+      "duration_key": "MLS",
       "duration_est_min": 120,
       "sources": [
         {
@@ -2186,6 +2286,7 @@
         "810"
       ],
       "confidence": "official",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -2217,6 +2318,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -2261,6 +2363,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -2304,6 +2407,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -2344,6 +2448,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -2382,6 +2487,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -2426,6 +2532,7 @@
         "680"
       ],
       "confidence": "official",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -2457,6 +2564,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -2499,6 +2607,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -2543,6 +2652,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -2581,6 +2691,7 @@
         "1050"
       ],
       "confidence": "official",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -2621,6 +2732,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -2663,6 +2775,7 @@
         "810"
       ],
       "confidence": "official",
+      "duration_key": "MLS",
       "duration_est_min": 120,
       "sources": [
         {
@@ -2693,6 +2806,7 @@
         "810"
       ],
       "confidence": "official",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -2724,6 +2838,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -2768,6 +2883,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -2811,6 +2927,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -2851,6 +2968,7 @@
         "680"
       ],
       "confidence": "official",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -2880,6 +2998,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -2920,6 +3039,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -2958,6 +3078,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -3000,6 +3121,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -3042,6 +3164,7 @@
         "810"
       ],
       "confidence": "official",
+      "duration_key": "MLS",
       "duration_est_min": 120,
       "sources": [
         {
@@ -3072,6 +3195,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -3116,6 +3240,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -3154,6 +3279,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -3198,6 +3324,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -3239,6 +3366,7 @@
         "810"
       ],
       "confidence": "review",
+      "duration_key": "MLS",
       "duration_est_min": 120,
       "sources": [
         {
@@ -3274,6 +3402,7 @@
         "810"
       ],
       "confidence": "official",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -3305,6 +3434,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "MLB-POST",
       "duration_est_min": 210,
       "sources": [
         {
@@ -3347,6 +3477,7 @@
         "1050"
       ],
       "confidence": "official",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -3389,6 +3520,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -3429,6 +3561,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -3469,6 +3602,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -3507,6 +3641,7 @@
         "810"
       ],
       "confidence": "official",
+      "duration_key": "MLS",
       "duration_est_min": 120,
       "sources": [
         {
@@ -3539,6 +3674,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -3582,6 +3718,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -3622,6 +3759,7 @@
         "680"
       ],
       "confidence": "official",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -3651,6 +3789,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -3691,6 +3830,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -3731,6 +3871,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -3769,6 +3910,7 @@
         "810"
       ],
       "confidence": "official",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -3800,6 +3942,7 @@
         "1050"
       ],
       "confidence": "official",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -3842,6 +3985,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -3885,6 +4029,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -3925,6 +4070,7 @@
         "680"
       ],
       "confidence": "official",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -3954,6 +4100,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -3994,6 +4141,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4034,6 +4182,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4074,6 +4223,7 @@
         "104.5"
       ],
       "confidence": "review",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -4112,6 +4262,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -4155,6 +4306,7 @@
         "680"
       ],
       "confidence": "official",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4189,6 +4341,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4229,6 +4382,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4269,6 +4423,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4309,6 +4464,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4349,6 +4505,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4389,6 +4546,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4429,6 +4587,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -4470,6 +4629,7 @@
         "810"
       ],
       "confidence": "official",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -4501,6 +4661,7 @@
         "1050"
       ],
       "confidence": "official",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -4543,6 +4704,7 @@
         "680"
       ],
       "confidence": "official",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4572,6 +4734,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4612,6 +4775,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4652,6 +4816,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4692,6 +4857,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -4735,6 +4901,7 @@
         "680"
       ],
       "confidence": "official",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4764,6 +4931,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4804,6 +4972,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4844,6 +5013,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4884,6 +5054,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NCAAF",
       "duration_est_min": 204,
       "sources": [
         {
@@ -4927,6 +5098,7 @@
         "680"
       ],
       "confidence": "official",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4956,6 +5128,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -4996,6 +5169,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5036,6 +5210,7 @@
         "680"
       ],
       "confidence": "official",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5069,6 +5244,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5109,6 +5285,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5149,6 +5326,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5189,6 +5367,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5229,6 +5408,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5269,6 +5449,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5309,6 +5490,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5349,6 +5531,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5389,6 +5572,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5429,6 +5613,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5469,6 +5654,7 @@
         "680"
       ],
       "confidence": "official",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5498,6 +5684,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5538,6 +5725,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5578,6 +5766,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5618,6 +5807,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5658,6 +5848,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5698,6 +5889,7 @@
         "680"
       ],
       "confidence": "official",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5731,6 +5923,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5771,6 +5964,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5811,6 +6005,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5851,6 +6046,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5891,6 +6087,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5931,6 +6128,7 @@
         "1050"
       ],
       "confidence": "indicated",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {
@@ -5966,6 +6164,7 @@
         "680"
       ],
       "confidence": "official",
+      "duration_key": "NFL",
       "duration_est_min": 195,
       "sources": [
         {

@@ -72,7 +72,7 @@
     h2 { font-family: "Iowan Old Style", Palatino, Georgia, serif; font-size: 28px; margin: 0 0 6px; letter-spacing: -0.02em; }
     h3 { margin: 22px 0 8px; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
     .day-nav { display: flex; gap: 8px; align-items: center; margin: 8px 0 12px; flex-wrap: wrap; }
-    .day-nav button, .month-nav button, .linkish {
+    .day-nav button, .month-nav button {
       border: 1px solid var(--line); background: var(--paper); border-radius: 8px; padding: 6px 10px; cursor: pointer;
     }
     .day-nav input[type="date"] { border: 1px solid var(--line); background: var(--paper); border-radius: 8px; padding: 5px 8px; }
@@ -123,7 +123,6 @@
     .dow, .cell { text-align: center; font-size: 12px; }
     .dow { color: var(--muted); padding-bottom: 4px; }
     .cell { border: 1px solid transparent; background: transparent; border-radius: 8px; min-height: 56px; padding: 4px 2px; cursor: pointer; }
-    .cell:disabled { cursor: default; color: #b3aa9f; }
     .cell.in { background: #f7f3ec; }
     .cell.has { background: #fff; border-color: var(--line); }
     .cell.selected { outline: 2px solid var(--ink); }
@@ -167,7 +166,17 @@
       .controls, .day-nav, aside, .skip { display: none; }
       body { background: white; }
     }
-  </style>
+      .durations { margin: 22px 0 6px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+    .durations-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+    .durations-head h3 { margin: 0; }
+    .dur-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px 18px; margin-top: 14px; }
+    .dur-grid label { display: block; font-size: 13px; color: var(--muted); }
+    .dur-grid .row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+    .dur-grid input { width: 5.5em; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px;
+      background: var(--bg); color: var(--fg); font: inherit; font-size: 14px; }
+    .dur-grid .unit { font-size: 13px; color: var(--muted); }
+    .dur-grid .was { font-size: 12px; color: var(--muted); }
+</style>
 </head>
 <body>
   <a class="skip" href="#day">Skip to the day</a>
@@ -229,6 +238,14 @@
       <h2>Does live sport really fill 10 AM to 10 PM?</h2>
       <p style="max-width:78ch">You said it looked that way. Rather than repeat the claim, this measures it: for every day in the snapshot, the estimated union of verified game broadcasts inside the 10 AM – 10 PM band, on the six stations, with overlapping games counted once.</p>
       <div class="stat-row" id="band-stats"></div>
+      <div class="durations">
+        <div class="durations-head">
+          <h3>Game lengths are estimates. Change them and every number here recomputes.</h3>
+          <button type="button" id="dur-reset">Reset to defaults</button>
+        </div>
+        <p class="notes" style="max-width:78ch">No source publishes how long each broadcast actually stays on air, so the band maths uses one average per sport. These are the assumptions the answer above rests on — move them and watch how much the answer actually depends on them.</p>
+        <div class="dur-grid" id="durations"></div>
+      </div>
       <h3>Average minutes of the band covered, by weekday</h3>
       <div class="bars" id="band-bars"></div>
       <p class="notes" id="band-note"></p>
@@ -265,7 +282,27 @@
     (function () {
       var L = window.RadioLogic;
       var DATA = null;
-      var state = { date: null, month: 9, year: 2026, stations: {}, leagues: {} };
+      /* ROWS is DATA.broadcasts with the reader's duration estimates applied.
+         DATA stays exactly as shipped; every renderer reads ROWS, so changing a
+         duration is a one-line remap rather than a signature change everywhere. */
+      var ROWS = [];
+      var state = { date: null, month: 9, year: 2026, stations: {}, leagues: {}, durations: {} };
+
+      function durationFor(key) {
+        if (Object.prototype.hasOwnProperty.call(state.durations, key)) return state.durations[key];
+        var d = (DATA.meta.durations || []).find(function (x) { return x.id === key; });
+        return d ? d.minutes : 0;
+      }
+      function rebuildRows() {
+        ROWS = DATA.broadcasts.map(function (b) {
+          var mins = durationFor(b.duration_key);
+          if (mins === b.duration_est_min) return b;
+          var copy = {};
+          for (var k in b) if (Object.prototype.hasOwnProperty.call(b, k)) copy[k] = b[k];
+          copy.duration_est_min = mins;
+          return copy;
+        });
+      }
       var STATION_CLASS = { "680": "s-680", "104.5": "s-1045", "810": "s-810", "960": "s-960", "1050": "s-1050", "107.7": "s-1077" };
       var LEAGUE_LABEL = { NFL: "NFL", NCAAF: "College football", MLB: "Baseball", MLS: "MLS", SOCCER: "U.S. national teams" };
       var BAND_LO = 10 * 60, BAND_HI = 22 * 60;
@@ -300,7 +337,7 @@
       }
       function leaguesInFeed() {
         var out = [];
-        DATA.broadcasts.forEach(function (b) { if (out.indexOf(b.league) === -1) out.push(b.league); });
+        ROWS.forEach(function (b) { if (out.indexOf(b.league) === -1) out.push(b.league); });
         return out.sort(function (a, b) {
           return (LEAGUE_LABEL[a] || a).localeCompare(LEAGUE_LABEL[b] || b);
         });
@@ -351,7 +388,7 @@
         document.getElementById("leagues").innerHTML = lg;
       }
       function renderStations() {
-        var all = DATA.broadcasts;
+        var all = ROWS;
         document.getElementById("stations").innerHTML = DATA.meta.stations.map(function (s) {
           var n = all.filter(function (b) { return b.stations.indexOf(s.id) !== -1; }).length;
           return '<article class="card"><h3><i class="dot ' + STATION_CLASS[s.id] + '"></i> ' +
@@ -374,14 +411,21 @@
           if (!host) return;
           var list = DATA.flags.filter(function (f) { return f.severity === sev; });
           host.innerHTML = list.length ? list.map(function (f) {
+            /* A flag that cites three checks has to link three pages, or the
+               reader cannot repeat the check that produced it. */
+            var links = (f.sources && f.sources.length)
+              ? f.sources.map(function (x) {
+                  return '<a href="' + esc(x.url) + '" rel="noopener">' + esc(x.label) + "</a>";
+                }).join(" \u00b7 ")
+              : '<a href="' + esc(f.url) + '" rel="noopener">Source</a>';
             return '<details class="' + esc(sev) + '"><summary>' + esc(f.title) +
               ' <span class="flag-id">' + esc(f.id) + "</span></summary><p>" + esc(f.detail) +
-              ' <a href="' + esc(f.url) + '" rel="noopener">Source</a></p></details>';
+              '</p><p class="notes">' + links + "</p></details>";
           }).join("") : '<p class="notes">None.</p>';
         });
       }
       function renderUnplaced() {
-        var rows = DATA.broadcasts.filter(function (b) { return !b.date; });
+        var rows = ROWS.filter(function (b) { return !b.date; });
         document.getElementById("unplaced").innerHTML = rows.map(function (b) {
           return '<div class="warn"><strong>Not placed on a day.</strong> ' + esc(b.title) +
             ". " + esc(b.notes) + " " + pills(b.stations) + sourceLinks(b) + "</div>";
@@ -389,7 +433,7 @@
       }
       function renderUpNext() {
         var from = state.date;
-        var rows = visible(DATA.broadcasts).filter(function (b) { return b.date && b.date > from; }).slice(0, 6);
+        var rows = visible(ROWS).filter(function (b) { return b.date && b.date > from; }).slice(0, 6);
         document.getElementById("upnext").innerHTML = rows.length ? rows.map(function (b) {
           return '<li><button type="button" data-jump="' + esc(b.date) + '">' +
             '<span class="when">' + esc(b.date.slice(5)) + " " + esc(b.start_pt ? L.label12(b.start_pt).replace(" PT", "") : "TBD") + "</span>" +
@@ -397,7 +441,7 @@
         }).join("") : '<li class="notes">Nothing later in this snapshot matches the current filters.</li>';
       }
       function renderBand() {
-        var s = L.bandSummary(visible(DATA.broadcasts), DATA.meta.window_start, DATA.meta.window_end, BAND_LO, BAND_HI);
+        var s = L.bandSummary(visible(ROWS), DATA.meta.window_start, DATA.meta.window_end, BAND_LO, BAND_HI);
         var pct = Math.round(s.meanCovered / s.span * 100);
         document.getElementById("band-stats").innerHTML =
           '<div class="stat"><b>' + s.daysWithGames + " / " + s.dayCount + "</b><span>days with at least one verified game</span></div>" +
@@ -421,7 +465,9 @@
         document.getElementById("band-note").textContent =
           "Verdict: the 10-to-10 band is mostly talk on a weekday and mostly games on an autumn Saturday and Sunday. " +
           busiest + " Kickoff-TBD rows contribute zero minutes here, so this is a floor, not a ceiling. " +
-          "Lengths are estimates, listed under Notes.";
+          "Lengths are estimates and the boxes above change them, but the conclusion does not rest on " +
+          "them: set every sport to a generous four hours and the average still only reaches 2h 13m of " +
+          "the twelve-hour band, with the same 18 days over half.";
       }
 
       function renderDay() {
@@ -433,7 +479,7 @@
         document.getElementById("jump").value = date;
         var before = date < meta.window_start;
         var after = date > meta.window_end;
-        var rows = L.sortBroadcasts(visible(L.byDate(DATA.broadcasts, date)));
+        var rows = L.sortBroadcasts(visible(L.byDate(ROWS, date)));
         var answer = document.getElementById("answer");
         answer.className = "answer";
         if (before || after) {
@@ -543,7 +589,7 @@
         var html = cells.map(function (iso) {
           if (!iso) return '<div class="cell"></div>';
           var inWin = L.inWindow(iso, DATA.meta.window_start, DATA.meta.window_end);
-          var rows = inWin ? visible(L.byDate(DATA.broadcasts, iso)) : [];
+          var rows = inWin ? visible(L.byDate(ROWS, iso)) : [];
           var order = DATA.meta.stations.map(function (s) { return s.id; });
           var dots = order.filter(function (id) {
             return rows.some(function (b) { return b.stations.indexOf(id) !== -1; });
@@ -591,8 +637,23 @@
         state.year = y; state.month = m;
         renderCal();
       }
+      /* The default is always printed next to the box, so this grid never needs
+         re-rendering while someone is typing in it — re-rendering would steal
+         the caret. Only the reset button and a full refresh redraw it. */
+      function renderDurations() {
+        document.getElementById("durations").innerHTML = (DATA.meta.durations || []).map(function (d) {
+          return "<div>" +
+            '<label for="dur-' + esc(d.id) + '">' + esc(d.label) + "</label>" +
+            '<div class="row"><input id="dur-' + esc(d.id) + '" type="number" min="30" max="360" step="5" ' +
+            'data-dur="' + esc(d.id) + '" value="' + durationFor(d.id) + '" aria-label="' + esc(d.label) +
+            ' estimated length in minutes"><span class="unit">min</span></div>' +
+            '<div class="was">default ' + d.minutes + " min</div></div>";
+        }).join("");
+      }
       function refreshAll() {
+        rebuildRows();
         renderFilters();
+        renderDurations();
         renderDay();
         renderCal();
         renderBand();
@@ -618,6 +679,21 @@
           }
           refreshAll();
         });
+        document.getElementById("durations").addEventListener("input", function (ev) {
+          var key = ev.target.getAttribute && ev.target.getAttribute("data-dur");
+          if (!key) return;
+          var v = parseInt(ev.target.value, 10);
+          if (!isFinite(v) || v < 30 || v > 360) return;   /* mid-typing, leave the last good value */
+          state.durations[key] = v;
+          rebuildRows();
+          renderDay();
+          renderCal();
+          renderBand();
+        });
+        document.getElementById("dur-reset").addEventListener("click", function () {
+          state.durations = {};
+          refreshAll();
+        });
         document.getElementById("prev").addEventListener("click", function () { setDate(L.addDays(state.date, -1)); });
         document.getElementById("next").addEventListener("click", function () { setDate(L.addDays(state.date, 1)); });
         document.getElementById("today").addEventListener("click", function () {
@@ -639,7 +715,7 @@
           var q = ev.target.value.trim().toLowerCase();
           var box = document.getElementById("results");
           if (q.length < 2) { box.innerHTML = ""; return; }
-          var hits = DATA.broadcasts.filter(function (b) {
+          var hits = ROWS.filter(function (b) {
             return (b.title + " " + (b.date || "") + " " + b.league + " " + b.venue + " " + b.stations.join(" "))
               .toLowerCase().indexOf(q) !== -1;
           }).slice(0, 8);
@@ -679,6 +755,7 @@
         document.getElementById("cal-note").textContent =
           "A dot means a verified broadcast on a station you get, in station order. Days before " +
           data.meta.window_start + " are outside this snapshot, not \u201cno game\u201d.";
+        rebuildRows();
         renderStations();
         renderLegend();
         renderFlags();

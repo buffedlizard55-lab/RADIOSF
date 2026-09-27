@@ -71,7 +71,14 @@ now the exact printed string; the Stanford away rows are back to the bare city t
 verified; the Earthquakes away rows carry no venue at all, because the club's radio release prints
 none.
 
-Nothing is normalised on the way in, which is why the feed contains the source's own
+The 49ers schedule was then re-read end to end as a third-pass spot check: all fifteen rows —
+date, Pacific kickoff, radio line, venue, and the Week 8 bye and Week 18 TBD — match the feed
+exactly. The single character that differs anywhere in that set is the registered-trademark sign
+in the club's "Levi's® Stadium", dropped here to "Levi's Stadium". That is the only normalisation
+applied to any venue string in the whole feed, and it is recorded here rather than left for a
+reader to discover.
+
+Nothing else is normalised on the way in, which is why the feed contains the source's own
 inconsistencies: Denver is "Empower Field at Mile High, Denver, CO" on Sep 27 and Dec 25 but "Mile
 High Stadium, Denver, CO" on Oct 15; Detroit is "Ford Field, Detroit, MI, USA" on Nov 26 and "Ford
 Field, Detroit, Michigan" on Dec 28; Mexico City is spelled "Estádio Azteca". Those are recorded in
@@ -89,9 +96,11 @@ their venue field is empty.
 
 `python3 scripts/build_feed.py` rewrites the JSON from the transcribed lists and exits non-zero on: a duplicate id, a station outside the six, a row with no source, an https-less source, a date outside the window, a time without a date, a Week 3 49ers game on 680, a Week 4+ 49ers game without 680, a 49ers game missing 107.7, a Stanford game on anything but 1050, a Cal game on anything but 810, 810 on the Big Game, a postseason row that acquired a clock time, a Westwood One event id that belongs to a merged 49ers row, a row pointing at a flag that does not exist, an unexpected per-source row count, and any two **official** rows that collide on the same station at the same time.
 
+`validate_flags()` additionally rejects a duplicate flag id, a bad severity, a flag link that is not https, and a flag whose primary `url` is not the first entry of its `sources` list. Every row is also required to carry a known duration bucket whose minutes equal the bucket default, so that resetting the on-page duration controls always restores the shipped numbers.
+
 `node scripts/ui_logic_test.js` checks the Pacific conversion, twelve-hour labels, Sunday-start calendar grids, overlap and TBD conflict detection, the band maths, and then re-validates the shipped JSON against the same invariants the page assumes — including that the file is already sorted.
 
-`node scripts/render_smoke_test.js` extracts the real inline script from `index.html`, runs it against the real feed in a DOM shim, walks **all 155 days**, exercises the station filter, the sport filter, day and month navigation, the date picker and the search box, and fails if the page asks for an element id that is not in the markup.
+`node scripts/render_smoke_test.js` extracts the real inline script from `index.html`, runs it against the real feed in a DOM shim, walks **all 155 days**, exercises the station filter, the sport filter, day and month navigation, the date picker, the search box and the duration controls, and fails if the page asks for an element id that is not in the markup. Two of its cases exist only as regressions: a date far outside the snapshot must not strand the calendar, and resetting the duration controls must return the day view byte for byte.
 
 ## What was deliberately left out
 

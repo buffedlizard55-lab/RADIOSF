@@ -95,11 +95,6 @@
     return out;
   }
 
-  function shareStation(a, b) {
-    var shared = sharedStations(a, b);
-    return shared.length ? shared.join(", ") : null;
-  }
-
   function conflictTitle(b) {
     return b.title ? "\u201c" + b.title + "\u201d" : b.id;
   }
@@ -175,10 +170,6 @@
     return out;
   }
 
-  function clip(start, end, lo, hi) {
-    return Math.max(0, Math.min(end, hi) - Math.max(start, lo));
-  }
-
   function unionMinutes(list, lo, hi) {
     var spans = [];
     var i, s, e, merged, cur, out, k;
@@ -216,11 +207,6 @@
 
   function inWindow(iso, start, end) {
     return iso >= start && iso <= end;
-  }
-
-  function filterBroadcasts(list, stationId) {
-    if (!stationId || stationId === "all") return list.slice();
-    return list.filter(function (b) { return b.stations.indexOf(stationId) !== -1; });
   }
 
   function byDate(list, iso) {
@@ -337,13 +323,10 @@
     endMinutes: endMinutes,
     rangesOverlap: rangesOverlap,
     sharedStations: sharedStations,
-    shareStation: shareStation,
     sameDayConflicts: sameDayConflicts,
-    clip: clip,
     unionMinutes: unionMinutes,
     monthCells: monthCells,
     inWindow: inWindow,
-    filterBroadcasts: filterBroadcasts,
     byDate: byDate,
     sortBroadcasts: sortBroadcasts,
     formatDuration: formatDuration

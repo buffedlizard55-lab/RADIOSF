@@ -124,6 +124,35 @@ feed.broadcasts.forEach(function (row) {
   if (row.start_pt) assert.ok(/^\d{2}:\d{2}$/.test(row.start_pt), row.id + " time format");
   assert.ok(row.duration_est_min > 0, row.id + " duration estimate");
 });
+/* Flags are the honesty mechanism, so their links have to work as hard as a row's.
+   Every flag must be reachable, and a flag that cites several checks must link them all. */
+var flagSeen = {};
+feed.flags.forEach(function (f) {
+  assert.ok(!flagSeen[f.id], "duplicate flag id " + f.id);
+  flagSeen[f.id] = true;
+  assert.ok(["limitation", "review", "note"].indexOf(f.severity) !== -1, f.id + " severity");
+  assert.ok(f.title && f.title.length > 8, f.id + " needs a readable title");
+  assert.ok(f.detail && f.detail.length > 40, f.id + " needs a detail a reader can act on");
+  assert.ok(/^https:\/\//.test(f.url), f.id + " url must be https");
+  (f.sources || []).forEach(function (x) {
+    assert.ok(/^https:\/\//.test(x.url), f.id + " extra link must be https");
+    assert.ok(x.label && x.label.length > 3, f.id + " extra link needs a label");
+  });
+  if (f.sources && f.sources.length) {
+    assert.strictEqual(f.sources[0].url, f.url, f.id + " primary url must lead its sources");
+  }
+});
+
+/* every duration bucket in the feed must be one the page can render a control for */
+var bucketIds = (feed.meta.durations || []).map(function (d) { return d.id; });
+assert.ok(bucketIds.length > 0, "meta.durations drives the duration controls");
+feed.broadcasts.forEach(function (row) {
+  assert.ok(bucketIds.indexOf(row.duration_key) !== -1, row.id + " has no duration bucket");
+  var d = feed.meta.durations.find(function (x) { return x.id === row.duration_key; });
+  assert.strictEqual(row.duration_est_min, d.minutes,
+    row.id + " duration must equal its bucket default, or resetting the control would not restore it");
+});
+
 assert.strictEqual(feed.meta.counts.broadcasts, feed.broadcasts.length);
 assert.strictEqual(
   feed.meta.counts.official + feed.meta.counts.indicated + feed.meta.counts.review,

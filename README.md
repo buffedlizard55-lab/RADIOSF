@@ -50,6 +50,14 @@ A calendar of **live game broadcasts** on the six Bay Area stations above. Click
 
 It is the radio-only cousin of [ScheduleFreeTime](https://buffedlizard55-lab.github.io/ScheduleFreeTime/). That site asks when you are free. This one asks when a game is on a radio you can actually receive.
 
+On the page you can:
+
+- **click any day** in the calendar, or use the arrows, the Today button, the date picker, or the left/right arrow keys;
+- **filter to one station** — useful if 960 is the only one that comes in where you are — or to one sport;
+- **search** for a team, venue or date across the whole snapshot;
+- **change the estimated length of a broadcast** for any sport and watch every figure on the page recompute, including the 10-to-10 answer below;
+- **open the source page for any row**, because every row links the page it was read from.
+
 Snapshot: **2026-09-27**, through **2027-02-28**, America/Los_Angeles. **147 broadcasts** across 155 days, **30 flagged irregularities**. Not a live scrape. Everything was transcribed from a page opened on the snapshot date; see [docs/VERIFICATION.md](docs/VERIFICATION.md).
 
 | Badge | Meaning | Rows |
@@ -86,7 +94,23 @@ You said live sport looked like it filled most of 10 AM to 10 PM. The site now c
 
 Average coverage by weekday: **Sunday 3h 40m · Saturday 2h 56m · Thursday 2h 20m · Monday 2h 13m · Friday 41m · Wednesday 20m · Tuesday 16m.**
 
-So the hunch holds on an autumn Sunday, Saturday or Thursday and is clearly wrong on a Tuesday or Wednesday. The rest of the weekday band is talk — Murph & Markus, Fair & Biased and Dirty Work on 680, the ESPN Radio network on 1050, Fox Sports Radio on 960 — and talk is not listed here as a game. End times are estimates (MLB 2:45, MLB postseason 3:30, NFL 3:15, college football 3:24, soccer 2:00) and are labelled as estimates everywhere they appear.
+So the hunch holds on an autumn Sunday, Saturday or Thursday and is clearly wrong on a Tuesday or Wednesday. The rest of the weekday band is talk — Murph & Markus, Fair & Biased and Dirty Work on 680, the ESPN Radio network on 1050, Fox Sports Radio on 960 — and talk is not listed here as a game.
+
+### The answer does not depend on the guesswork
+
+No source publishes how long a broadcast actually stays on air, so the band maths uses one average per sport (MLB 2:45, MLB postseason 3:30, NFL 3:15, college football 3:24, soccer 2:00). Those are assumptions, so the page puts them in editable boxes: change any of them and every figure above recomputes instantly.
+
+The conclusion survives the whole plausible range, and well past it:
+
+| Estimated length of every broadcast | Days with a game | Days over half the band | Mean, all days | Mean, game days |
+| --- | --- | --- | --- | --- |
+| 90 min (absurdly short) | 77 | 0 | 52m | 1h 45m |
+| defaults − 30 min | 77 | 5 | 1h 31m | 3h 03m |
+| **defaults** | **77** | **18** | **1h 47m** | **3h 36m** |
+| defaults + 60 min | 77 | 18 | 2h 17m | 4h 36m |
+| 240 min for every sport | 77 | 18 | 2h 13m | 4h 29m |
+
+Even at a flat four hours for every single broadcast, the average day reaches 2h 13m of a 12-hour band and the same 18 days of 155 cross the halfway mark. "Days with a game" never moves at all, because it does not depend on length. The observation is not wrong because of a bad duration estimate; it is wrong because most days simply have no game.
 
 ## Rebuild and test
 

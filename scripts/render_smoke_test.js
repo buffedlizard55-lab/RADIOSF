@@ -96,6 +96,17 @@ function fakeEvent(attrName, attrValue, extra) {
   return { target: { closest: function () { return node; }, matches: function () { return false; }, value: extra && extra.value } };
 }
 
+function durEvent(key, value) {
+  return {
+    target: {
+      getAttribute: function (n) { return n === "data-dur" ? key : null; },
+      value: String(value),
+      matches: function () { return false; },
+      closest: function () { return null; }
+    }
+  };
+}
+
 function fire(key, ev) {
   var fn = listeners[key];
   assert.ok(fn, "no handler bound for " + key);
@@ -181,6 +192,21 @@ Promise.resolve().then(function () {
   assert.ok(els["month-label"].textContent.indexOf("October 2026") !== -1,
     "month arrows still work after a far-past date");
   fire("cal:click", fakeEvent("data-date", "2026-10-15"));
+
+  /* Duration estimates are the assumption the whole band answer rests on, so the
+     control has to actually move the number, and reset has to actually reset. */
+  assert.ok(els.durations.innerHTML.indexOf('data-dur="NFL"') !== -1, "duration controls render");
+  assert.ok(els.durations.innerHTML.indexOf("default 195 min") !== -1, "the shipped default is printed");
+  var bandBefore = els["band-stats"].innerHTML;
+  var dayBefore = els.log.innerHTML;
+  fire("durations:input", durEvent("NFL", 360));
+  assert.notStrictEqual(els["band-stats"].innerHTML, bandBefore, "a longer NFL estimate recomputes the band");
+  fire("durations:input", durEvent("NFL", 5));
+  assert.notStrictEqual(els["band-stats"].innerHTML, bandBefore, "out-of-range input is ignored, last good value kept");
+  fire("dur-reset:click", {});
+  assert.strictEqual(els["band-stats"].innerHTML, bandBefore, "reset restores the shipped defaults");
+  fire("cal:click", fakeEvent("data-date", "2026-10-15"));
+  assert.strictEqual(els.log.innerHTML, dayBefore, "the day view comes back unchanged after a reset");
 
   /* search */
   fire("q:input", { target: { value: "stanford", matches: function () { return false; } } });
