@@ -131,14 +131,20 @@ class SourceWatchTests(unittest.TestCase):
                         "the report gives the Pacific time a human would transcribe")
 
     def test_a_resolved_placeholder_is_a_change_to_a_known_game(self):
-        """NL Wild Card #3 -> PHI/ARI must not read as one game lost and one found."""
+        """AL 4/5 Winner -> NYY/BOS must not read as one game lost and one found.
+
+        This is the case the description-keyed monitor got wrong: a renamed
+        bracket slot looked like a game disappearing and a different game
+        appearing. The API resolved its PHI/ARI slot the same way during this
+        pass, which is what made the bug worth fixing.
+        """
         api = self.api_from_snapshot()
-        self.find_game(api, 849845)["teams"]["away"]["team"]["name"] = "Philadelphia Phillies"
+        self.find_game(api, 849835)["teams"]["away"]["team"]["name"] = "New York Yankees"
         differences = self.diff(api)
         joined = "\n".join(differences)
-        self.assertIn("away team changed for gamePk 849845", joined)
-        self.assertIn("'PHI/ARI'", joined)
-        self.assertIn("'Philadelphia Phillies'", joined)
+        self.assertIn("away team changed for gamePk 849835", joined)
+        self.assertIn("'NYY/BOS'", joined)
+        self.assertIn("'New York Yankees'", joined)
         self.assertNotIn("no longer returns", joined)
         self.assertNotIn("now returns gamePk", joined)
 

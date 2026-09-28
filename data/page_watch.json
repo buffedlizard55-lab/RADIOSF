@@ -1,6 +1,6 @@
 {
   "_about": "Read-only page-change watch for the club, school and station pages that have no machine-readable endpoint. Every 'expect' string was read on the live page on 2026-09-27; if one disappears the page changed and the rows it supports need a human re-read. Every 'alert_if_present' string was absent on 2026-09-27; if one appears, new schedule information may have been published. The watcher never edits data/broadcasts.json.\n\nA page that builds its schedule in the browser cannot be watched this way: gostanford.com/sports/football/schedule serves its 2026 ticker to a browser, not to a plain request, so an entry for it reported every expected string missing on the first live run (source watch preview, pull request 12) and was removed. Stanford dates, opponents and kickoffs stay watched through ESPN's schedule feed, which is machine-readable; the school page remains cited on every Stanford row for a human to open.",
-  "checked": "2026-09-27",
+  "checked": "2026-09-28",
   "pages": [
     {
       "id": "49ers-schedule",
@@ -9,12 +9,8 @@
       "rows": "niners-* (15 rows)",
       "expect": [
         {
-          "text": "KSFO 810 AM / KSAN 107.7 FM",
-          "why": "Week 3 radio line"
-        },
-        {
           "text": "KSAN 107.7 FM / KNBR 104.5 FM / 680 AM",
-          "why": "Week 4 onward radio line"
+          "why": "Week 4 onward radio line. This is now the only radio-line watch on the page: the club drops the broadcast line from a game once it is FINAL, so the Week 3 line this entry used to check disappeared on 2026-09-28 and can never be found again. Keeping it would report \"changed\" every day."
         },
         {
           "text": "Estadio Banorte",

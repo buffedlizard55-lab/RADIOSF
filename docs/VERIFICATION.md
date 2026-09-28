@@ -19,6 +19,17 @@ Open issue #13 reported MLB schedule drift. Every source below was fetched again
 | [KNBR 1050 weekly grid](https://www.thesportsleader.com/knbr1050shows/) | Re-read. Still the week of **Aug 31 – Sep 6**, four weeks stale, and it still prints the ESPN Radio network schedule on weekdays ("ESPN Gamenight", the `ESPN-2B` network designations) with Stanford football, Earthquakes soccer and Westwood One CFB taking the station on the weekend. This is the affiliate evidence behind the `indicated` rows and it is unchanged; flag `KNBR_GRID_STALE` still applies. |
 | [ESPN Radio weekly grid](https://www.espn.com/espnradio/schedule) | Re-read. Still the week of **Sep 21–27**: MLB Mets @ Rangers Wed 7:30 p.m., MLB Guardians @ Royals Fri 7:00 p.m., CFB Wisconsin @ Penn State Sat 4:30 p.m., CFB Texas A&M @ LSU Sat 8:00 p.m. All four are now in the past, so no rows were made from it. The grid has not rolled over to the Wild Card week. |
 
+### What the live source watch preview caught that this session's re-read missed
+
+The `source watch preview` workflow ran all six monitors on GitHub's runners at 2026-09-28 03:20 UTC, twenty minutes after the Stats API was transcribed here. It reported two drifts, both acted on before merging:
+
+| Live finding | What was done |
+| --- | --- |
+| **The Stats API resolved `PHI/ARI`.** The monitor reported `away team changed for gamePk 849845/849841/849844: 'PHI/ARI' in the snapshot, 'Philadelphia Phillies' in the API.` The same endpoint read at 03:00 UTC still printed the placeholder. | Re-fetched the endpoint and confirmed. The three NL Wild Card 'A' rows now carry **Philadelphia Phillies**, matching MLB.com's bracket, which had named the Phillies as the No. 6 seed all along. Each row's note records that the label was a placeholder before it moved, so a resolved slot does not read as though it had always been settled. The saved fixture and flag text were updated with it. Every other field in the response was unchanged, including the trailing space in gamePk 849827's description. |
+| **49ers.com dropped the broadcast line from the completed Week 3 game.** The page watcher reported `expected text "KSFO 810 AM / KSAN 107.7 FM" is no longer found (Week 3 radio line)`. | Re-read the page: Week 3 now prints `Sun 09/27 · FINAL · W36 - 30` with no radio line at all, while Week 4 onward still prints `KSAN 107.7 FM / KNBR 104.5 FM / 680 AM`. **The feed's Week 3 station claim is not being changed** — it was verified against this page on 2026-09-27, when the club printed it, and a game being over does not unmake a verified listing. What changed is the watch: the club removes a game's broadcast line once it is FINAL, so that `expect` string can never be found again and would have reported "changed" every single day. It was removed from `data/page_watch.json` and the remaining radio-line entry now says why it is the only one. `checked` moved to 2026-09-28. |
+
+Both are the reason the preview workflow exists. A hand re-read at 03:00 and a monitor run at 03:20 disagreed, and the monitor was right.
+
 ### How each clock time was checked
 
 A converted time is the easiest thing in this project to get subtly wrong, so all twelve were checked three ways rather than once.

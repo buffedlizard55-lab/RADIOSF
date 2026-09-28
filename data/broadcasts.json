@@ -292,7 +292,7 @@
       "id": "MLB_WC_THURSDAY_PROVISIONAL",
       "severity": "review",
       "title": "The October 1 Wild Card Game 3 times are published but not final",
-      "detail": "An irregularity worth reading before trusting a clock time. For Thursday, October 1, the MLB Stats API returns startTimeTBD false with a real instant for all four Wild Card Game 3 slots \u2014 18:00, 21:00, 00:00 and 02:00 UTC. MLB.com's own Wild Card Series article disagrees about how settled that is: it prints \"Game 3 (if necessary): Thursday\" with no time for any of the four series and states that \"Thursday's game times and TV networks are subject to change depending on which series remain ongoing.\" This feed shows the API's instant because that is the only clock time either source publishes, and keeps all four rows conditional, so they are excluded from the 10 AM\u201310 PM coverage maths and from the conflict panel. A second, smaller irregularity: the API still prints the NL Wild Card 'A' away slot as \"PHI/ARI\" while MLB.com's bracket names the Phillies, and the API's description for gamePk 849827 is \"NLDS 'A' Game 4 \" with a trailing space. Both are the source's own strings; neither has been silently corrected.",
+      "detail": "An irregularity worth reading before trusting a clock time. For Thursday, October 1, the MLB Stats API returns startTimeTBD false with a real instant for all four Wild Card Game 3 slots \u2014 18:00, 21:00, 00:00 and 02:00 UTC. MLB.com's own Wild Card Series article disagrees about how settled that is: it prints \"Game 3 (if necessary): Thursday\" with no time for any of the four series and states that \"Thursday's game times and TV networks are subject to change depending on which series remain ongoing.\" This feed shows the API's instant because that is the only clock time either source publishes, and keeps all four rows conditional, so they are excluded from the 10 AM\u201310 PM coverage maths and from the conflict panel. A second, smaller irregularity: the API's description for gamePk 849827 is \"NLDS 'A' Game 4 \" with a trailing space, which is the source's own string and not a transcription typo. A third has already resolved itself: the API printed the NL Wild Card 'A' away slot as \"PHI/ARI\" at 03:00 UTC on 2026-09-28 and as \"Philadelphia Phillies\" by 03:20, which the source watch preview on pull request #14 caught. Bracket placeholders in this feed move without warning, and the monitor reports each one.",
       "url": "https://www.mlb.com/news/mlb-2026-wild-card-series-matchups"
     },
     {
@@ -733,7 +733,7 @@
       "id": "mlb-post-849845",
       "date": "2026-09-29",
       "start_pt": "11:00",
-      "title": "MLB Postseason on ESPN Radio \u2014 NL Wild Card 'A' Game 1: PHI/ARI at Atlanta Braves",
+      "title": "MLB Postseason on ESPN Radio \u2014 NL Wild Card 'A' Game 1: Philadelphia Phillies at Atlanta Braves",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "Truist Park",
@@ -772,7 +772,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "First pitch 11:00 AM PT, converted from the Stats API's 2026-09-29T18:00:00Z. MLB.com's Wild Card Series article prints the same game at 2 p.m. ET, independently confirming it. The API still prints the away slot as PHI/ARI on 2026-09-28; MLB.com's bracket names the Phillies as the No. 6 seed at the Braves, and that article is linked rather than substituted. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "First pitch 11:00 AM PT, converted from the Stats API's 2026-09-29T18:00:00Z. MLB.com's Wild Card Series article prints the same game at 2 p.m. ET, independently confirming it. The API printed this away slot as the placeholder PHI/ARI when it was first read on 2026-09-28 and resolved it to the Phillies later the same day; the resolved label is what ships, and MLB.com's bracket independently names the Phillies as the No. 6 seed at the Braves. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -783,7 +783,7 @@
         {
           "game_pk": 849845,
           "description": "NL Wild Card 'A' Game 1",
-          "away": "PHI/ARI",
+          "away": "Philadelphia Phillies",
           "home": "Atlanta Braves",
           "venue": "Truist Park",
           "conditional": false
@@ -1024,7 +1024,7 @@
       "id": "mlb-post-849841",
       "date": "2026-09-30",
       "start_pt": "11:00",
-      "title": "MLB Postseason on ESPN Radio \u2014 NL Wild Card 'A' Game 2: PHI/ARI at Atlanta Braves",
+      "title": "MLB Postseason on ESPN Radio \u2014 NL Wild Card 'A' Game 2: Philadelphia Phillies at Atlanta Braves",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "Truist Park",
@@ -1063,7 +1063,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "First pitch 11:00 AM PT, converted from the Stats API's 2026-09-30T18:00:00Z. MLB.com's Wild Card Series article prints the same game at 2 p.m. ET, independently confirming it. The API still prints the away slot as PHI/ARI on 2026-09-28; MLB.com's bracket names the Phillies as the No. 6 seed at the Braves, and that article is linked rather than substituted. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "First pitch 11:00 AM PT, converted from the Stats API's 2026-09-30T18:00:00Z. MLB.com's Wild Card Series article prints the same game at 2 p.m. ET, independently confirming it. The API printed this away slot as the placeholder PHI/ARI when it was first read on 2026-09-28 and resolved it to the Phillies later the same day; the resolved label is what ships, and MLB.com's bracket independently names the Phillies as the No. 6 seed at the Braves. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -1074,7 +1074,7 @@
         {
           "game_pk": 849841,
           "description": "NL Wild Card 'A' Game 2",
-          "away": "PHI/ARI",
+          "away": "Philadelphia Phillies",
           "home": "Atlanta Braves",
           "venue": "Truist Park",
           "conditional": false
@@ -1276,7 +1276,7 @@
       "id": "mlb-post-849844",
       "date": "2026-10-01",
       "start_pt": "11:00",
-      "title": "MLB Postseason on ESPN Radio \u2014 NL Wild Card 'A' Game 3: PHI/ARI at Atlanta Braves (if necessary)",
+      "title": "MLB Postseason on ESPN Radio \u2014 NL Wild Card 'A' Game 3: Philadelphia Phillies at Atlanta Braves (if necessary)",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "Truist Park",
@@ -1315,7 +1315,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "First pitch 11:00 AM PT, converted from the Stats API's 2026-10-01T18:00:00Z. This game is only if necessary, and MLB.com's article says Thursday's game times and TV networks are subject to change depending on which series remain ongoing, so the API's instant is provisional. The API still prints the away slot as PHI/ARI on 2026-09-28; MLB.com's bracket names the Phillies as the No. 6 seed at the Braves, and that article is linked rather than substituted. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "First pitch 11:00 AM PT, converted from the Stats API's 2026-10-01T18:00:00Z. This game is only if necessary, and MLB.com's article says Thursday's game times and TV networks are subject to change depending on which series remain ongoing, so the API's instant is provisional. The API printed this away slot as the placeholder PHI/ARI when it was first read on 2026-09-28 and resolved it to the Phillies later the same day; the resolved label is what ships, and MLB.com's bracket independently names the Phillies as the No. 6 seed at the Braves. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -1327,7 +1327,7 @@
         {
           "game_pk": 849844,
           "description": "NL Wild Card 'A' Game 3",
-          "away": "PHI/ARI",
+          "away": "Philadelphia Phillies",
           "home": "Atlanta Braves",
           "venue": "Truist Park",
           "conditional": true

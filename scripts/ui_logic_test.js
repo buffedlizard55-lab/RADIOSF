@@ -399,11 +399,22 @@ assert.deepStrictEqual(
     .filter(function (d, i, all) { return all.indexOf(d) === i; }),
   ["2026-09-29", "2026-09-30", "2026-10-01"],
   "only the Wild Card dates carry per-game clock times");
-/* The API's own unresolved placeholder must survive to the page verbatim: a
-   reader who sees PHI/ARI knows the bracket slot is not settled in that source. */
-assert.ok(mlb.some(function (row) {
+/* The API resolved its PHI/ARI bracket slot during this pass. The resolved team
+   ships, and the row records that the label was a placeholder before it moved —
+   a resolved slot must not read as though it had always been settled. */
+var nlwcA = mlb.filter(function (row) {
+  return row.game_details.some(function (g) { return g.description.indexOf("NL Wild Card 'A'") === 0; });
+});
+assert.strictEqual(nlwcA.length, 3, "three NL Wild Card 'A' games");
+nlwcA.forEach(function (row) {
+  assert.strictEqual(row.game_details[0].away, "Philadelphia Phillies",
+    row.id + " carries the API's resolved away label");
+  assert.ok(/printed this away slot as the placeholder PHI\/ARI/.test(row.notes),
+    row.id + " records that its away label was a placeholder before the API resolved it");
+});
+assert.ok(!mlb.some(function (row) {
   return row.game_details.some(function (g) { return g.away === "PHI/ARI"; });
-}), "the API's PHI/ARI placeholder is not silently resolved");
+}), "no resolved placeholder is still shipped as a placeholder");
 assert.ok(feed.flags.some(function (f) { return f.id === "MLB_WC_THURSDAY_PROVISIONAL"; }),
   "the provisional October 1 times are flagged for review");
 assert.ok(!feed.flags.some(function (f) { return f.id === "WWO_POSTSEASON_UNDATED"; }),

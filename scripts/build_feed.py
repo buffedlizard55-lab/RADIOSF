@@ -422,10 +422,12 @@ FLAGS = [
             "ongoing.\" This feed shows the API's instant because that is the only clock time "
             "either source publishes, and keeps all four rows conditional, so they are excluded "
             "from the 10 AM–10 PM coverage maths and from the conflict panel. A second, smaller "
-            "irregularity: the API still prints the NL Wild Card 'A' away slot as \"PHI/ARI\" "
-            "while MLB.com's bracket names the Phillies, and the API's description for gamePk "
-            "849827 is \"NLDS 'A' Game 4 \" with a trailing space. Both are the source's own "
-            "strings; neither has been silently corrected."
+            "irregularity: the API's description for gamePk 849827 is \"NLDS 'A' Game 4 \" with a "
+            "trailing space, which is the source's own string and not a transcription typo. A "
+            "third has already resolved itself: the API printed the NL Wild Card 'A' away slot as "
+            "\"PHI/ARI\" at 03:00 UTC on 2026-09-28 and as \"Philadelphia Phillies\" by 03:20, "
+            "which the source watch preview on pull request #14 caught. Bracket placeholders in "
+            "this feed move without warning, and the monitor reports each one."
         ),
         "url": MLB_WC_MATCHUPS,
     },
@@ -1037,19 +1039,19 @@ def wwo_soccer_rows() -> list[dict]:
 
 MLB_POST_DATES: list[tuple[str, bool, list[tuple]]] = [
     ("2026-09-29", False, [
-        (849845, "2026-09-29T18:00:00Z", "NL Wild Card 'A' Game 1", "PHI/ARI", "Atlanta Braves", "Truist Park"),
+        (849845, "2026-09-29T18:00:00Z", "NL Wild Card 'A' Game 1", "Philadelphia Phillies", "Atlanta Braves", "Truist Park"),
         (849849, "2026-09-29T21:00:00Z", "AL Wild Card 'A' Game 1", "Chicago White Sox", "Houston Astros", "Daikin Park"),
         (849851, "2026-09-30T00:00:00Z", "AL Wild Card 'B' Game 1", "Boston Red Sox", "New York Yankees", "Yankee Stadium"),
         (849843, "2026-09-30T02:00:00Z", "NL Wild Card 'B' Game 1", "Chicago Cubs", "San Diego Padres", "Petco Park"),
     ]),
     ("2026-09-30", False, [
-        (849841, "2026-09-30T18:00:00Z", "NL Wild Card 'A' Game 2", "PHI/ARI", "Atlanta Braves", "Truist Park"),
+        (849841, "2026-09-30T18:00:00Z", "NL Wild Card 'A' Game 2", "Philadelphia Phillies", "Atlanta Braves", "Truist Park"),
         (849846, "2026-09-30T21:00:00Z", "AL Wild Card 'A' Game 2", "Chicago White Sox", "Houston Astros", "Daikin Park"),
         (849848, "2026-10-01T00:00:00Z", "AL Wild Card 'B' Game 2", "Boston Red Sox", "New York Yankees", "Yankee Stadium"),
         (849842, "2026-10-01T02:00:00Z", "NL Wild Card 'B' Game 2", "Chicago Cubs", "San Diego Padres", "Petco Park"),
     ]),
     ("2026-10-01", False, [
-        (849844, "2026-10-01T18:00:00Z", "NL Wild Card 'A' Game 3", "PHI/ARI", "Atlanta Braves", "Truist Park"),
+        (849844, "2026-10-01T18:00:00Z", "NL Wild Card 'A' Game 3", "Philadelphia Phillies", "Atlanta Braves", "Truist Park"),
         (849850, "2026-10-01T21:00:00Z", "AL Wild Card 'A' Game 3", "Chicago White Sox", "Houston Astros", "Daikin Park"),
         (849847, "2026-10-02T00:00:00Z", "AL Wild Card 'B' Game 3", "Boston Red Sox", "New York Yankees", "Yankee Stadium"),
         (849840, "2026-10-02T02:00:00Z", "NL Wild Card 'B' Game 3", "Chicago Cubs", "San Diego Padres", "Petco Park"),
@@ -1281,11 +1283,12 @@ def mlb_postseason_rows() -> list[dict]:
                     "times and TV networks are subject to change depending on which series remain "
                     "ongoing, so the API's instant is provisional."
                 )
-            if away == "PHI/ARI":
+            if desc.startswith("NL Wild Card 'A'"):
                 time_note += (
-                    f" The API still prints the away slot as {away} on {MLB_FETCHED}; MLB.com's "
-                    "bracket names the Phillies as the No. 6 seed at the Braves, and that article "
-                    "is linked rather than substituted."
+                    " The API printed this away slot as the placeholder PHI/ARI when it was first "
+                    f"read on {MLB_FETCHED} and resolved it to the Phillies later the same day; "
+                    "the resolved label is what ships, and MLB.com's bracket independently names "
+                    "the Phillies as the No. 6 seed at the Braves."
                 )
             rows.append(game(
                 id=f"mlb-post-{pk}",

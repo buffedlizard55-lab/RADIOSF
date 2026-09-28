@@ -195,8 +195,10 @@ Promise.resolve().then(function () {
   });
   assert.ok(els.log.innerHTML.indexOf("Chicago White Sox at Houston Astros") !== -1,
     "the API's now-resolved home team renders as the API prints it");
-  assert.ok(els.log.innerHTML.indexOf("PHI/ARI at Atlanta Braves") !== -1,
-    "the API's unresolved away placeholder is not silently resolved");
+  assert.ok(els.log.innerHTML.indexOf("Philadelphia Phillies at Atlanta Braves") !== -1,
+    "the API's resolved away label renders as the API now prints it");
+  assert.ok(els.log.innerHTML.indexOf("placeholder PHI/ARI") !== -1,
+    "the row still says its away label was a placeholder before the API resolved it");
   assert.ok(els.log.innerHTML.indexOf("converted from the Stats API&#39;s 2026-09-29T18:00:00Z") !== -1,
     "a per-game row shows the instant its clock time came from");
   assert.ok(els.log.innerHTML.indexOf("MLB Stats API schedule slot, not per-game 1050 clearance.") !== -1,

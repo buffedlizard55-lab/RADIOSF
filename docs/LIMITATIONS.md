@@ -12,6 +12,13 @@ Snapshot 2026-09-28 (ninth pass). 182 schedule entries: 168 rows with at least o
 | **The 5 PM and 7 PM games on a Wild Card day produced a misleading conflict warning.** The overlap text told the reader a local game usually keeps the station — true for Westwood One, wrong for two games on one ESPN Radio feed. | `sameDayConflicts` now detects two listings of the same national network and says the network runs a single feed, so the earlier estimated window is running into the next listed start rather than two games competing for the affiliate. |
 | **An if-necessary game with a published time exported to `.ics` as a normal booking.** | Conditional rows now carry `STATUS:TENTATIVE`, so a calendar client shows them as provisional. RFC 5545 defaults to CONFIRMED, which is exactly the wrong default for a game that may not happen. |
 
+## Found in the ninth pass, and fixed before merging
+
+| Finding | Fix |
+| --- | --- |
+| **The Stats API resolved its `PHI/ARI` bracket slot twenty minutes after it was transcribed.** The source watch preview on the pull request reported the away team change for gamePks 849845, 849841 and 849844. | Re-fetched and confirmed; the three rows now carry **Philadelphia Phillies**, matching MLB.com's bracket. Each row records that its away label was a placeholder before the API resolved it. This is the first live demonstration that bracket placeholders in this feed move without warning, and that the gamePk-keyed monitor catches the move rather than reporting a game lost and a game found. |
+| **49ers.com removes a game's broadcast line once it is FINAL**, so the Week 3 `expect` string could never be found again and the page watcher would have reported "changed" every day. | The string was removed from `data/page_watch.json` and the surviving radio-line entry explains why it is now the only one. **The feed's Week 3 station claim was left alone**: it was verified against the page on 2026-09-27 while the club still printed it, and a completed game does not unmake a verified listing. The claim's provenance is now that single verification, and `docs/VERIFICATION.md` says so. |
+
 ## Found in the ninth pass, not yet fixed
 
 | Finding | Why it is not fixed yet |
