@@ -147,7 +147,7 @@ Promise.resolve().then(function () {
     assert.ok((el.innerHTML + el.textContent).length > 0, "#" + id + " rendered empty");
   });
   assert.ok(/snapshot date/i.test(els.verified.textContent), "snapshot date and age line");
-  assert.ok(/STALE · 4 days since the snapshot date 2026-09-27/.test(els.verified.textContent),
+  assert.ok(/STALE · 3 days since the snapshot date 2026-09-28/.test(els.verified.textContent),
     "an old snapshot is dated and warned about");
   assert.ok(els.verified.className.indexOf("stale") !== -1, "stale snapshot uses warning styling");
   assert.ok(/21 if-necessary game possibilities across 13 dates/.test(els.verified.textContent),
@@ -184,11 +184,42 @@ Promise.resolve().then(function () {
     "the NBA row renders with the PDF's own matchup strings");
   assert.ok(els.log.innerHTML.indexOf("Listed start 16:00 PT, converted from the 7:00 PM ET") !== -1,
     "the NBA row shows the conversion it came from");
+  /* September 29 is the first date the API has actually scheduled: four
+     per-game rows with Pacific clock times, each converted from the API's own
+     UTC instant. The page must show the times, keep the API's unresolved
+     placeholder verbatim, and not repeat a single game's slot as a list. */
   fire("cal:click", fakeEvent("data-date", "2026-09-29"));
+  ["11:00 AM PT", "2:00 PM PT", "5:00 PM PT", "7:00 PM PT"].forEach(function (when) {
+    assert.ok(els.log.innerHTML.indexOf(when) !== -1,
+      "the first Wild Card day lists a game at " + when);
+  });
+  assert.ok(els.log.innerHTML.indexOf("Chicago White Sox at Houston Astros") !== -1,
+    "the API's now-resolved home team renders as the API prints it");
+  assert.ok(els.log.innerHTML.indexOf("PHI/ARI at Atlanta Braves") !== -1,
+    "the API's unresolved away placeholder is not silently resolved");
+  assert.ok(els.log.innerHTML.indexOf("converted from the Stats API&#39;s 2026-09-29T18:00:00Z") !== -1,
+    "a per-game row shows the instant its clock time came from");
+  assert.ok(els.log.innerHTML.indexOf("MLB Stats API schedule slot, not per-game 1050 clearance.") !== -1,
+    "a per-game row keeps the clearance caveat without repeating its own slot");
+  assert.ok(els.log.innerHTML.indexOf("MLB schedule slots (not per-game 1050 clearance)") === -1,
+    "a per-game row does not render a grouped slot list");
+  /* Two of the four games are three hours apart in estimate but two apart in
+     fact, and both are ESPN Radio: the warning must say single feed, not a
+     station being fought over. */
+  assert.ok(/network runs a single national/.test(els.conflicts.innerHTML),
+    "an overlap between two games on one network feed is explained as sequencing");
+
+  /* A date the API has not scheduled keeps the grouped shape: no clock time,
+     every slot listed, venue strings included. */
+  fire("cal:click", fakeEvent("data-date", "2026-10-03"));
+  assert.ok(els.log.innerHTML.indexOf("Time TBD") !== -1,
+    "an unscheduled postseason date shows no invented clock time");
   assert.ok(els.log.innerHTML.indexOf("MLB schedule slots (not per-game 1050 clearance)") !== -1,
-    "MLB matchup details are clearly distinguished from per-game station clearance");
-  assert.ok(els.log.innerHTML.indexOf("Chicago White Sox at HOU/TEX") !== -1,
-    "source-printed MLB away/home labels render on the selected date");
+    "a grouped date lists every API schedule slot for the day");
+  assert.ok(els.log.innerHTML.indexOf("NYY/BOS") !== -1,
+    "the API's Division Series placeholder renders verbatim");
+  assert.ok(els.log.innerHTML.indexOf("UNIQLO Field at Dodger Stadium") !== -1,
+    "the API's own venue string renders, inconsistencies included");
 
   /* Conditional-only postseason dates stay visible, but neither get counted as
      scheduled days nor contribute estimated broadcast minutes. */
@@ -255,6 +286,19 @@ Promise.resolve().then(function () {
     "a playoff window day with no published kickoff exports as an all-day event");
   assert.ok(allDay.indexOf("DTSTART:") === -1 || !/DTSTART:\d/.test(allDay),
     "no clock time is invented for it");
+
+  /* An if-necessary game now carries a published first pitch, so it exports as a
+     timed event. It is still a possibility, so it must not read as a booking. */
+  fire("cal:click", fakeEvent("data-date", "2026-10-01"));
+  var tentative = decodeURIComponent(els.ics.innerHTML.match(/href="([^"]+)"/)[1]
+    .replace(/^data:text\/calendar;charset=utf-8,/, ""));
+  var tentativeUnfolded = tentative.replace(/\r\n[ ]/g, "");
+  assert.ok(/DTSTART:20261001T180000Z/.test(tentativeUnfolded),
+    "the 11:00 AM Pacific first pitch on October 1 is 6:00 PM UTC");
+  assert.strictEqual(tentativeUnfolded.match(/STATUS:TENTATIVE/g).length, 4,
+    "each of the four if-necessary October 1 games exports as tentative, not confirmed");
+  assert.ok(/only if necessary/.test(tentativeUnfolded),
+    "the tentative events say why in their summary");
   /* A day outside the snapshot offers no file at all. */
   fire("cal:click", fakeEvent("data-date", "2027-03-15"));
   assert.strictEqual(els.ics.innerHTML, "", "a day outside the snapshot offers no calendar file");

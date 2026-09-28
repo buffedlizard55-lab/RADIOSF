@@ -1,11 +1,11 @@
 {
   "meta": {
     "name": "RADIOSF",
-    "snapshot_date": "2026-09-27",
+    "snapshot_date": "2026-09-28",
     "window_start": "2026-09-27",
     "window_end": "2027-02-28",
     "timezone": "America/Los_Angeles",
-    "verified_note": "Line-checked against pages fetched 2026-09-27. Not a live scrape. This pass added the NBA's own 2026-27 ESPN Radio schedule as 20 \u201cindicated\u201d rows on 1050 \u2014 the first basketball rows in the feed \u2014 and a monitor that re-reads that PDF daily.",
+    "verified_note": "Line-checked against pages fetched 2026-09-27, except the MLB postseason rows, which were re-read from the MLB Stats API on 2026-09-28 when it published the twelve Wild Card first pitches; those dates are now split into per-game rows with Pacific clock times, each cross-checked against the ET time MLB.com's own Wild Card Series article prints. Not a live scrape. Row counts moved from 173 to 182 because three grouped MLB dates became twelve per-game rows.",
     "durations": [
       {
         "id": "MLB",
@@ -116,15 +116,15 @@
       }
     ],
     "counts": {
-      "broadcasts": 173,
-      "conditional": 11,
+      "broadcasts": 182,
+      "conditional": 14,
       "conditional_games": 21,
-      "placed": 172,
+      "placed": 181,
       "unplaced": 1,
       "official": 37,
-      "indicated": 134,
+      "indicated": 143,
       "review": 2,
-      "flags": 34
+      "flags": 35
     },
     "espn_watch": {
       "pdf": "https://ak-static.cms.nba.com/wp-content/uploads/sites/46/2026/08/2026-27-ESPN-Radio-Schedule.pdf",
@@ -285,8 +285,15 @@
       "id": "MLB_POSTSEASON_ESPN",
       "severity": "review",
       "title": "MLB postseason is an ESPN Radio network row, not a Bay Area per-game clearance",
-      "detail": "MLB's own postseason release says \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games.\" KTCT 1050 AM is a full-time ESPN Radio affiliate: its published weekly grid is the ESPN Radio network schedule, and its station record lists ESPN Radio as the network. No Cumulus or ESPN page publishes a game-by-game Bay Area clearance list, so these rows are \"indicated\". Three further caveats. There is one ESPN Radio feed, so on a day with two or four scheduled games only one of them can be on 1050 at a time. Start times were still TBD in the Stats API on 2026-09-27 \u2014 every game carries a placeholder 07:33 UTC with startTimeTBD true \u2014 so no clock time is shown. And Stanford football, Earthquakes soccer and Westwood One college football all preempt 1050 on autumn weekends. Neither the Giants nor the Athletics are in this field.",
+      "detail": "MLB's own postseason release says \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games, beginning with the Wild Card Series presented by AbbVie.\" KTCT 1050 AM is a full-time ESPN Radio affiliate: its published weekly grid is the ESPN Radio network schedule, and its station record lists ESPN Radio as the network. No Cumulus or ESPN page publishes a game-by-game Bay Area clearance list, so these rows are \"indicated\". Two further caveats. There is one ESPN Radio feed, so on a day with two or four scheduled games only one of them can be on 1050 at a time, and an estimated window that runs into the next listed game is a single-feed artefact rather than two games fighting for the station. And Stanford football, Earthquakes soccer and Westwood One college football all preempt 1050 on autumn weekends. Re-read 2026-09-28: the Stats API has now published real first pitches for the twelve Wild Card games on September 29, 30 and October 1, so those dates are split into per-game rows with Pacific clock times, each cross-checked against the ET time MLB.com's own Wild Card Series article prints. Every game from the Division Series onward still carries startTimeTBD true with a 07:33 UTC placeholder, so those dates stay grouped and show no time. Neither the Giants nor the Athletics are in this field.",
       "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
+    },
+    {
+      "id": "MLB_WC_THURSDAY_PROVISIONAL",
+      "severity": "review",
+      "title": "The October 1 Wild Card Game 3 times are published but not final",
+      "detail": "An irregularity worth reading before trusting a clock time. For Thursday, October 1, the MLB Stats API returns startTimeTBD false with a real instant for all four Wild Card Game 3 slots \u2014 18:00, 21:00, 00:00 and 02:00 UTC. MLB.com's own Wild Card Series article disagrees about how settled that is: it prints \"Game 3 (if necessary): Thursday\" with no time for any of the four series and states that \"Thursday's game times and TV networks are subject to change depending on which series remain ongoing.\" This feed shows the API's instant because that is the only clock time either source publishes, and keeps all four rows conditional, so they are excluded from the 10 AM\u201310 PM coverage maths and from the conflict panel. A second, smaller irregularity: the API still prints the NL Wild Card 'A' away slot as \"PHI/ARI\" while MLB.com's bracket names the Phillies, and the API's description for gamePk 849827 is \"NLDS 'A' Game 4 \" with a trailing space. Both are the source's own strings; neither has been silently corrected.",
+      "url": "https://www.mlb.com/news/mlb-2026-wild-card-series-matchups"
     },
     {
       "id": "ESPN_RADIO_NBA",
@@ -723,6 +730,132 @@
       ]
     },
     {
+      "id": "mlb-post-849845",
+      "date": "2026-09-29",
+      "start_pt": "11:00",
+      "title": "MLB Postseason on ESPN Radio \u2014 NL Wild Card 'A' Game 1: PHI/ARI at Atlanta Braves",
+      "league": "MLB",
+      "network": "ESPN Radio",
+      "venue": "Truist Park",
+      "status": "scheduled",
+      "conditional": false,
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_key": "MLB-POST",
+      "duration_est_min": 210,
+      "sources": [
+        {
+          "label": "MLB: \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games\"",
+          "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
+        },
+        {
+          "label": "MLB Stats API gamePk 849845, first pitch 2026-09-29T18:00:00Z = 11:00 PT on 2026-09-29, startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1.1/game/849845/feed/live"
+        },
+        {
+          "label": "MLB Stats API postseason endpoint, 2026-09-29: 4 game(s), startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
+        },
+        {
+          "label": "MLB.com Wild Card Series matchups: this game's start printed as 2 p.m. ET",
+          "url": "https://www.mlb.com/news/mlb-2026-wild-card-series-matchups"
+        },
+        {
+          "label": "KNBR 1050 weekly grid \u2014 the ESPN Radio network schedule",
+          "url": "https://www.thesportsleader.com/knbr1050shows/"
+        },
+        {
+          "label": "KTCT station record: network ESPN Radio",
+          "url": "https://en.wikipedia.org/wiki/KTCT"
+        }
+      ],
+      "notes": "First pitch 11:00 AM PT, converted from the Stats API's 2026-09-29T18:00:00Z. MLB.com's Wild Card Series article prints the same game at 2 p.m. ET, independently confirming it. The API still prints the away slot as PHI/ARI on 2026-09-28; MLB.com's bracket names the Phillies as the No. 6 seed at the Braves, and that article is linked rather than substituted. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "flag_ids": [
+        "MLB_POSTSEASON_ESPN",
+        "TALK_NOT_GAMES",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "game_pk": 849845,
+          "description": "NL Wild Card 'A' Game 1",
+          "away": "PHI/ARI",
+          "home": "Atlanta Braves",
+          "venue": "Truist Park",
+          "conditional": false
+        }
+      ],
+      "game_count": 1,
+      "conditional_game_count": 0
+    },
+    {
+      "id": "mlb-post-849849",
+      "date": "2026-09-29",
+      "start_pt": "14:00",
+      "title": "MLB Postseason on ESPN Radio \u2014 AL Wild Card 'A' Game 1: Chicago White Sox at Houston Astros",
+      "league": "MLB",
+      "network": "ESPN Radio",
+      "venue": "Daikin Park",
+      "status": "scheduled",
+      "conditional": false,
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_key": "MLB-POST",
+      "duration_est_min": 210,
+      "sources": [
+        {
+          "label": "MLB: \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games\"",
+          "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
+        },
+        {
+          "label": "MLB Stats API gamePk 849849, first pitch 2026-09-29T21:00:00Z = 14:00 PT on 2026-09-29, startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1.1/game/849849/feed/live"
+        },
+        {
+          "label": "MLB Stats API postseason endpoint, 2026-09-29: 4 game(s), startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
+        },
+        {
+          "label": "MLB.com Wild Card Series matchups: this game's start printed as 5 p.m. ET",
+          "url": "https://www.mlb.com/news/mlb-2026-wild-card-series-matchups"
+        },
+        {
+          "label": "KNBR 1050 weekly grid \u2014 the ESPN Radio network schedule",
+          "url": "https://www.thesportsleader.com/knbr1050shows/"
+        },
+        {
+          "label": "KTCT station record: network ESPN Radio",
+          "url": "https://en.wikipedia.org/wiki/KTCT"
+        }
+      ],
+      "notes": "First pitch 2:00 PM PT, converted from the Stats API's 2026-09-29T21:00:00Z. MLB.com's Wild Card Series article prints the same game at 5 p.m. ET, independently confirming it. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "flag_ids": [
+        "MLB_POSTSEASON_ESPN",
+        "TALK_NOT_GAMES",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "game_pk": 849849,
+          "description": "AL Wild Card 'A' Game 1",
+          "away": "Chicago White Sox",
+          "home": "Houston Astros",
+          "venue": "Daikin Park",
+          "conditional": false
+        }
+      ],
+      "game_count": 1,
+      "conditional_game_count": 0
+    },
+    {
       "id": "wwo-soccer-570239",
       "date": "2026-09-29",
       "start_pt": "16:45",
@@ -762,14 +895,14 @@
       ]
     },
     {
-      "id": "mlb-post-2026-09-29",
+      "id": "mlb-post-849851",
       "date": "2026-09-29",
-      "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 Wild Card Series, Game 1",
+      "start_pt": "17:00",
+      "title": "MLB Postseason on ESPN Radio \u2014 AL Wild Card 'B' Game 1: Boston Red Sox at New York Yankees",
       "league": "MLB",
       "network": "ESPN Radio",
-      "venue": "",
-      "status": "tba",
+      "venue": "Yankee Stadium",
+      "status": "scheduled",
       "conditional": false,
       "result": null,
       "stations": [
@@ -784,8 +917,16 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-09-29: 4 game(s), startTimeTBD true",
+          "label": "MLB Stats API gamePk 849851, first pitch 2026-09-30T00:00:00Z = 17:00 PT on 2026-09-29, startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1.1/game/849851/feed/live"
+        },
+        {
+          "label": "MLB Stats API postseason endpoint, 2026-09-29: 4 game(s), startTimeTBD false, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
+        },
+        {
+          "label": "MLB.com Wild Card Series matchups: this game's start printed as 8 p.m. ET",
+          "url": "https://www.mlb.com/news/mlb-2026-wild-card-series-matchups"
         },
         {
           "label": "KNBR 1050 weekly grid \u2014 the ESPN Radio network schedule",
@@ -796,7 +937,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "First pitch 5:00 PM PT, converted from the Stats API's 2026-09-30T00:00:00Z. MLB.com's Wild Card Series article prints the same game at 8 p.m. ET, independently confirming it. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -805,42 +946,26 @@
       ],
       "game_details": [
         {
-          "description": "AL Wild Card 'A' Game 1",
-          "away": "Chicago White Sox",
-          "home": "HOU/TEX",
-          "conditional": false
-        },
-        {
+          "game_pk": 849851,
           "description": "AL Wild Card 'B' Game 1",
           "away": "Boston Red Sox",
           "home": "New York Yankees",
-          "conditional": false
-        },
-        {
-          "description": "NL Wild Card 'A' Game 1",
-          "away": "NL Wild Card #3",
-          "home": "Atlanta Braves",
-          "conditional": false
-        },
-        {
-          "description": "NL Wild Card 'B' Game 1",
-          "away": "Chicago Cubs",
-          "home": "San Diego Padres",
+          "venue": "Yankee Stadium",
           "conditional": false
         }
       ],
-      "game_count": 4,
+      "game_count": 1,
       "conditional_game_count": 0
     },
     {
-      "id": "mlb-post-2026-09-30",
-      "date": "2026-09-30",
-      "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 Wild Card Series, Game 2",
+      "id": "mlb-post-849843",
+      "date": "2026-09-29",
+      "start_pt": "19:00",
+      "title": "MLB Postseason on ESPN Radio \u2014 NL Wild Card 'B' Game 1: Chicago Cubs at San Diego Padres",
       "league": "MLB",
       "network": "ESPN Radio",
-      "venue": "",
-      "status": "tba",
+      "venue": "Petco Park",
+      "status": "scheduled",
       "conditional": false,
       "result": null,
       "stations": [
@@ -855,8 +980,16 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-09-30: 4 game(s), startTimeTBD true",
+          "label": "MLB Stats API gamePk 849843, first pitch 2026-09-30T02:00:00Z = 19:00 PT on 2026-09-29, startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1.1/game/849843/feed/live"
+        },
+        {
+          "label": "MLB Stats API postseason endpoint, 2026-09-29: 4 game(s), startTimeTBD false, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
+        },
+        {
+          "label": "MLB.com Wild Card Series matchups: this game's start printed as 10 p.m. ET/7 p.m. PT",
+          "url": "https://www.mlb.com/news/mlb-2026-wild-card-series-matchups"
         },
         {
           "label": "KNBR 1050 weekly grid \u2014 the ESPN Radio network schedule",
@@ -867,7 +1000,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "First pitch 7:00 PM PT, converted from the Stats API's 2026-09-30T02:00:00Z. MLB.com's Wild Card Series article prints the same game at 10 p.m. ET/7 p.m. PT, independently confirming it. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -876,32 +1009,396 @@
       ],
       "game_details": [
         {
-          "description": "AL Wild Card 'B' Game 2",
-          "away": "Boston Red Sox",
-          "home": "New York Yankees",
-          "conditional": false
-        },
-        {
-          "description": "AL Wild Card 'A' Game 2",
-          "away": "Chicago White Sox",
-          "home": "HOU/TEX",
-          "conditional": false
-        },
-        {
-          "description": "NL Wild Card 'A' Game 2",
-          "away": "NL Wild Card #3",
-          "home": "Atlanta Braves",
-          "conditional": false
-        },
-        {
-          "description": "NL Wild Card 'B' Game 2",
+          "game_pk": 849843,
+          "description": "NL Wild Card 'B' Game 1",
           "away": "Chicago Cubs",
           "home": "San Diego Padres",
+          "venue": "Petco Park",
           "conditional": false
         }
       ],
-      "game_count": 4,
+      "game_count": 1,
       "conditional_game_count": 0
+    },
+    {
+      "id": "mlb-post-849841",
+      "date": "2026-09-30",
+      "start_pt": "11:00",
+      "title": "MLB Postseason on ESPN Radio \u2014 NL Wild Card 'A' Game 2: PHI/ARI at Atlanta Braves",
+      "league": "MLB",
+      "network": "ESPN Radio",
+      "venue": "Truist Park",
+      "status": "scheduled",
+      "conditional": false,
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_key": "MLB-POST",
+      "duration_est_min": 210,
+      "sources": [
+        {
+          "label": "MLB: \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games\"",
+          "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
+        },
+        {
+          "label": "MLB Stats API gamePk 849841, first pitch 2026-09-30T18:00:00Z = 11:00 PT on 2026-09-30, startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1.1/game/849841/feed/live"
+        },
+        {
+          "label": "MLB Stats API postseason endpoint, 2026-09-30: 4 game(s), startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
+        },
+        {
+          "label": "MLB.com Wild Card Series matchups: this game's start printed as 2 p.m. ET",
+          "url": "https://www.mlb.com/news/mlb-2026-wild-card-series-matchups"
+        },
+        {
+          "label": "KNBR 1050 weekly grid \u2014 the ESPN Radio network schedule",
+          "url": "https://www.thesportsleader.com/knbr1050shows/"
+        },
+        {
+          "label": "KTCT station record: network ESPN Radio",
+          "url": "https://en.wikipedia.org/wiki/KTCT"
+        }
+      ],
+      "notes": "First pitch 11:00 AM PT, converted from the Stats API's 2026-09-30T18:00:00Z. MLB.com's Wild Card Series article prints the same game at 2 p.m. ET, independently confirming it. The API still prints the away slot as PHI/ARI on 2026-09-28; MLB.com's bracket names the Phillies as the No. 6 seed at the Braves, and that article is linked rather than substituted. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "flag_ids": [
+        "MLB_POSTSEASON_ESPN",
+        "TALK_NOT_GAMES",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "game_pk": 849841,
+          "description": "NL Wild Card 'A' Game 2",
+          "away": "PHI/ARI",
+          "home": "Atlanta Braves",
+          "venue": "Truist Park",
+          "conditional": false
+        }
+      ],
+      "game_count": 1,
+      "conditional_game_count": 0
+    },
+    {
+      "id": "mlb-post-849846",
+      "date": "2026-09-30",
+      "start_pt": "14:00",
+      "title": "MLB Postseason on ESPN Radio \u2014 AL Wild Card 'A' Game 2: Chicago White Sox at Houston Astros",
+      "league": "MLB",
+      "network": "ESPN Radio",
+      "venue": "Daikin Park",
+      "status": "scheduled",
+      "conditional": false,
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_key": "MLB-POST",
+      "duration_est_min": 210,
+      "sources": [
+        {
+          "label": "MLB: \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games\"",
+          "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
+        },
+        {
+          "label": "MLB Stats API gamePk 849846, first pitch 2026-09-30T21:00:00Z = 14:00 PT on 2026-09-30, startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1.1/game/849846/feed/live"
+        },
+        {
+          "label": "MLB Stats API postseason endpoint, 2026-09-30: 4 game(s), startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
+        },
+        {
+          "label": "MLB.com Wild Card Series matchups: this game's start printed as 5 p.m. ET",
+          "url": "https://www.mlb.com/news/mlb-2026-wild-card-series-matchups"
+        },
+        {
+          "label": "KNBR 1050 weekly grid \u2014 the ESPN Radio network schedule",
+          "url": "https://www.thesportsleader.com/knbr1050shows/"
+        },
+        {
+          "label": "KTCT station record: network ESPN Radio",
+          "url": "https://en.wikipedia.org/wiki/KTCT"
+        }
+      ],
+      "notes": "First pitch 2:00 PM PT, converted from the Stats API's 2026-09-30T21:00:00Z. MLB.com's Wild Card Series article prints the same game at 5 p.m. ET, independently confirming it. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "flag_ids": [
+        "MLB_POSTSEASON_ESPN",
+        "TALK_NOT_GAMES",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "game_pk": 849846,
+          "description": "AL Wild Card 'A' Game 2",
+          "away": "Chicago White Sox",
+          "home": "Houston Astros",
+          "venue": "Daikin Park",
+          "conditional": false
+        }
+      ],
+      "game_count": 1,
+      "conditional_game_count": 0
+    },
+    {
+      "id": "mlb-post-849848",
+      "date": "2026-09-30",
+      "start_pt": "17:00",
+      "title": "MLB Postseason on ESPN Radio \u2014 AL Wild Card 'B' Game 2: Boston Red Sox at New York Yankees",
+      "league": "MLB",
+      "network": "ESPN Radio",
+      "venue": "Yankee Stadium",
+      "status": "scheduled",
+      "conditional": false,
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_key": "MLB-POST",
+      "duration_est_min": 210,
+      "sources": [
+        {
+          "label": "MLB: \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games\"",
+          "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
+        },
+        {
+          "label": "MLB Stats API gamePk 849848, first pitch 2026-10-01T00:00:00Z = 17:00 PT on 2026-09-30, startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1.1/game/849848/feed/live"
+        },
+        {
+          "label": "MLB Stats API postseason endpoint, 2026-09-30: 4 game(s), startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
+        },
+        {
+          "label": "MLB.com Wild Card Series matchups: this game's start printed as 8 p.m. ET",
+          "url": "https://www.mlb.com/news/mlb-2026-wild-card-series-matchups"
+        },
+        {
+          "label": "KNBR 1050 weekly grid \u2014 the ESPN Radio network schedule",
+          "url": "https://www.thesportsleader.com/knbr1050shows/"
+        },
+        {
+          "label": "KTCT station record: network ESPN Radio",
+          "url": "https://en.wikipedia.org/wiki/KTCT"
+        }
+      ],
+      "notes": "First pitch 5:00 PM PT, converted from the Stats API's 2026-10-01T00:00:00Z. MLB.com's Wild Card Series article prints the same game at 8 p.m. ET, independently confirming it. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "flag_ids": [
+        "MLB_POSTSEASON_ESPN",
+        "TALK_NOT_GAMES",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "game_pk": 849848,
+          "description": "AL Wild Card 'B' Game 2",
+          "away": "Boston Red Sox",
+          "home": "New York Yankees",
+          "venue": "Yankee Stadium",
+          "conditional": false
+        }
+      ],
+      "game_count": 1,
+      "conditional_game_count": 0
+    },
+    {
+      "id": "mlb-post-849842",
+      "date": "2026-09-30",
+      "start_pt": "19:00",
+      "title": "MLB Postseason on ESPN Radio \u2014 NL Wild Card 'B' Game 2: Chicago Cubs at San Diego Padres",
+      "league": "MLB",
+      "network": "ESPN Radio",
+      "venue": "Petco Park",
+      "status": "scheduled",
+      "conditional": false,
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_key": "MLB-POST",
+      "duration_est_min": 210,
+      "sources": [
+        {
+          "label": "MLB: \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games\"",
+          "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
+        },
+        {
+          "label": "MLB Stats API gamePk 849842, first pitch 2026-10-01T02:00:00Z = 19:00 PT on 2026-09-30, startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1.1/game/849842/feed/live"
+        },
+        {
+          "label": "MLB Stats API postseason endpoint, 2026-09-30: 4 game(s), startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
+        },
+        {
+          "label": "MLB.com Wild Card Series matchups: this game's start printed as 10 p.m. ET/7 p.m. PT",
+          "url": "https://www.mlb.com/news/mlb-2026-wild-card-series-matchups"
+        },
+        {
+          "label": "KNBR 1050 weekly grid \u2014 the ESPN Radio network schedule",
+          "url": "https://www.thesportsleader.com/knbr1050shows/"
+        },
+        {
+          "label": "KTCT station record: network ESPN Radio",
+          "url": "https://en.wikipedia.org/wiki/KTCT"
+        }
+      ],
+      "notes": "First pitch 7:00 PM PT, converted from the Stats API's 2026-10-01T02:00:00Z. MLB.com's Wild Card Series article prints the same game at 10 p.m. ET/7 p.m. PT, independently confirming it. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "flag_ids": [
+        "MLB_POSTSEASON_ESPN",
+        "TALK_NOT_GAMES",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE"
+      ],
+      "game_details": [
+        {
+          "game_pk": 849842,
+          "description": "NL Wild Card 'B' Game 2",
+          "away": "Chicago Cubs",
+          "home": "San Diego Padres",
+          "venue": "Petco Park",
+          "conditional": false
+        }
+      ],
+      "game_count": 1,
+      "conditional_game_count": 0
+    },
+    {
+      "id": "mlb-post-849844",
+      "date": "2026-10-01",
+      "start_pt": "11:00",
+      "title": "MLB Postseason on ESPN Radio \u2014 NL Wild Card 'A' Game 3: PHI/ARI at Atlanta Braves (if necessary)",
+      "league": "MLB",
+      "network": "ESPN Radio",
+      "venue": "Truist Park",
+      "status": "if-necessary",
+      "conditional": true,
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_key": "MLB-POST",
+      "duration_est_min": 210,
+      "sources": [
+        {
+          "label": "MLB: \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games\"",
+          "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
+        },
+        {
+          "label": "MLB Stats API gamePk 849844, first pitch 2026-10-01T18:00:00Z = 11:00 PT on 2026-10-01, startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1.1/game/849844/feed/live"
+        },
+        {
+          "label": "MLB Stats API postseason endpoint, 2026-10-01: 4 game(s), startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
+        },
+        {
+          "label": "MLB.com Wild Card Series matchups",
+          "url": "https://www.mlb.com/news/mlb-2026-wild-card-series-matchups"
+        },
+        {
+          "label": "KNBR 1050 weekly grid \u2014 the ESPN Radio network schedule",
+          "url": "https://www.thesportsleader.com/knbr1050shows/"
+        },
+        {
+          "label": "KTCT station record: network ESPN Radio",
+          "url": "https://en.wikipedia.org/wiki/KTCT"
+        }
+      ],
+      "notes": "First pitch 11:00 AM PT, converted from the Stats API's 2026-10-01T18:00:00Z. This game is only if necessary, and MLB.com's article says Thursday's game times and TV networks are subject to change depending on which series remain ongoing, so the API's instant is provisional. The API still prints the away slot as PHI/ARI on 2026-09-28; MLB.com's bracket names the Phillies as the No. 6 seed at the Braves, and that article is linked rather than substituted. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "flag_ids": [
+        "MLB_POSTSEASON_ESPN",
+        "TALK_NOT_GAMES",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE",
+        "MLB_WC_THURSDAY_PROVISIONAL"
+      ],
+      "game_details": [
+        {
+          "game_pk": 849844,
+          "description": "NL Wild Card 'A' Game 3",
+          "away": "PHI/ARI",
+          "home": "Atlanta Braves",
+          "venue": "Truist Park",
+          "conditional": true
+        }
+      ],
+      "game_count": 1,
+      "conditional_game_count": 1
+    },
+    {
+      "id": "mlb-post-849850",
+      "date": "2026-10-01",
+      "start_pt": "14:00",
+      "title": "MLB Postseason on ESPN Radio \u2014 AL Wild Card 'A' Game 3: Chicago White Sox at Houston Astros (if necessary)",
+      "league": "MLB",
+      "network": "ESPN Radio",
+      "venue": "Daikin Park",
+      "status": "if-necessary",
+      "conditional": true,
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_key": "MLB-POST",
+      "duration_est_min": 210,
+      "sources": [
+        {
+          "label": "MLB: \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games\"",
+          "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
+        },
+        {
+          "label": "MLB Stats API gamePk 849850, first pitch 2026-10-01T21:00:00Z = 14:00 PT on 2026-10-01, startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1.1/game/849850/feed/live"
+        },
+        {
+          "label": "MLB Stats API postseason endpoint, 2026-10-01: 4 game(s), startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
+        },
+        {
+          "label": "MLB.com Wild Card Series matchups",
+          "url": "https://www.mlb.com/news/mlb-2026-wild-card-series-matchups"
+        },
+        {
+          "label": "KNBR 1050 weekly grid \u2014 the ESPN Radio network schedule",
+          "url": "https://www.thesportsleader.com/knbr1050shows/"
+        },
+        {
+          "label": "KTCT station record: network ESPN Radio",
+          "url": "https://en.wikipedia.org/wiki/KTCT"
+        }
+      ],
+      "notes": "First pitch 2:00 PM PT, converted from the Stats API's 2026-10-01T21:00:00Z. This game is only if necessary, and MLB.com's article says Thursday's game times and TV networks are subject to change depending on which series remain ongoing, so the API's instant is provisional. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "flag_ids": [
+        "MLB_POSTSEASON_ESPN",
+        "TALK_NOT_GAMES",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE",
+        "MLB_WC_THURSDAY_PROVISIONAL"
+      ],
+      "game_details": [
+        {
+          "game_pk": 849850,
+          "description": "AL Wild Card 'A' Game 3",
+          "away": "Chicago White Sox",
+          "home": "Houston Astros",
+          "venue": "Daikin Park",
+          "conditional": true
+        }
+      ],
+      "game_count": 1,
+      "conditional_game_count": 1
     },
     {
       "id": "wwo-nfl-548554",
@@ -945,13 +1442,13 @@
       ]
     },
     {
-      "id": "mlb-post-2026-10-01",
+      "id": "mlb-post-849847",
       "date": "2026-10-01",
-      "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 Wild Card Series, Game 3 (if necessary)",
+      "start_pt": "17:00",
+      "title": "MLB Postseason on ESPN Radio \u2014 AL Wild Card 'B' Game 3: Boston Red Sox at New York Yankees (if necessary)",
       "league": "MLB",
       "network": "ESPN Radio",
-      "venue": "",
+      "venue": "Yankee Stadium",
       "status": "if-necessary",
       "conditional": true,
       "result": null,
@@ -967,8 +1464,16 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-01: 4 game(s), startTimeTBD true",
+          "label": "MLB Stats API gamePk 849847, first pitch 2026-10-02T00:00:00Z = 17:00 PT on 2026-10-01, startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1.1/game/849847/feed/live"
+        },
+        {
+          "label": "MLB Stats API postseason endpoint, 2026-10-01: 4 game(s), startTimeTBD false, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
+        },
+        {
+          "label": "MLB.com Wild Card Series matchups",
+          "url": "https://www.mlb.com/news/mlb-2026-wild-card-series-matchups"
         },
         {
           "label": "KNBR 1050 weekly grid \u2014 the ESPN Radio network schedule",
@@ -979,41 +1484,90 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "First pitch 5:00 PM PT, converted from the Stats API's 2026-10-02T00:00:00Z. This game is only if necessary, and MLB.com's article says Thursday's game times and TV networks are subject to change depending on which series remain ongoing, so the API's instant is provisional. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
         "SPANISH_EXCLUDED",
-        "DURATION_ESTIMATE"
+        "DURATION_ESTIMATE",
+        "MLB_WC_THURSDAY_PROVISIONAL"
       ],
       "game_details": [
         {
-          "description": "AL Wild Card 'A' Game 3",
-          "away": "Chicago White Sox",
-          "home": "HOU/TEX",
-          "conditional": true
-        },
-        {
-          "description": "NL Wild Card 'A' Game 3",
-          "away": "NL Wild Card #3",
-          "home": "Atlanta Braves",
-          "conditional": true
-        },
-        {
+          "game_pk": 849847,
           "description": "AL Wild Card 'B' Game 3",
           "away": "Boston Red Sox",
           "home": "New York Yankees",
-          "conditional": true
-        },
-        {
-          "description": "NL Wild Card 'B' Game 3",
-          "away": "Chicago Cubs",
-          "home": "San Diego Padres",
+          "venue": "Yankee Stadium",
           "conditional": true
         }
       ],
-      "game_count": 4,
-      "conditional_game_count": 4
+      "game_count": 1,
+      "conditional_game_count": 1
+    },
+    {
+      "id": "mlb-post-849840",
+      "date": "2026-10-01",
+      "start_pt": "19:00",
+      "title": "MLB Postseason on ESPN Radio \u2014 NL Wild Card 'B' Game 3: Chicago Cubs at San Diego Padres (if necessary)",
+      "league": "MLB",
+      "network": "ESPN Radio",
+      "venue": "Petco Park",
+      "status": "if-necessary",
+      "conditional": true,
+      "result": null,
+      "stations": [
+        "1050"
+      ],
+      "confidence": "indicated",
+      "duration_key": "MLB-POST",
+      "duration_est_min": 210,
+      "sources": [
+        {
+          "label": "MLB: \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games\"",
+          "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
+        },
+        {
+          "label": "MLB Stats API gamePk 849840, first pitch 2026-10-02T02:00:00Z = 19:00 PT on 2026-10-01, startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1.1/game/849840/feed/live"
+        },
+        {
+          "label": "MLB Stats API postseason endpoint, 2026-10-01: 4 game(s), startTimeTBD false, fetched 2026-09-28",
+          "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
+        },
+        {
+          "label": "MLB.com Wild Card Series matchups",
+          "url": "https://www.mlb.com/news/mlb-2026-wild-card-series-matchups"
+        },
+        {
+          "label": "KNBR 1050 weekly grid \u2014 the ESPN Radio network schedule",
+          "url": "https://www.thesportsleader.com/knbr1050shows/"
+        },
+        {
+          "label": "KTCT station record: network ESPN Radio",
+          "url": "https://en.wikipedia.org/wiki/KTCT"
+        }
+      ],
+      "notes": "First pitch 7:00 PM PT, converted from the Stats API's 2026-10-02T02:00:00Z. This game is only if necessary, and MLB.com's article says Thursday's game times and TV networks are subject to change depending on which series remain ongoing, so the API's instant is provisional. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "flag_ids": [
+        "MLB_POSTSEASON_ESPN",
+        "TALK_NOT_GAMES",
+        "SPANISH_EXCLUDED",
+        "DURATION_ESTIMATE",
+        "MLB_WC_THURSDAY_PROVISIONAL"
+      ],
+      "game_details": [
+        {
+          "game_pk": 849840,
+          "description": "NL Wild Card 'B' Game 3",
+          "away": "Chicago Cubs",
+          "home": "San Diego Padres",
+          "venue": "Petco Park",
+          "conditional": true
+        }
+      ],
+      "game_count": 1,
+      "conditional_game_count": 1
     },
     {
       "id": "stanford-2026-10-03",
@@ -1139,7 +1693,7 @@
       "id": "mlb-post-2026-10-03",
       "date": "2026-10-03",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 Division Series, Game 1",
+      "title": "MLB Postseason on ESPN Radio \u2014 ALDS 'A', ALDS 'B', NLDS 'A', NLDS 'B', Game 1",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -1158,7 +1712,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-03: 4 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-03: 4 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -1170,7 +1724,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -1179,27 +1733,35 @@
       ],
       "game_details": [
         {
+          "game_pk": 849835,
           "description": "ALDS 'A' Game 1",
-          "away": "AL 4/5 Winner",
+          "away": "NYY/BOS",
           "home": "Tampa Bay Rays",
+          "venue": "Tropicana Field",
           "conditional": false
         },
         {
+          "game_pk": 849829,
           "description": "ALDS 'B' Game 1",
-          "away": "AL 3/6 Winner",
+          "away": "HOU/CWS",
           "home": "Cleveland Guardians",
+          "venue": "Progressive Field",
           "conditional": false
         },
         {
+          "game_pk": 849830,
           "description": "NLDS 'A' Game 1",
-          "away": "NL 4/5 Winner",
+          "away": "SD/CHC",
           "home": "Milwaukee Brewers",
+          "venue": "American Family Field",
           "conditional": false
         },
         {
+          "game_pk": 849828,
           "description": "NLDS 'B' Game 1",
-          "away": "NL 3/6 Winner",
+          "away": "ATL/PHI",
           "home": "Los Angeles Dodgers",
+          "venue": "UNIQLO Field at Dodger Stadium",
           "conditional": false
         }
       ],
@@ -1372,7 +1934,7 @@
       "id": "mlb-post-2026-10-04",
       "date": "2026-10-04",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 NL Division Series, Game 2",
+      "title": "MLB Postseason on ESPN Radio \u2014 NLDS 'A', NLDS 'B', Game 2",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -1391,7 +1953,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-04: 2 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-04: 2 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -1403,7 +1965,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -1412,15 +1974,19 @@
       ],
       "game_details": [
         {
+          "game_pk": 849825,
           "description": "NLDS 'A' Game 2",
-          "away": "NL 4/5 Winner",
+          "away": "SD/CHC",
           "home": "Milwaukee Brewers",
+          "venue": "American Family Field",
           "conditional": false
         },
         {
+          "game_pk": 849823,
           "description": "NLDS 'B' Game 2",
-          "away": "NL 3/6 Winner",
+          "away": "ATL/PHI",
           "home": "Los Angeles Dodgers",
+          "venue": "UNIQLO Field at Dodger Stadium",
           "conditional": false
         }
       ],
@@ -1472,7 +2038,7 @@
       "id": "mlb-post-2026-10-05",
       "date": "2026-10-05",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 AL Division Series, Game 2",
+      "title": "MLB Postseason on ESPN Radio \u2014 ALDS 'A', ALDS 'B', Game 2",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -1491,7 +2057,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-05: 2 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-05: 2 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -1503,7 +2069,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -1512,15 +2078,19 @@
       ],
       "game_details": [
         {
+          "game_pk": 849839,
           "description": "ALDS 'A' Game 2",
-          "away": "AL 4/5 Winner",
+          "away": "NYY/BOS",
           "home": "Tampa Bay Rays",
+          "venue": "Tropicana Field",
           "conditional": false
         },
         {
+          "game_pk": 849834,
           "description": "ALDS 'B' Game 2",
-          "away": "AL 3/6 Winner",
+          "away": "HOU/CWS",
           "home": "Cleveland Guardians",
+          "venue": "Progressive Field",
           "conditional": false
         }
       ],
@@ -1570,7 +2140,7 @@
       "id": "mlb-post-2026-10-06",
       "date": "2026-10-06",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 NL Division Series, Game 3",
+      "title": "MLB Postseason on ESPN Radio \u2014 NLDS 'A', NLDS 'B', Game 3",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -1589,7 +2159,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-06: 2 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-06: 2 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -1601,7 +2171,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -1610,15 +2180,19 @@
       ],
       "game_details": [
         {
+          "game_pk": 849819,
           "description": "NLDS 'B' Game 3",
           "away": "Los Angeles Dodgers",
-          "home": "NL 3/6 Winner",
+          "home": "ATL/PHI",
+          "venue": "NL Stadium",
           "conditional": false
         },
         {
+          "game_pk": 849826,
           "description": "NLDS 'A' Game 3",
           "away": "Milwaukee Brewers",
-          "home": "NL 4/5 Winner",
+          "home": "SD/CHC",
+          "venue": "NL Stadium",
           "conditional": false
         }
       ],
@@ -1629,7 +2203,7 @@
       "id": "mlb-post-2026-10-07",
       "date": "2026-10-07",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 AL Division Series Game 3, NL Division Series Game 4 \u2014 2 of them if necessary",
+      "title": "MLB Postseason on ESPN Radio \u2014 ALDS 'A', ALDS 'B', NLDS 'A', NLDS 'B', Games 3/4 \u2014 2 of them if necessary",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -1648,7 +2222,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-07: 4 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-07: 4 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -1660,7 +2234,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 4-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -1669,27 +2243,35 @@
       ],
       "game_details": [
         {
+          "game_pk": 849838,
           "description": "ALDS 'A' Game 3",
           "away": "Tampa Bay Rays",
-          "home": "AL 4/5 Winner",
+          "home": "NYY/BOS",
+          "venue": "AL Stadium",
           "conditional": false
         },
         {
+          "game_pk": 849822,
           "description": "NLDS 'B' Game 4",
           "away": "Los Angeles Dodgers",
-          "home": "NL 3/6 Winner",
+          "home": "ATL/PHI",
+          "venue": "NL Stadium",
           "conditional": true
         },
         {
+          "game_pk": 849833,
           "description": "ALDS 'B' Game 3",
           "away": "Cleveland Guardians",
-          "home": "AL 3/6 Winner",
+          "home": "HOU/CWS",
+          "venue": "AL Stadium",
           "conditional": false
         },
         {
+          "game_pk": 849827,
           "description": "NLDS 'A' Game 4",
           "away": "Milwaukee Brewers",
-          "home": "NL 4/5 Winner",
+          "home": "SD/CHC",
+          "venue": "NL Stadium",
           "conditional": true
         }
       ],
@@ -1741,7 +2323,7 @@
       "id": "mlb-post-2026-10-08",
       "date": "2026-10-08",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 AL Division Series, Game 4 (if necessary)",
+      "title": "MLB Postseason on ESPN Radio \u2014 ALDS 'A', ALDS 'B', Game 4 (if necessary)",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -1760,7 +2342,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-08: 2 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-08: 2 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -1772,7 +2354,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -1781,15 +2363,19 @@
       ],
       "game_details": [
         {
+          "game_pk": 849837,
           "description": "ALDS 'A' Game 4",
           "away": "Tampa Bay Rays",
-          "home": "AL 4/5 Winner",
+          "home": "NYY/BOS",
+          "venue": "AL Stadium",
           "conditional": true
         },
         {
+          "game_pk": 849832,
           "description": "ALDS 'B' Game 4",
           "away": "Cleveland Guardians",
-          "home": "AL 3/6 Winner",
+          "home": "HOU/CWS",
+          "venue": "AL Stadium",
           "conditional": true
         }
       ],
@@ -1800,7 +2386,7 @@
       "id": "mlb-post-2026-10-09",
       "date": "2026-10-09",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 NL Division Series, Game 5 (if necessary)",
+      "title": "MLB Postseason on ESPN Radio \u2014 NLDS 'A', NLDS 'B', Game 5 (if necessary)",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -1819,7 +2405,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-09: 2 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-09: 2 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -1831,7 +2417,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -1840,15 +2426,19 @@
       ],
       "game_details": [
         {
+          "game_pk": 849824,
           "description": "NLDS 'A' Game 5",
-          "away": "NL 4/5 Winner",
+          "away": "SD/CHC",
           "home": "Milwaukee Brewers",
+          "venue": "American Family Field",
           "conditional": true
         },
         {
+          "game_pk": 849821,
           "description": "NLDS 'B' Game 5",
-          "away": "NL 3/6 Winner",
+          "away": "ATL/PHI",
           "home": "Los Angeles Dodgers",
+          "venue": "UNIQLO Field at Dodger Stadium",
           "conditional": true
         }
       ],
@@ -2010,7 +2600,7 @@
       "id": "mlb-post-2026-10-10",
       "date": "2026-10-10",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 AL Division Series, Game 5 (if necessary)",
+      "title": "MLB Postseason on ESPN Radio \u2014 ALDS 'A', ALDS 'B', Game 5 (if necessary)",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -2029,7 +2619,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-10: 2 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-10: 2 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -2041,7 +2631,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -2050,15 +2640,19 @@
       ],
       "game_details": [
         {
+          "game_pk": 849836,
           "description": "ALDS 'A' Game 5",
-          "away": "AL 4/5 Winner",
+          "away": "NYY/BOS",
           "home": "Tampa Bay Rays",
+          "venue": "Tropicana Field",
           "conditional": true
         },
         {
+          "game_pk": 849831,
           "description": "ALDS 'B' Game 5",
-          "away": "AL 3/6 Winner",
+          "away": "HOU/CWS",
           "home": "Cleveland Guardians",
+          "venue": "Progressive Field",
           "conditional": true
         }
       ],
@@ -2230,7 +2824,7 @@
       "id": "mlb-post-2026-10-11",
       "date": "2026-10-11",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 NLCS Game 1",
+      "title": "MLB Postseason on ESPN Radio \u2014 NLCS, Game 1",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -2249,7 +2843,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-11: 1 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-11: 1 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -2261,7 +2855,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -2270,9 +2864,11 @@
       ],
       "game_details": [
         {
+          "game_pk": 849809,
           "description": "NLCS Game 1",
           "away": "NL Lower Seed",
           "home": "NL Higher Seed",
+          "venue": "NL Stadium",
           "conditional": false
         }
       ],
@@ -2324,7 +2920,7 @@
       "id": "mlb-post-2026-10-12",
       "date": "2026-10-12",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 ALCS Game 1, NLCS Game 2",
+      "title": "MLB Postseason on ESPN Radio \u2014 ALCS, NLCS, Games 1/2",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -2343,7 +2939,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-12: 2 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-12: 2 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -2355,7 +2951,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -2364,15 +2960,19 @@
       ],
       "game_details": [
         {
+          "game_pk": 849820,
           "description": "ALCS Game 1",
           "away": "AL Lower Seed",
           "home": "AL Higher Seed",
+          "venue": "AL Stadium",
           "conditional": false
         },
         {
+          "game_pk": 849812,
           "description": "NLCS Game 2",
           "away": "NL Lower Seed",
           "home": "NL Higher Seed",
+          "venue": "NL Stadium",
           "conditional": false
         }
       ],
@@ -2422,7 +3022,7 @@
       "id": "mlb-post-2026-10-13",
       "date": "2026-10-13",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 ALCS Game 2",
+      "title": "MLB Postseason on ESPN Radio \u2014 ALCS, Game 2",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -2441,7 +3041,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-13: 1 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-13: 1 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -2453,7 +3053,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -2462,9 +3062,11 @@
       ],
       "game_details": [
         {
+          "game_pk": 849813,
           "description": "ALCS Game 2",
           "away": "AL Lower Seed",
           "home": "AL Higher Seed",
+          "venue": "AL Stadium",
           "conditional": false
         }
       ],
@@ -2506,7 +3108,7 @@
       "id": "mlb-post-2026-10-14",
       "date": "2026-10-14",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 NLCS Game 3",
+      "title": "MLB Postseason on ESPN Radio \u2014 NLCS, Game 3",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -2525,7 +3127,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-14: 1 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-14: 1 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -2537,7 +3139,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -2546,9 +3148,11 @@
       ],
       "game_details": [
         {
+          "game_pk": 849811,
           "description": "NLCS Game 3",
           "away": "NL Higher Seed",
           "home": "NL Lower Seed",
+          "venue": "NL Stadium",
           "conditional": false
         }
       ],
@@ -2600,7 +3204,7 @@
       "id": "mlb-post-2026-10-15",
       "date": "2026-10-15",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 ALCS Game 3, NLCS Game 4",
+      "title": "MLB Postseason on ESPN Radio \u2014 ALCS, NLCS, Games 3/4",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -2619,7 +3223,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-15: 2 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-15: 2 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -2631,7 +3235,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -2640,15 +3244,19 @@
       ],
       "game_details": [
         {
+          "game_pk": 849818,
           "description": "ALCS Game 3",
           "away": "AL Higher Seed",
           "home": "AL Lower Seed",
+          "venue": "AL Stadium",
           "conditional": false
         },
         {
+          "game_pk": 849810,
           "description": "NLCS Game 4",
           "away": "NL Higher Seed",
           "home": "NL Lower Seed",
+          "venue": "NL Stadium",
           "conditional": false
         }
       ],
@@ -2659,7 +3267,7 @@
       "id": "mlb-post-2026-10-16",
       "date": "2026-10-16",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 ALCS Game 4, NLCS Game 5 \u2014 1 of them if necessary",
+      "title": "MLB Postseason on ESPN Radio \u2014 ALCS, NLCS, Games 4/5 \u2014 1 of them if necessary",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -2678,7 +3286,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-16: 2 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-16: 2 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -2690,7 +3298,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -2699,15 +3307,19 @@
       ],
       "game_details": [
         {
+          "game_pk": 849817,
           "description": "ALCS Game 4",
           "away": "AL Higher Seed",
           "home": "AL Lower Seed",
+          "venue": "AL Stadium",
           "conditional": false
         },
         {
+          "game_pk": 849808,
           "description": "NLCS Game 5",
           "away": "NL Higher Seed",
           "home": "NL Lower Seed",
+          "venue": "NL Stadium",
           "conditional": true
         }
       ],
@@ -2830,7 +3442,7 @@
       "id": "mlb-post-2026-10-17",
       "date": "2026-10-17",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 ALCS Game 5 (if necessary)",
+      "title": "MLB Postseason on ESPN Radio \u2014 ALCS, Game 5 (if necessary)",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -2849,7 +3461,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-17: 1 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-17: 1 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -2861,7 +3473,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -2870,9 +3482,11 @@
       ],
       "game_details": [
         {
+          "game_pk": 849816,
           "description": "ALCS Game 5",
           "away": "AL Higher Seed",
           "home": "AL Lower Seed",
+          "venue": "AL Stadium",
           "conditional": true
         }
       ],
@@ -3014,7 +3628,7 @@
       "id": "mlb-post-2026-10-18",
       "date": "2026-10-18",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 NLCS Game 6 (if necessary)",
+      "title": "MLB Postseason on ESPN Radio \u2014 NLCS, Game 6 (if necessary)",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -3033,7 +3647,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-18: 1 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-18: 1 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -3045,7 +3659,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -3054,9 +3668,11 @@
       ],
       "game_details": [
         {
+          "game_pk": 849806,
           "description": "NLCS Game 6",
           "away": "NL Lower Seed",
           "home": "NL Higher Seed",
+          "venue": "NL Stadium",
           "conditional": true
         }
       ],
@@ -3101,7 +3717,7 @@
       "id": "mlb-post-2026-10-19",
       "date": "2026-10-19",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 ALCS Game 6, NLCS Game 7 (if necessary)",
+      "title": "MLB Postseason on ESPN Radio \u2014 ALCS, NLCS, Games 6/7 (if necessary)",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -3120,7 +3736,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-19: 2 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-19: 2 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -3132,7 +3748,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 2-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -3141,15 +3757,19 @@
       ],
       "game_details": [
         {
+          "game_pk": 849807,
           "description": "NLCS Game 7",
           "away": "NL Lower Seed",
           "home": "NL Higher Seed",
+          "venue": "NL Stadium",
           "conditional": true
         },
         {
+          "game_pk": 849815,
           "description": "ALCS Game 6",
           "away": "AL Lower Seed",
           "home": "AL Higher Seed",
+          "venue": "AL Stadium",
           "conditional": true
         }
       ],
@@ -3203,7 +3823,7 @@
       "id": "mlb-post-2026-10-20",
       "date": "2026-10-20",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 ALCS Game 7 (if necessary)",
+      "title": "MLB Postseason on ESPN Radio \u2014 ALCS, Game 7 (if necessary)",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -3222,7 +3842,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-20: 1 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-20: 1 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -3234,7 +3854,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -3243,9 +3863,11 @@
       ],
       "game_details": [
         {
+          "game_pk": 849814,
           "description": "ALCS Game 7",
           "away": "AL Lower Seed",
           "home": "AL Higher Seed",
+          "venue": "AL Stadium",
           "conditional": true
         }
       ],
@@ -3342,7 +3964,7 @@
       "id": "mlb-post-2026-10-23",
       "date": "2026-10-23",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 World Series Game 1",
+      "title": "MLB Postseason on ESPN Radio \u2014 World Series, 1",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -3361,7 +3983,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-23: 1 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-23: 1 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -3373,7 +3995,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -3382,9 +4004,11 @@
       ],
       "game_details": [
         {
+          "game_pk": 849805,
           "description": "World Series Game 1",
           "away": "Lower Seed League Champion",
           "home": "Higher Seed League Champion",
+          "venue": "TBD",
           "conditional": false
         }
       ],
@@ -3462,7 +4086,7 @@
       "id": "mlb-post-2026-10-24",
       "date": "2026-10-24",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 World Series Game 2",
+      "title": "MLB Postseason on ESPN Radio \u2014 World Series, 2",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -3481,7 +4105,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-24: 1 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-24: 1 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -3493,7 +4117,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -3502,9 +4126,11 @@
       ],
       "game_details": [
         {
+          "game_pk": 849802,
           "description": "World Series Game 2",
           "away": "Lower Seed League Champion",
           "home": "Higher Seed League Champion",
+          "venue": "TBD",
           "conditional": false
         }
       ],
@@ -3717,7 +4343,7 @@
       "id": "mlb-post-2026-10-26",
       "date": "2026-10-26",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 World Series Game 3",
+      "title": "MLB Postseason on ESPN Radio \u2014 World Series, 3",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -3736,7 +4362,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-26: 1 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-26: 1 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -3748,7 +4374,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -3757,9 +4383,11 @@
       ],
       "game_details": [
         {
+          "game_pk": 849804,
           "description": "World Series Game 3",
           "away": "Higher Seed League Champion",
           "home": "Lower Seed League Champion",
+          "venue": "TBD",
           "conditional": false
         }
       ],
@@ -3770,7 +4398,7 @@
       "id": "mlb-post-2026-10-27",
       "date": "2026-10-27",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 World Series Game 4",
+      "title": "MLB Postseason on ESPN Radio \u2014 World Series, 4",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -3789,7 +4417,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-27: 1 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-27: 1 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -3801,7 +4429,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -3810,9 +4438,11 @@
       ],
       "game_details": [
         {
+          "game_pk": 849803,
           "description": "World Series Game 4",
           "away": "Higher Seed League Champion",
           "home": "Lower Seed League Champion",
+          "venue": "TBD",
           "conditional": false
         }
       ],
@@ -3854,7 +4484,7 @@
       "id": "mlb-post-2026-10-28",
       "date": "2026-10-28",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 World Series Game 5 (if necessary)",
+      "title": "MLB Postseason on ESPN Radio \u2014 World Series, 5 (if necessary)",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -3873,7 +4503,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-28: 1 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-28: 1 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -3885,7 +4515,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -3894,9 +4524,11 @@
       ],
       "game_details": [
         {
+          "game_pk": 849799,
           "description": "World Series Game 5",
           "away": "Higher Seed League Champion",
           "home": "Lower Seed League Champion",
+          "venue": "TBD",
           "conditional": true
         }
       ],
@@ -3948,7 +4580,7 @@
       "id": "mlb-post-2026-10-30",
       "date": "2026-10-30",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 World Series Game 6 (if necessary)",
+      "title": "MLB Postseason on ESPN Radio \u2014 World Series, 6 (if necessary)",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -3967,7 +4599,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-30: 1 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-30: 1 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -3979,7 +4611,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -3988,9 +4620,11 @@
       ],
       "game_details": [
         {
+          "game_pk": 849801,
           "description": "World Series Game 6",
           "away": "Lower Seed League Champion",
           "home": "Higher Seed League Champion",
+          "venue": "TBD",
           "conditional": true
         }
       ],
@@ -4122,7 +4756,7 @@
       "id": "mlb-post-2026-10-31",
       "date": "2026-10-31",
       "start_pt": null,
-      "title": "MLB Postseason on ESPN Radio \u2014 World Series Game 7 (if necessary)",
+      "title": "MLB Postseason on ESPN Radio \u2014 World Series, 7 (if necessary)",
       "league": "MLB",
       "network": "ESPN Radio",
       "venue": "",
@@ -4141,7 +4775,7 @@
           "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
         },
         {
-          "label": "MLB Stats API postseason endpoint, 2026-10-31: 1 game(s), startTimeTBD true",
+          "label": "MLB Stats API postseason endpoint, 2026-10-31: 1 game(s), startTimeTBD true, fetched 2026-09-28",
           "url": "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
         },
         {
@@ -4153,7 +4787,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Matchups and game labels below are transcribed from MLB's Stats API; placeholders such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. ESPN Radio runs one national feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
+      "notes": "Matchups, game labels and venues below are the Stats API's own strings, placeholders included; a real participant is never inferred. Every first pitch on this date was still startTimeTBD in the API on 2026-09-28 \u2014 it prints a 07:33 UTC placeholder for those games \u2014 so no clock time is shown. ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area clearance, so this listing is indicated rather than confirmed and local programming can take the station. There is one ESPN Radio feed, so on a 1-game day at most one of these can be on 1050 at a time, and Stanford football, the Earthquakes or Westwood One college football can take the station instead. Neither the Giants nor the Athletics are in this field.",
       "flag_ids": [
         "MLB_POSTSEASON_ESPN",
         "TALK_NOT_GAMES",
@@ -4162,9 +4796,11 @@
       ],
       "game_details": [
         {
+          "game_pk": 849800,
           "description": "World Series Game 7",
           "away": "Lower Seed League Champion",
           "home": "Higher Seed League Champion",
+          "venue": "TBD",
           "conditional": true
         }
       ],

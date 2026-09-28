@@ -1,10 +1,37 @@
-# Verification — 2026-09-27
+# Verification — 2026-09-28
 
-No broadcast was added from memory. Every row in `data/broadcasts.json` was transcribed from a page opened on this date. The generator is `scripts/build_feed.py`; the review table it writes is `docs/LINE_BY_LINE.md`.
+No broadcast was added from memory. Every row in `data/broadcasts.json` was transcribed from a page opened on 2026-09-27, except the MLB postseason rows, which were re-read on 2026-09-28. The generator is `scripts/build_feed.py`; the review table it writes is `docs/LINE_BY_LINE.md`.
 
 Window: **2026-09-27 through 2027-02-28**, America/Los_Angeles. Days before Sep 27 are labelled "before this snapshot", never "quiet".
 
-Result: **173 date-level schedule entries**: 162 rows with at least one non-conditional listing (2 are mixed) and 11 entirely if-necessary rows. 172 entries have a date; 1 is deliberately unplaced. 37 official, 134 indicated, 2 review. 34 flags. The two mixed postseason rows also contain three if-necessary games; the feed records **21 possible games across 13 dates**. Two dates have only if-necessary possibilities and no non-conditional listing. No rows were added this pass; the weekly ESPN Radio grid was re-read and automated. The 20 `nba-espn-` rows remain `indicated`.
+Result: **182 date-level schedule entries**: 168 rows with at least one non-conditional listing (2 are mixed) and 14 entirely if-necessary rows. 181 entries have a date; 1 is deliberately unplaced. 37 official, 143 indicated, 2 review. 35 flags. The two mixed postseason rows also contain three if-necessary games; the feed records **21 possible games across 13 dates**. Two dates have only if-necessary possibilities and no non-conditional listing.
+
+## Re-read and rebuilt in the ninth pass, 2026-09-28
+
+Open issue #13 reported MLB schedule drift. Every source below was fetched again on 2026-09-28 through the session fetch tool — the sandbox has no outbound network at all, `curl` to any host including example.com fails with `SSL_ERROR_SYSCALL`, so nothing here came from a cache or from the previous pass's notes.
+
+| Source fetched 2026-09-28 | What it settled |
+| --- | --- |
+| [MLB Stats API postseason endpoint](https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1) | **53 games over 28 dates.** Twelve Wild Card games on Sep 29, Sep 30 and Oct 1 now carry `startTimeTBD` false with real UTC instants: 18:00, 21:00, 00:00 and 02:00 Z on each of the three days. Every game from the Division Series onward still carries `startTimeTBD` true with a 07:33Z, 08:33Z or 10:33Z placeholder. Away/home labels and venues transcribed verbatim, including the unresolved `PHI/ARI`, `NYY/BOS`, `HOU/CWS`, `SD/CHC`, `ATL/PHI`, `NL Lower Seed`, `NL Stadium`, `AL Stadium` and `TBD`. One source-string irregularity: the description for gamePk 849827 is `NLDS 'A' Game 4 ` with a trailing space. Read through the [`fields=`-narrowed view](https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1&fields=dates,date,games,gamePk,gameDate,officialDate,description,ifNecessary,seriesDescription,seriesGameNumber,gamesInSeries,status,startTimeTBD,teams,away,home,team,name,venue,name) in three chunks; saved as `scripts/fixtures/mlb_postseason_2026-09-28.json`, and the monitor run against that fixture reports **clear** with exit 0. |
+| [MLB postseason press release](https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule) | Re-read. Still prints **"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games, beginning with the Wild Card Series presented by AbbVie."** That sentence is the entire basis for every `mlb-post-` row's station claim, and it is unchanged. The same page's bracket section names the seeds: AL 1 Rays, 2 Guardians, 3 Astros, 4 Yankees, 5 Red Sox, 6 White Sox; NL 1 Brewers, 2 Dodgers, 3 Braves, 4 Padres, 5 Cubs, 6 Phillies, and prints each Wild Card series' Eastern time. |
+| [MLB.com Wild Card Series matchups](https://www.mlb.com/news/mlb-2026-wild-card-series-matchups) | The second, independent source for all twelve first pitches. It prints (6) White Sox at (3) Astros 5 p.m. ET, (5) Red Sox at (4) Yankees 8 p.m. ET, (6) Phillies at (3) Braves 2 p.m. ET and (5) Cubs at (4) Padres **10 p.m. ET/7 p.m. PT** for Games 1 and 2 — all four match the API's UTC instants once converted, and the Cubs–Padres Pacific time matches the conversion exactly. For Game 3 it prints only "Thursday" for all four series and states "Thursday's game times and TV networks are subject to change depending on which series remain ongoing", which is the irregularity behind flag `MLB_WC_THURSDAY_PROVISIONAL`. |
+| [ESPN MLB scoreboard API, 2026-09-29](https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260929) | A third, unrelated machine-readable source, used to check that the transcription is not self-consistent-but-wrong. Event 401907965 prints `date: 2026-09-29T18:00Z`, "Philadelphia Phillies at Atlanta Braves", venue Truist Park, season type 3 (post-season) — the same instant, the same matchup and the same venue as gamePk 849845. ESPN has already resolved the away slot that the Stats API still prints as `PHI/ARI`. |
+| [KNBR 1050 weekly grid](https://www.thesportsleader.com/knbr1050shows/) | Re-read. Still the week of **Aug 31 – Sep 6**, four weeks stale, and it still prints the ESPN Radio network schedule on weekdays ("ESPN Gamenight", the `ESPN-2B` network designations) with Stanford football, Earthquakes soccer and Westwood One CFB taking the station on the weekend. This is the affiliate evidence behind the `indicated` rows and it is unchanged; flag `KNBR_GRID_STALE` still applies. |
+| [ESPN Radio weekly grid](https://www.espn.com/espnradio/schedule) | Re-read. Still the week of **Sep 21–27**: MLB Mets @ Rangers Wed 7:30 p.m., MLB Guardians @ Royals Fri 7:00 p.m., CFB Wisconsin @ Penn State Sat 4:30 p.m., CFB Texas A&M @ LSU Sat 8:00 p.m. All four are now in the past, so no rows were made from it. The grid has not rolled over to the Wild Card week. |
+
+### How each clock time was checked
+
+A converted time is the easiest thing in this project to get subtly wrong, so all twelve were checked three ways rather than once.
+
+1. **The conversion.** `mlb_utc_to_pt` uses the IANA `America/Los_Angeles` zone, not a hard-coded −7, so it survives the November changeover. The builder then asserts the converted Pacific **date** equals the API's `officialDate` — which is what catches the two games whose UTC instant falls on the following day (the 8 p.m. and 10 p.m. ET games are `00:00Z` and `02:00Z` of the next day but are still the same Pacific date).
+2. **A second official source.** MLB.com's article prints the Eastern time for all four series, and a Pacific time for one of them. All four agree.
+3. **A third, unrelated source.** ESPN's scoreboard API was queried for 2026-09-29 and confirms the first game's instant, matchup and venue independently.
+
+`validate()` then re-derives every row's displayed clock time from the instant its own source label cites, so a hand-typed time cannot survive a rebuild, and it requires all 53 gamePks exactly once across the 37 rows and all 28 dates covered.
+
+### Not re-read this pass
+
+The other 145 rows were last line-checked on 2026-09-27 and are recorded below under the eighth-pass and earlier headings. Their sources are unchanged as far as this session can tell: the daily source watch of 2026-09-27 18:29 UTC reported all four Westwood One grids clear, all nine watched pages clear and the NBA PDF clear, and only the MLB endpoint had drifted. The full six-monitor live run for **this** snapshot is the source watch preview on the pull request.
 
 ## Re-verified in the eighth pass, same snapshot date
 

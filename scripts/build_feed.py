@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Build the curated, source-backed schedule snapshot. Source of truth for data/broadcasts.json.
 
-Every row below was transcribed from a page fetched on 2026-09-27.
-Do not add a game that is not in this file. Re-fetch before editing.
+Every row below was transcribed from a page fetched on 2026-09-27, except the MLB
+postseason rows, which were re-read on 2026-09-28 when the Stats API published the
+first Wild Card first pitches. Do not add a game that is not in this file.
+Re-fetch before editing.
 
 Rules this file enforces:
   * only the six receivable stations may appear;
@@ -14,8 +16,10 @@ Rules this file enforces:
 from __future__ import annotations
 
 import json
-from datetime import date
+import re
+from datetime import date, datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "data" / "broadcasts.json"
@@ -24,7 +28,14 @@ LINE = ROOT / "docs" / "LINE_BY_LINE.md"
 ALLOWED = ["680", "810", "960", "1050", "104.5", "107.7"]
 WINDOW_START = "2026-09-27"
 WINDOW_END = "2027-02-28"
-SNAPSHOT = "2026-09-27"
+# 2026-09-28: the MLB postseason rows were re-read from the Stats API on this
+# date, when it published the first Wild Card first pitches. Every other row was
+# last line-checked on 2026-09-27; that split is stated in meta.verified_note.
+SNAPSHOT = "2026-09-28"
+MLB_FETCHED = "2026-09-28"
+PACIFIC = ZoneInfo("America/Los_Angeles")
+MLB_UTC_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+MLB_FIRST_PITCH_RE = re.compile(r"first pitch (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)")
 
 WWO_NFL_STATIONS = ["680", "104.5", "1050"]
 WWO_NCAAF_STATIONS = ["680", "104.5", "1050"]
@@ -75,6 +86,10 @@ GIANTS_RADIO = "https://www.mlb.com/giants/schedule/tv"
 ATH_RADIO = "https://www.mlb.com/athletics/schedule/affiliates"
 MLB_POST_PRESS = "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
 MLB_POST_API = "https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1"
+# MLB.com's own per-series Wild Card article. It is the second, independent
+# source for every Wild Card first pitch, and the only source that says
+# Thursday's times are not final.
+MLB_WC_MATCHUPS = "https://www.mlb.com/news/mlb-2026-wild-card-series-matchups"
 QUAKES = "https://www.sjearthquakes.com/news/news-earthquakes-announce-radio-stations-for-2026-mls-season"
 QUAKES_PDF = "https://images.mlssoccer.com/image/upload/v1766018474/assets/sje/schedule/2026%20Schedule.pdf"
 STANFORD_RADIO = "https://gostanford.com/news/2026/07/30/2026-football-radio-broadcast-team-announced"
@@ -139,6 +154,33 @@ def et_to_pt(hhmm: str) -> str:
     if total < 0 or total >= 24 * 60:
         raise SystemExit(f"ET time {hhmm} crosses midnight; handle explicitly")
     return f"{total // 60:02d}:{total % 60:02d}"
+
+
+def mlb_utc_to_pt(iso_utc: str) -> tuple[str, str]:
+    """Convert an MLB Stats API gameDate (UTC) to a Pacific (ISO date, HH:MM) pair.
+
+    The API prints gameDate as an absolute UTC instant, so a 10 p.m. ET game is
+    the next day's 02:00Z and lands on the *same* Pacific date. The conversion
+    uses the IANA zone rather than a hard-coded -7 so a game after the November
+    changeover is still right. This function only converts: the caller must have
+    checked startTimeTBD first, because the API fills unpublished first pitches
+    with a 07:33Z placeholder that would convert into a plausible-looking 12:33
+    AM and must never be shown as a time.
+    """
+    if not MLB_UTC_RE.fullmatch(iso_utc):
+        raise SystemExit(f"MLB gameDate {iso_utc!r} is not an ISO-8601 UTC instant")
+    instant = datetime.fromisoformat(iso_utc.replace("Z", "+00:00"))
+    local = instant.astimezone(PACIFIC)
+    return local.date().isoformat(), local.strftime("%H:%M")
+
+
+def pt_label_12(hhmm: str) -> str:
+    """"14:00" -> "2:00 PM PT". Mirrors label12() in scripts/logic.js."""
+    hours, minutes = (int(x) for x in hhmm.split(":"))
+    suffix = "AM" if hours < 12 else "PM"
+    hour12 = hours % 12 or 12
+    return f"{hour12}:{minutes:02d} {suffix} PT"
+
 
 
 def src(label: str, url: str) -> dict:
@@ -348,17 +390,44 @@ FLAGS = [
         "title": "MLB postseason is an ESPN Radio network row, not a Bay Area per-game clearance",
         "detail": (
             "MLB's own postseason release says \"ESPN Radio will provide live national coverage of "
-            "all 2026 MLB Postseason games.\" KTCT 1050 AM is a full-time ESPN Radio affiliate: its "
-            "published weekly grid is the ESPN Radio network schedule, and its station record lists "
-            "ESPN Radio as the network. No Cumulus or ESPN page publishes a game-by-game Bay Area "
-            "clearance list, so these rows are \"indicated\". Three further caveats. There is one "
-            "ESPN Radio feed, so on a day with two or four scheduled games only one of them can be "
-            "on 1050 at a time. Start times were still TBD in the Stats API on 2026-09-27 — every "
-            "game carries a placeholder 07:33 UTC with startTimeTBD true — so no clock time is shown. "
-            "And Stanford football, Earthquakes soccer and Westwood One college football all preempt "
-            "1050 on autumn weekends. Neither the Giants nor the Athletics are in this field."
+            "all 2026 MLB Postseason games, beginning with the Wild Card Series presented by "
+            "AbbVie.\" KTCT 1050 AM is a full-time ESPN Radio affiliate: its published weekly grid "
+            "is the ESPN Radio network schedule, and its station record lists ESPN Radio as the "
+            "network. No Cumulus or ESPN page publishes a game-by-game Bay Area clearance list, so "
+            "these rows are \"indicated\". Two further caveats. There is one ESPN Radio feed, so on "
+            "a day with two or four scheduled games only one of them can be on 1050 at a time, and "
+            "an estimated window that runs into the next listed game is a single-feed artefact "
+            "rather than two games fighting for the station. And Stanford football, Earthquakes "
+            "soccer and Westwood One college football all preempt 1050 on autumn weekends. "
+            "Re-read 2026-09-28: the Stats API has now published real first pitches for the twelve "
+            "Wild Card games on September 29, 30 and October 1, so those dates are split into "
+            "per-game rows with Pacific clock times, each cross-checked against the ET time "
+            "MLB.com's own Wild Card Series article prints. Every game from the Division Series "
+            "onward still carries startTimeTBD true with a 07:33 UTC placeholder, so those dates "
+            "stay grouped and show no time. Neither the Giants nor the Athletics are in this field."
         ),
         "url": MLB_POST_PRESS,
+    },
+    {
+        "id": "MLB_WC_THURSDAY_PROVISIONAL",
+        "severity": "review",
+        "title": "The October 1 Wild Card Game 3 times are published but not final",
+        "detail": (
+            "An irregularity worth reading before trusting a clock time. For Thursday, October 1, "
+            "the MLB Stats API returns startTimeTBD false with a real instant for all four Wild "
+            "Card Game 3 slots — 18:00, 21:00, 00:00 and 02:00 UTC. MLB.com's own Wild Card Series "
+            "article disagrees about how settled that is: it prints \"Game 3 (if necessary): "
+            "Thursday\" with no time for any of the four series and states that \"Thursday's game "
+            "times and TV networks are subject to change depending on which series remain "
+            "ongoing.\" This feed shows the API's instant because that is the only clock time "
+            "either source publishes, and keeps all four rows conditional, so they are excluded "
+            "from the 10 AM–10 PM coverage maths and from the conflict panel. A second, smaller "
+            "irregularity: the API still prints the NL Wild Card 'A' away slot as \"PHI/ARI\" "
+            "while MLB.com's bracket names the Phillies, and the API's description for gamePk "
+            "849827 is \"NLDS 'A' Game 4 \" with a trailing space. Both are the source's own "
+            "strings; neither has been silently corrected."
+        ),
+        "url": MLB_WC_MATCHUPS,
     },
     {
         "id": "ESPN_RADIO_NBA",
@@ -948,171 +1017,322 @@ def wwo_soccer_rows() -> list[dict]:
 
 
 # --- MLB postseason on ESPN Radio --------------------------------------------
+# Transcribed on 2026-09-28 from the MLB Stats API postseason endpoint
+# (https://statsapi.mlb.com/api/v1/schedule/postseason?season=2026&sportId=1),
+# which returned 53 games across 28 dates. Every field below is the API's own
+# string: the description, the away/home labels (including unresolved
+# placeholders such as "NYY/BOS" and "NL Lower Seed"), the venue and the UTC
+# first pitch. Nothing is inferred. Where the API still prints a placeholder the
+# placeholder is what ships, and MLB.com's separate bracket article is cited
+# beside it so a reader can see the resolved teams without this feed guessing.
+#
+# One irregularity is recorded rather than silently tidied: the API's
+# description for gamePk 849827 is "NLDS 'A' Game 4 " with a trailing space.
+# This feed stores the trimmed string, which is also what the monitor compares.
+#
+# Each slot is (game_pk, game_date_utc, description, away, home, venue).
+# start_time_tbd is per date, because that is how the API publishes it: the Wild
+# Card round now carries real instants, and every game from the Division Series
+# onward still carries a 07:33Z placeholder with startTimeTBD true.
+
+MLB_POST_DATES: list[tuple[str, bool, list[tuple]]] = [
+    ("2026-09-29", False, [
+        (849845, "2026-09-29T18:00:00Z", "NL Wild Card 'A' Game 1", "PHI/ARI", "Atlanta Braves", "Truist Park"),
+        (849849, "2026-09-29T21:00:00Z", "AL Wild Card 'A' Game 1", "Chicago White Sox", "Houston Astros", "Daikin Park"),
+        (849851, "2026-09-30T00:00:00Z", "AL Wild Card 'B' Game 1", "Boston Red Sox", "New York Yankees", "Yankee Stadium"),
+        (849843, "2026-09-30T02:00:00Z", "NL Wild Card 'B' Game 1", "Chicago Cubs", "San Diego Padres", "Petco Park"),
+    ]),
+    ("2026-09-30", False, [
+        (849841, "2026-09-30T18:00:00Z", "NL Wild Card 'A' Game 2", "PHI/ARI", "Atlanta Braves", "Truist Park"),
+        (849846, "2026-09-30T21:00:00Z", "AL Wild Card 'A' Game 2", "Chicago White Sox", "Houston Astros", "Daikin Park"),
+        (849848, "2026-10-01T00:00:00Z", "AL Wild Card 'B' Game 2", "Boston Red Sox", "New York Yankees", "Yankee Stadium"),
+        (849842, "2026-10-01T02:00:00Z", "NL Wild Card 'B' Game 2", "Chicago Cubs", "San Diego Padres", "Petco Park"),
+    ]),
+    ("2026-10-01", False, [
+        (849844, "2026-10-01T18:00:00Z", "NL Wild Card 'A' Game 3", "PHI/ARI", "Atlanta Braves", "Truist Park"),
+        (849850, "2026-10-01T21:00:00Z", "AL Wild Card 'A' Game 3", "Chicago White Sox", "Houston Astros", "Daikin Park"),
+        (849847, "2026-10-02T00:00:00Z", "AL Wild Card 'B' Game 3", "Boston Red Sox", "New York Yankees", "Yankee Stadium"),
+        (849840, "2026-10-02T02:00:00Z", "NL Wild Card 'B' Game 3", "Chicago Cubs", "San Diego Padres", "Petco Park"),
+    ]),
+    ("2026-10-03", True, [
+        (849835, "", "ALDS 'A' Game 1", "NYY/BOS", "Tampa Bay Rays", "Tropicana Field"),
+        (849829, "", "ALDS 'B' Game 1", "HOU/CWS", "Cleveland Guardians", "Progressive Field"),
+        (849830, "", "NLDS 'A' Game 1", "SD/CHC", "Milwaukee Brewers", "American Family Field"),
+        (849828, "", "NLDS 'B' Game 1", "ATL/PHI", "Los Angeles Dodgers", "UNIQLO Field at Dodger Stadium"),
+    ]),
+    ("2026-10-04", True, [
+        (849825, "", "NLDS 'A' Game 2", "SD/CHC", "Milwaukee Brewers", "American Family Field"),
+        (849823, "", "NLDS 'B' Game 2", "ATL/PHI", "Los Angeles Dodgers", "UNIQLO Field at Dodger Stadium"),
+    ]),
+    ("2026-10-05", True, [
+        (849839, "", "ALDS 'A' Game 2", "NYY/BOS", "Tampa Bay Rays", "Tropicana Field"),
+        (849834, "", "ALDS 'B' Game 2", "HOU/CWS", "Cleveland Guardians", "Progressive Field"),
+    ]),
+    ("2026-10-06", True, [
+        (849819, "", "NLDS 'B' Game 3", "Los Angeles Dodgers", "ATL/PHI", "NL Stadium"),
+        (849826, "", "NLDS 'A' Game 3", "Milwaukee Brewers", "SD/CHC", "NL Stadium"),
+    ]),
+    ("2026-10-07", True, [
+        (849838, "", "ALDS 'A' Game 3", "Tampa Bay Rays", "NYY/BOS", "AL Stadium"),
+        (849822, "", "NLDS 'B' Game 4", "Los Angeles Dodgers", "ATL/PHI", "NL Stadium"),
+        (849833, "", "ALDS 'B' Game 3", "Cleveland Guardians", "HOU/CWS", "AL Stadium"),
+        (849827, "", "NLDS 'A' Game 4", "Milwaukee Brewers", "SD/CHC", "NL Stadium"),
+    ]),
+    ("2026-10-08", True, [
+        (849837, "", "ALDS 'A' Game 4", "Tampa Bay Rays", "NYY/BOS", "AL Stadium"),
+        (849832, "", "ALDS 'B' Game 4", "Cleveland Guardians", "HOU/CWS", "AL Stadium"),
+    ]),
+    ("2026-10-09", True, [
+        (849824, "", "NLDS 'A' Game 5", "SD/CHC", "Milwaukee Brewers", "American Family Field"),
+        (849821, "", "NLDS 'B' Game 5", "ATL/PHI", "Los Angeles Dodgers", "UNIQLO Field at Dodger Stadium"),
+    ]),
+    ("2026-10-10", True, [
+        (849836, "", "ALDS 'A' Game 5", "NYY/BOS", "Tampa Bay Rays", "Tropicana Field"),
+        (849831, "", "ALDS 'B' Game 5", "HOU/CWS", "Cleveland Guardians", "Progressive Field"),
+    ]),
+    ("2026-10-11", True, [
+        (849809, "", "NLCS Game 1", "NL Lower Seed", "NL Higher Seed", "NL Stadium"),
+    ]),
+    ("2026-10-12", True, [
+        (849820, "", "ALCS Game 1", "AL Lower Seed", "AL Higher Seed", "AL Stadium"),
+        (849812, "", "NLCS Game 2", "NL Lower Seed", "NL Higher Seed", "NL Stadium"),
+    ]),
+    ("2026-10-13", True, [
+        (849813, "", "ALCS Game 2", "AL Lower Seed", "AL Higher Seed", "AL Stadium"),
+    ]),
+    ("2026-10-14", True, [
+        (849811, "", "NLCS Game 3", "NL Higher Seed", "NL Lower Seed", "NL Stadium"),
+    ]),
+    ("2026-10-15", True, [
+        (849818, "", "ALCS Game 3", "AL Higher Seed", "AL Lower Seed", "AL Stadium"),
+        (849810, "", "NLCS Game 4", "NL Higher Seed", "NL Lower Seed", "NL Stadium"),
+    ]),
+    ("2026-10-16", True, [
+        (849817, "", "ALCS Game 4", "AL Higher Seed", "AL Lower Seed", "AL Stadium"),
+        (849808, "", "NLCS Game 5", "NL Higher Seed", "NL Lower Seed", "NL Stadium"),
+    ]),
+    ("2026-10-17", True, [
+        (849816, "", "ALCS Game 5", "AL Higher Seed", "AL Lower Seed", "AL Stadium"),
+    ]),
+    ("2026-10-18", True, [
+        (849806, "", "NLCS Game 6", "NL Lower Seed", "NL Higher Seed", "NL Stadium"),
+    ]),
+    ("2026-10-19", True, [
+        (849807, "", "NLCS Game 7", "NL Lower Seed", "NL Higher Seed", "NL Stadium"),
+        (849815, "", "ALCS Game 6", "AL Lower Seed", "AL Higher Seed", "AL Stadium"),
+    ]),
+    ("2026-10-20", True, [
+        (849814, "", "ALCS Game 7", "AL Lower Seed", "AL Higher Seed", "AL Stadium"),
+    ]),
+    ("2026-10-23", True, [
+        (849805, "", "World Series Game 1", "Lower Seed League Champion", "Higher Seed League Champion", "TBD"),
+    ]),
+    ("2026-10-24", True, [
+        (849802, "", "World Series Game 2", "Lower Seed League Champion", "Higher Seed League Champion", "TBD"),
+    ]),
+    ("2026-10-26", True, [
+        (849804, "", "World Series Game 3", "Higher Seed League Champion", "Lower Seed League Champion", "TBD"),
+    ]),
+    ("2026-10-27", True, [
+        (849803, "", "World Series Game 4", "Higher Seed League Champion", "Lower Seed League Champion", "TBD"),
+    ]),
+    ("2026-10-28", True, [
+        (849799, "", "World Series Game 5", "Higher Seed League Champion", "Lower Seed League Champion", "TBD"),
+    ]),
+    ("2026-10-30", True, [
+        (849801, "", "World Series Game 6", "Lower Seed League Champion", "Higher Seed League Champion", "TBD"),
+    ]),
+    ("2026-10-31", True, [
+        (849800, "", "World Series Game 7", "Lower Seed League Champion", "Higher Seed League Champion", "TBD"),
+    ]),
+]
+
+# Games the API still labels if necessary. Everything else is a normal game.
+MLB_IF_NECESSARY = {
+    849844, 849850, 849847, 849840,                       # Wild Card Game 3, all four series
+    849822, 849827,                                       # NLDS Game 4
+    849837, 849832,                                       # ALDS Game 4
+    849824, 849821,                                       # NLDS Game 5
+    849836, 849831,                                       # ALDS Game 5
+    849808, 849816, 849806, 849807, 849815, 849814,       # NLCS 5-7, ALCS 5-7
+    849799, 849801, 849800,                               # World Series 5-7
+}
+
+# MLB.com's own Wild Card Series article prints each series' ET clock time, and
+# for Cubs at Padres a Pacific one too. It is the second, independent source for
+# every Wild Card first pitch in the feed, and it is also the only source that
+# says Thursday's times are not final.
+MLB_WC_ET = {
+    849845: "2 p.m. ET", 849841: "2 p.m. ET",
+    849849: "5 p.m. ET", 849846: "5 p.m. ET",
+    849851: "8 p.m. ET", 849848: "8 p.m. ET",
+    849843: "10 p.m. ET/7 p.m. PT", 849842: "10 p.m. ET/7 p.m. PT",
+}
+
+
 def mlb_postseason_rows() -> list[dict]:
-    """One row per scheduled postseason date from the MLB Stats API postseason endpoint,
-    fetched 2026-09-27. Every game on that endpoint carries startTimeTBD true, so no row
-    gets a clock time. MLB's own release puts every game on ESPN Radio; KTCT 1050 is a
-    full-time ESPN Radio affiliate. That is a network row, not a per-game clearance.
+    """MLB postseason rows on ESPN Radio, from the Stats API postseason endpoint.
+
+    A date whose games all carry a published first pitch becomes one row per
+    game, with the Pacific clock time; any other date stays one grouped row with
+    no time, because the API's placeholder instant is not a time. That rule is
+    what makes the split reproducible instead of editorial: when the Division
+    Series times are published, those dates split the same way.
+
+    Every row is a network row, not a per-game Bay Area clearance, so all of
+    them stay "indicated".
     """
-    # Each API schedule slot is (description, away, home, if_necessary). Team
-    # placeholders are retained verbatim; a real participant is never inferred.
-    raw = [
-        ("2026-09-29", "Wild Card Series, Game 1", [
-            ("AL Wild Card 'A' Game 1", "Chicago White Sox", "HOU/TEX", False),
-            ("AL Wild Card 'B' Game 1", "Boston Red Sox", "New York Yankees", False),
-            ("NL Wild Card 'A' Game 1", "NL Wild Card #3", "Atlanta Braves", False),
-            ("NL Wild Card 'B' Game 1", "Chicago Cubs", "San Diego Padres", False),
-        ]),
-        ("2026-09-30", "Wild Card Series, Game 2", [
-            ("AL Wild Card 'B' Game 2", "Boston Red Sox", "New York Yankees", False),
-            ("AL Wild Card 'A' Game 2", "Chicago White Sox", "HOU/TEX", False),
-            ("NL Wild Card 'A' Game 2", "NL Wild Card #3", "Atlanta Braves", False),
-            ("NL Wild Card 'B' Game 2", "Chicago Cubs", "San Diego Padres", False),
-        ]),
-        ("2026-10-01", "Wild Card Series, Game 3", [
-            ("AL Wild Card 'A' Game 3", "Chicago White Sox", "HOU/TEX", True),
-            ("NL Wild Card 'A' Game 3", "NL Wild Card #3", "Atlanta Braves", True),
-            ("AL Wild Card 'B' Game 3", "Boston Red Sox", "New York Yankees", True),
-            ("NL Wild Card 'B' Game 3", "Chicago Cubs", "San Diego Padres", True),
-        ]),
-        ("2026-10-03", "Division Series, Game 1", [
-            ("ALDS 'A' Game 1", "AL 4/5 Winner", "Tampa Bay Rays", False),
-            ("ALDS 'B' Game 1", "AL 3/6 Winner", "Cleveland Guardians", False),
-            ("NLDS 'A' Game 1", "NL 4/5 Winner", "Milwaukee Brewers", False),
-            ("NLDS 'B' Game 1", "NL 3/6 Winner", "Los Angeles Dodgers", False),
-        ]),
-        ("2026-10-04", "NL Division Series, Game 2", [
-            ("NLDS 'A' Game 2", "NL 4/5 Winner", "Milwaukee Brewers", False),
-            ("NLDS 'B' Game 2", "NL 3/6 Winner", "Los Angeles Dodgers", False),
-        ]),
-        ("2026-10-05", "AL Division Series, Game 2", [
-            ("ALDS 'A' Game 2", "AL 4/5 Winner", "Tampa Bay Rays", False),
-            ("ALDS 'B' Game 2", "AL 3/6 Winner", "Cleveland Guardians", False),
-        ]),
-        ("2026-10-06", "NL Division Series, Game 3", [
-            ("NLDS 'B' Game 3", "Los Angeles Dodgers", "NL 3/6 Winner", False),
-            ("NLDS 'A' Game 3", "Milwaukee Brewers", "NL 4/5 Winner", False),
-        ]),
-        ("2026-10-07", "AL Division Series Game 3, NL Division Series Game 4", [
-            ("ALDS 'A' Game 3", "Tampa Bay Rays", "AL 4/5 Winner", False),
-            ("NLDS 'B' Game 4", "Los Angeles Dodgers", "NL 3/6 Winner", True),
-            ("ALDS 'B' Game 3", "Cleveland Guardians", "AL 3/6 Winner", False),
-            ("NLDS 'A' Game 4", "Milwaukee Brewers", "NL 4/5 Winner", True),
-        ]),
-        ("2026-10-08", "AL Division Series, Game 4", [
-            ("ALDS 'A' Game 4", "Tampa Bay Rays", "AL 4/5 Winner", True),
-            ("ALDS 'B' Game 4", "Cleveland Guardians", "AL 3/6 Winner", True),
-        ]),
-        ("2026-10-09", "NL Division Series, Game 5", [
-            ("NLDS 'A' Game 5", "NL 4/5 Winner", "Milwaukee Brewers", True),
-            ("NLDS 'B' Game 5", "NL 3/6 Winner", "Los Angeles Dodgers", True),
-        ]),
-        ("2026-10-10", "AL Division Series, Game 5", [
-            ("ALDS 'A' Game 5", "AL 4/5 Winner", "Tampa Bay Rays", True),
-            ("ALDS 'B' Game 5", "AL 3/6 Winner", "Cleveland Guardians", True),
-        ]),
-        ("2026-10-11", "NLCS Game 1", [
-            ("NLCS Game 1", "NL Lower Seed", "NL Higher Seed", False),
-        ]),
-        ("2026-10-12", "ALCS Game 1, NLCS Game 2", [
-            ("ALCS Game 1", "AL Lower Seed", "AL Higher Seed", False),
-            ("NLCS Game 2", "NL Lower Seed", "NL Higher Seed", False),
-        ]),
-        ("2026-10-13", "ALCS Game 2", [
-            ("ALCS Game 2", "AL Lower Seed", "AL Higher Seed", False),
-        ]),
-        ("2026-10-14", "NLCS Game 3", [
-            ("NLCS Game 3", "NL Higher Seed", "NL Lower Seed", False),
-        ]),
-        ("2026-10-15", "ALCS Game 3, NLCS Game 4", [
-            ("ALCS Game 3", "AL Higher Seed", "AL Lower Seed", False),
-            ("NLCS Game 4", "NL Higher Seed", "NL Lower Seed", False),
-        ]),
-        ("2026-10-16", "ALCS Game 4, NLCS Game 5", [
-            ("ALCS Game 4", "AL Higher Seed", "AL Lower Seed", False),
-            ("NLCS Game 5", "NL Higher Seed", "NL Lower Seed", True),
-        ]),
-        ("2026-10-17", "ALCS Game 5", [
-            ("ALCS Game 5", "AL Higher Seed", "AL Lower Seed", True),
-        ]),
-        ("2026-10-18", "NLCS Game 6", [
-            ("NLCS Game 6", "NL Lower Seed", "NL Higher Seed", True),
-        ]),
-        ("2026-10-19", "ALCS Game 6, NLCS Game 7", [
-            ("NLCS Game 7", "NL Lower Seed", "NL Higher Seed", True),
-            ("ALCS Game 6", "AL Lower Seed", "AL Higher Seed", True),
-        ]),
-        ("2026-10-20", "ALCS Game 7", [
-            ("ALCS Game 7", "AL Lower Seed", "AL Higher Seed", True),
-        ]),
-        ("2026-10-23", "World Series Game 1", [
-            ("World Series Game 1", "Lower Seed League Champion", "Higher Seed League Champion", False),
-        ]),
-        ("2026-10-24", "World Series Game 2", [
-            ("World Series Game 2", "Lower Seed League Champion", "Higher Seed League Champion", False),
-        ]),
-        ("2026-10-26", "World Series Game 3", [
-            ("World Series Game 3", "Higher Seed League Champion", "Lower Seed League Champion", False),
-        ]),
-        ("2026-10-27", "World Series Game 4", [
-            ("World Series Game 4", "Higher Seed League Champion", "Lower Seed League Champion", False),
-        ]),
-        ("2026-10-28", "World Series Game 5", [
-            ("World Series Game 5", "Higher Seed League Champion", "Lower Seed League Champion", True),
-        ]),
-        ("2026-10-30", "World Series Game 6", [
-            ("World Series Game 6", "Lower Seed League Champion", "Higher Seed League Champion", True),
-        ]),
-        ("2026-10-31", "World Series Game 7", [
-            ("World Series Game 7", "Lower Seed League Champion", "Higher Seed League Champion", True),
-        ]),
-    ]
     rows = []
-    for date, label, game_details in raw:
-        descriptions = [detail[0] for detail in game_details]
-        if_nec = sum(1 for detail in game_details if detail[3])
-        n = len(descriptions)
-        all_conditional = if_nec == n
-        suffix = " (if necessary)" if all_conditional else (f" — {if_nec} of them if necessary" if if_nec else "")
-        rows.append(game(
-            id=f"mlb-post-{date}",
-            date=date,
-            start_pt=None,
-            title=f"MLB Postseason on ESPN Radio — {label}{suffix}",
-            league="MLB",
-            network="ESPN Radio",
-            venue="",
-            status="if-necessary" if all_conditional else "tba",
-            conditional=all_conditional,
-            game_count=n,
-            conditional_game_count=if_nec,
-            game_details=[
-                {"description": desc, "away": away, "home": home, "conditional": is_conditional}
-                for desc, away, home, is_conditional in game_details
-            ],
-            stations=["1050"],
-            confidence="indicated",
-            duration_key="MLB-POST",
-            duration_est_min=DUR["MLB-POST"],
-            sources=[
-                src("MLB: \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games\"", MLB_POST_PRESS),
-                src(f"MLB Stats API postseason endpoint, {date}: {n} game(s), startTimeTBD true", MLB_POST_API),
-                src("KNBR 1050 weekly grid — the ESPN Radio network schedule", KNBR_1050_SHOWS),
-                src("KTCT station record: network ESPN Radio", KTCT_WIKI),
-            ],
-            notes=(
-                "Matchups and game labels below are transcribed from MLB's Stats API; placeholders "
-                "such as seed-winner slots stay unresolved, and if-necessary games are not confirmed. "
-                "Every listed first pitch was TBD in the API on 2026-09-27, so no clock time is shown. "
-                "ESPN Radio runs one national feed, so on a "
-                f"{n}-game day at most one of these can be on 1050 at a time"
-                + (", and Stanford football, the Earthquakes or Westwood One college football can take the station instead. "
-                   if date <= "2026-11-07" else ". ")
-                + "Neither the Giants nor the Athletics are in this field."
-            ),
-            flag_ids=["MLB_POSTSEASON_ESPN", "TALK_NOT_GAMES", "SPANISH_EXCLUDED", "DURATION_ESTIMATE"],
-        ))
+    for iso_date, start_time_tbd, slots in MLB_POST_DATES:
+        n = len(slots)
+        conditional_count = sum(1 for slot in slots if slot[0] in MLB_IF_NECESSARY)
+        endpoint_label = (
+            f"MLB Stats API postseason endpoint, {iso_date}: {n} game(s), "
+            f"startTimeTBD {'true' if start_time_tbd else 'false'}, fetched {MLB_FETCHED}"
+        )
+        common_sources = [
+            src("MLB: \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games\"", MLB_POST_PRESS),
+            src(endpoint_label, MLB_POST_API),
+            src("KNBR 1050 weekly grid — the ESPN Radio network schedule", KNBR_1050_SHOWS),
+            src("KTCT station record: network ESPN Radio", KTCT_WIKI),
+        ]
+        shared_note = (
+            "ESPN Radio carries every 2026 postseason game nationally and KTCT 1050 is a full-time "
+            "ESPN Radio affiliate, but no Cumulus or ESPN page publishes a per-game Bay Area "
+            "clearance, so this listing is indicated rather than confirmed and local programming "
+            "can take the station. There is one ESPN Radio feed, so on a "
+            f"{n}-game day at most one of these can be on 1050 at a time"
+            + (", and Stanford football, the Earthquakes or Westwood One college football can take "
+               "the station instead. " if iso_date <= "2026-11-07" else ". ")
+            + "Neither the Giants nor the Athletics are in this field."
+        )
+
+        if start_time_tbd:
+            all_conditional = conditional_count == n
+            suffix = (" (if necessary)" if all_conditional
+                      else (f" — {conditional_count} of them if necessary" if conditional_count else ""))
+            label = mlb_round_label(slots)
+            rows.append(game(
+                id=f"mlb-post-{iso_date}",
+                date=iso_date,
+                start_pt=None,
+                title=f"MLB Postseason on ESPN Radio — {label}{suffix}",
+                league="MLB",
+                network="ESPN Radio",
+                venue="",
+                status="if-necessary" if all_conditional else "tba",
+                conditional=all_conditional,
+                game_count=n,
+                conditional_game_count=conditional_count,
+                game_details=[
+                    {"game_pk": pk, "description": desc, "away": away, "home": home,
+                     "venue": venue, "conditional": pk in MLB_IF_NECESSARY}
+                    for pk, _utc, desc, away, home, venue in slots
+                ],
+                stations=["1050"],
+                confidence="indicated",
+                duration_key="MLB-POST",
+                duration_est_min=DUR["MLB-POST"],
+                sources=common_sources,
+                notes=(
+                    "Matchups, game labels and venues below are the Stats API's own strings, "
+                    "placeholders included; a real participant is never inferred. Every first "
+                    f"pitch on this date was still startTimeTBD in the API on {MLB_FETCHED} — it "
+                    "prints a 07:33 UTC placeholder for those games — so no clock time is shown. "
+                    + shared_note
+                ),
+                flag_ids=["MLB_POSTSEASON_ESPN", "TALK_NOT_GAMES", "SPANISH_EXCLUDED", "DURATION_ESTIMATE"],
+            ))
+            continue
+
+        for pk, utc, desc, away, home, venue in slots:
+            conditional = pk in MLB_IF_NECESSARY
+            pt_date, pt_time = mlb_utc_to_pt(utc)
+            if pt_date != iso_date:
+                raise SystemExit(
+                    f"gamePk {pk}: first pitch {utc} is {pt_date} in Pacific but the API's "
+                    f"officialDate is {iso_date}; do not place it silently"
+                )
+            et = MLB_WC_ET.get(pk)
+            sources = [
+                common_sources[0],
+                src(
+                    f"MLB Stats API gamePk {pk}, first pitch {utc} = {pt_time} PT on {pt_date}, "
+                    f"startTimeTBD false, fetched {MLB_FETCHED}",
+                    mlb_game(pk),
+                ),
+                common_sources[1],
+                src(
+                    "MLB.com Wild Card Series matchups"
+                    + (f": this game's start printed as {et}" if et else ""),
+                    MLB_WC_MATCHUPS,
+                ),
+                common_sources[2],
+                common_sources[3],
+            ]
+            time_note = (
+                f"First pitch {pt_label_12(pt_time)}, converted from the Stats API's {utc}."
+                + (f" MLB.com's Wild Card Series article prints the same game at {et}, "
+                   "independently confirming it." if et else "")
+            )
+            if conditional:
+                time_note += (
+                    " This game is only if necessary, and MLB.com's article says Thursday's game "
+                    "times and TV networks are subject to change depending on which series remain "
+                    "ongoing, so the API's instant is provisional."
+                )
+            if away == "PHI/ARI":
+                time_note += (
+                    f" The API still prints the away slot as {away} on {MLB_FETCHED}; MLB.com's "
+                    "bracket names the Phillies as the No. 6 seed at the Braves, and that article "
+                    "is linked rather than substituted."
+                )
+            rows.append(game(
+                id=f"mlb-post-{pk}",
+                date=iso_date,
+                start_pt=pt_time,
+                title=(f"MLB Postseason on ESPN Radio — {desc}: {away} at {home}"
+                       + (" (if necessary)" if conditional else "")),
+                league="MLB",
+                network="ESPN Radio",
+                venue=venue,
+                status="if-necessary" if conditional else "scheduled",
+                conditional=conditional,
+                game_count=1,
+                conditional_game_count=1 if conditional else 0,
+                game_details=[
+                    {"game_pk": pk, "description": desc, "away": away, "home": home,
+                     "venue": venue, "conditional": conditional}
+                ],
+                stations=["1050"],
+                confidence="indicated",
+                duration_key="MLB-POST",
+                duration_est_min=DUR["MLB-POST"],
+                sources=sources,
+                notes=time_note + " " + shared_note,
+                flag_ids=["MLB_POSTSEASON_ESPN", "TALK_NOT_GAMES", "SPANISH_EXCLUDED", "DURATION_ESTIMATE"]
+                + (["MLB_WC_THURSDAY_PROVISIONAL"] if conditional else []),
+            ))
     return rows
+
+
+def mlb_round_label(slots: list[tuple]) -> str:
+    """A short human label for a grouped postseason date, from the API descriptions."""
+    descriptions = [slot[2] for slot in slots]
+    first = descriptions[0]
+    if first.startswith("World Series"):
+        return f"World Series, {first.rsplit(' ', 1)[-1]}"
+    if first.startswith("NLCS") and first.startswith("ALCS"):
+        return first
+    series = sorted({d.split(" Game ")[0] for d in descriptions})
+    games = sorted({d.rsplit("Game ", 1)[-1] for d in descriptions})
+    if len(series) == 1:
+        prefix = {"ALDS": "AL Division Series", "NLDS": "NL Division Series",
+                  "NLCS": "NLCS", "ALCS": "ALCS"}.get(series[0], series[0])
+        return f"{prefix}, Game {games[0]}" if len(games) == 1 else f"{prefix}, Games {'/'.join(games)}"
+    pretty = [({"ALDS": "AL Division Series", "NLDS": "NL Division Series",
+                "NLCS": "NLCS", "ALCS": "ALCS"}.get(s, s)) for s in series]
+    return ", ".join(pretty) + f", Game{'s' if len(games) > 1 else ''} {'/'.join(games)}"
 
 
 # --- NBA on ESPN Radio --------------------------------------------------------
@@ -1667,7 +1887,7 @@ def validate(rows: list[dict]) -> None:
         "wwo-ncaaf-": 11,
         "wwo-soccer-": 5,
         "nfl-post-": 6,
-        "mlb-post-": 28,
+        "mlb-post-": 37,  # 12 per-game Wild Card rows + 25 grouped dates
         "nba-espn-": 20,
         "stanford-": 7,
         "cal-": 7,
@@ -1697,6 +1917,24 @@ def validate(rows: list[dict]) -> None:
         if "107.7" not in r["stations"]:
             raise SystemExit(f"every listed 49ers game is on 107.7: {r['id']}")
 
+    # The MLB postseason must account for every game the API returned, exactly
+    # once: 53 games over 28 dates as of 2026-09-28. A transcription that drops
+    # or duplicates a slot is caught here rather than on the page.
+    mlb_rows = [r for r in rows if r["id"].startswith("mlb-post-")]
+    mlb_pks = [item["game_pk"] for r in mlb_rows for item in r["game_details"]]
+    if len(mlb_pks) != 53 or len(set(mlb_pks)) != 53:
+        raise SystemExit(f"expected 53 distinct MLB postseason gamePks, got {len(set(mlb_pks))}")
+    source_pks = {pk for _d, _t, slots in MLB_POST_DATES for pk, *_ in slots}
+    if set(mlb_pks) != source_pks:
+        raise SystemExit("MLB postseason rows do not match the transcribed API slots")
+    mlb_dates = {r["date"] for r in mlb_rows}
+    if len(mlb_dates) != 28 or mlb_dates != {d for d, _t, _s in MLB_POST_DATES}:
+        raise SystemExit(f"expected the API's 28 postseason dates, got {len(mlb_dates)}")
+    for r in mlb_rows:
+        slots_by_date = dict((d, s) for d, _t, s in MLB_POST_DATES)[r["date"]]
+        if len(r["game_details"]) == len(slots_by_date) and r["start_pt"] is not None:
+            raise SystemExit(f"{r['id']}: this date's first pitches are TBD; do not invent one")
+
     for r in rows:
         rid = r["id"]
         if rid.startswith("giants-") and r["stations"] != ["680", "104.5"]:
@@ -1712,10 +1950,38 @@ def validate(rows: list[dict]) -> None:
         if rid.startswith("mlb-post-"):
             if r["stations"] != ["1050"]:
                 raise SystemExit("mlb postseason station")
-            if r["start_pt"] is not None:
-                raise SystemExit("mlb postseason times were TBD; do not invent one")
             if r["confidence"] != "indicated":
                 raise SystemExit("mlb postseason rows are network-level, not official")
+            details = r.get("game_details") or []
+            pks = [item.get("game_pk") for item in details]
+            if not details or any(not isinstance(pk, int) for pk in pks):
+                raise SystemExit(f"{rid}: every MLB slot needs the API's integer gamePk")
+            if len(set(pks)) != len(pks):
+                raise SystemExit(f"{rid}: duplicate gamePk in one row")
+            if r["start_pt"] is None:
+                # A grouped date row. The API's placeholder instant is not a time,
+                # and no source may be cited as one.
+                if any(MLB_FIRST_PITCH_RE.search(s["label"]) for s in r["sources"]):
+                    raise SystemExit(f"{rid} has no start time but cites a first pitch")
+            else:
+                # A per-game row. Its clock time must be the API's own instant
+                # converted, not a typed time: re-derive it from the cited
+                # gameDate and refuse the row if the two disagree.
+                if len(details) != 1:
+                    raise SystemExit(f"{rid} carries a clock time but groups {len(details)} games")
+                pitch = next(
+                    (MLB_FIRST_PITCH_RE.search(s["label"]).group(1) for s in r["sources"]
+                     if MLB_FIRST_PITCH_RE.search(s["label"])), None)
+                if not pitch:
+                    raise SystemExit(f"{rid} has a start time but cites no API first pitch")
+                got_date, got_time = mlb_utc_to_pt(pitch)
+                if (got_date, got_time) != (r["date"], r["start_pt"]):
+                    raise SystemExit(
+                        f"{rid} start {r['date']} {r['start_pt']} does not match the cited "
+                        f"first pitch {pitch} ({got_date} {got_time})"
+                    )
+                if f"gamePk {pks[0]}," not in " ".join(s["label"] for s in r["sources"]):
+                    raise SystemExit(f"{rid} does not cite its own gamePk {pks[0]}")
         if rid.startswith("wwo-soccer-") and r["stations"] != ["1050"]:
             raise SystemExit("soccer station is the finder's only Bay Area row")
         if rid.startswith("nba-espn-"):
@@ -1797,8 +2063,9 @@ def line_markdown(rows: list[dict], flags: list[dict]) -> str:
         title = r["title"]
         if r.get("game_details"):
             slots = "; ".join(
-                f"{item['description']}: {item['away']} at {item['home']}" +
-                (" (if necessary)" if item["conditional"] else "")
+                f"{item['description']}: {item['away']} at {item['home']}"
+                + (f" [{item['venue']}]" if item.get("venue") else "")
+                + (" (if necessary)" if item["conditional"] else "")
                 for item in r["game_details"]
             )
             title += " — MLB API schedule slots: " + slots
@@ -1833,9 +2100,12 @@ def main() -> None:
             "window_end": WINDOW_END,
             "timezone": "America/Los_Angeles",
             "verified_note": (
-                "Line-checked against pages fetched 2026-09-27. Not a live scrape. This pass added the "
-                "NBA's own 2026-27 ESPN Radio schedule as 20 \u201cindicated\u201d rows on 1050 \u2014 the first "
-                "basketball rows in the feed \u2014 and a monitor that re-reads that PDF daily."
+                "Line-checked against pages fetched 2026-09-27, except the MLB postseason rows, "
+                "which were re-read from the MLB Stats API on 2026-09-28 when it published the "
+                "twelve Wild Card first pitches; those dates are now split into per-game rows "
+                "with Pacific clock times, each cross-checked against the ET time MLB.com's own "
+                "Wild Card Series article prints. Not a live scrape. Row counts moved from 173 to "
+                "182 because three grouped MLB dates became twelve per-game rows."
             ),
             "durations": DURATIONS,
             "band": {"start": "10:00", "end": "22:00", "label": "10 AM–10 PM, the window you asked about"},

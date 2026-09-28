@@ -4,6 +4,21 @@
 The monitor compares today's MLB Stats API response with the MLB postseason
 rows already in the static snapshot. It never edits broadcasts.json, publishes a
 new snapshot, or treats a source change as an approved radio clearance.
+
+Games are matched on the API's own permanent `gamePk`, not on a description
+string, so a renamed placeholder ("NL Wild Card #3" -> "PHI/ARI") is reported as
+a change to a known game rather than as one game disappearing and another
+appearing. A date may be represented in the snapshot by one grouped row or by
+several per-game rows; both are aggregated before comparison.
+
+Three outcomes, kept strictly apart like the other monitors:
+
+* **clear** — the response parsed and every future date matched the snapshot.
+* **changed** — a real difference. The report names the gamePk, the field that
+  moved, and, for a newly published first pitch, the Pacific clock time a human
+  would transcribe.
+* **unavailable** — the response could not be fetched, parsed or understood.
+  Never "unchanged".
 """
 from __future__ import annotations
 
@@ -11,7 +26,6 @@ import argparse
 import json
 import re
 import sys
-from collections import Counter
 from datetime import date, datetime
 from http.client import HTTPException
 from pathlib import Path
@@ -23,11 +37,24 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[1]
 FEED_PATH = ROOT / "data" / "broadcasts.json"
 USER_AGENT = "RADIOSF-source-watch/1.0 (+https://github.com/buffedlizard55-lab/RADIOSF)"
-COUNT_RE = re.compile(r":\s*(\d+)\s+game\(s\),\s*startTimeTBD\s+(true|false)\b", re.I)
+# The builder records the API instant a per-game row's clock time came from.
+FIRST_PITCH_RE = re.compile(r"first pitch (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)")
+UTC_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+PACIFIC = ZoneInfo("America/Los_Angeles")
 
 
 class MonitorError(Exception):
     """The source could not be checked safely."""
+
+
+def utc_to_pt(iso_utc: str) -> str:
+    """Pacific wall clock for an API instant, as a human would transcribe it."""
+    if not UTC_RE.fullmatch(iso_utc):
+        raise MonitorError(f"The MLB Stats API returned an unparseable gameDate: {iso_utc!r}.")
+    local = datetime.fromisoformat(iso_utc.replace("Z", "+00:00")).astimezone(PACIFIC)
+    hours, minutes = local.hour, local.minute
+    return f"{local.date().isoformat()} {hours % 12 or 12}:{minutes:02d} " \
+           f"{'AM' if hours < 12 else 'PM'} PT"
 
 
 def api_url(feed: dict[str, Any]) -> str:
@@ -40,41 +67,66 @@ def api_url(feed: dict[str, Any]) -> str:
     raise MonitorError("The feed has no MLB postseason Stats API source URL.")
 
 
+def row_first_pitch(row: dict[str, Any]) -> str | None:
+    for source in row.get("sources", []):
+        match = FIRST_PITCH_RE.search(source.get("label", ""))
+        if match:
+            return match.group(1)
+    return None
+
+
 def expected_schedule(feed: dict[str, Any], today: str) -> dict[str, dict[str, Any]]:
+    """Group the snapshot's MLB postseason rows by date, keyed on gamePk."""
     expected: dict[str, dict[str, Any]] = {}
     for row in feed.get("broadcasts", []):
         if not str(row.get("id", "")).startswith("mlb-post-") or not row.get("date"):
             continue
         if row["date"] < today:
             continue
-        if row["date"] in expected:
-            raise MonitorError(f"The snapshot has duplicate MLB postseason rows for {row['date']}.")
+        details = row.get("game_details")
+        if not isinstance(details, list) or not details:
+            raise MonitorError(f"The snapshot row {row.get('id')} has no MLB matchup baseline.")
 
-        api_source = next((
-            source for source in row.get("sources", [])
-            if "MLB Stats API postseason endpoint" in source.get("label", "")
-        ), None)
-        if not api_source:
-            raise MonitorError(f"The snapshot row {row.get('id')} is missing its Stats API source label.")
-        count_match = COUNT_RE.search(api_source.get("label", ""))
-        if not count_match:
-            raise MonitorError(f"Could not read the recorded MLB baseline for {row.get('id')}.")
-        count = int(count_match.group(1))
-        game_details = row.get("game_details")
-        if not isinstance(game_details, list) or len(game_details) != count:
-            raise MonitorError(f"The snapshot row {row.get('id')} has no complete MLB matchup baseline.")
-        descriptions = [item.get("description", "").strip() for item in game_details]
-        if any(not description for description in descriptions):
-            raise MonitorError(f"The snapshot row {row.get('id')} has an empty MLB game description.")
-        expected[row["date"]] = {
-            "count": count,
-            "descriptions": Counter(descriptions),
-            "games": Counter((
-                item.get("description"), item.get("away"), item.get("home"), item.get("conditional")
-            ) for item in game_details),
-            "all_start_times_tbd": count_match.group(2).lower() == "true",
-            "row_id": row["id"],
-        }
+        first_pitch = row_first_pitch(row)
+        if first_pitch and len(details) != 1:
+            raise MonitorError(
+                f"The snapshot row {row.get('id')} cites a first pitch but groups "
+                f"{len(details)} games; a clock time belongs to one game."
+            )
+        if bool(first_pitch) != bool(row.get("start_pt")):
+            raise MonitorError(
+                f"The snapshot row {row.get('id')} has a start time and a cited first pitch "
+                "that do not agree about existing."
+            )
+
+        bucket = expected.setdefault(row["date"], {"row_ids": [], "games": {}, "count": 0})
+        bucket["row_ids"].append(row["id"])
+        for item in details:
+            if not isinstance(item, dict):
+                raise MonitorError(f"The snapshot row {row.get('id')} has a malformed game slot.")
+            pk = item.get("game_pk")
+            if not isinstance(pk, int):
+                raise MonitorError(
+                    f"The snapshot row {row.get('id')} has a game slot without the API's gamePk."
+                )
+            if pk in bucket["games"]:
+                raise MonitorError(f"The snapshot lists gamePk {pk} twice on {row['date']}.")
+            for key in ("description", "away", "home"):
+                if not isinstance(item.get(key), str) or not item[key].strip():
+                    raise MonitorError(
+                        f"The snapshot row {row.get('id')} has an empty MLB {key} for gamePk {pk}."
+                    )
+            bucket["games"][pk] = {
+                "description": item["description"].strip(),
+                "away": item["away"].strip(),
+                "home": item["home"].strip(),
+                "venue": str(item.get("venue") or "").strip(),
+                "conditional": bool(item.get("conditional")),
+                "first_pitch": first_pitch,
+                "start_pt": row.get("start_pt"),
+                "row_id": row["id"],
+            }
+            bucket["count"] += 1
     return expected
 
 
@@ -103,11 +155,17 @@ def observed_schedule(document: dict[str, Any], today: str) -> dict[str, dict[st
                     raise ValueError
             except ValueError as exc:
                 raise MonitorError(f"The MLB Stats API returned an invalid date: {game_date}.") from exc
+            pk = game.get("gamePk")
+            if not isinstance(pk, int):
+                raise MonitorError(f"The MLB Stats API returned no integer gamePk for {game_date}.")
             if game_date < today:
                 continue
             description = game.get("description")
             if not isinstance(description, str) or not description.strip():
                 raise MonitorError(f"The MLB Stats API returned no description for {game_date}.")
+            game_date_utc = game.get("gameDate")
+            if not isinstance(game_date_utc, str) or not UTC_RE.fullmatch(game_date_utc):
+                raise MonitorError(f"The MLB Stats API returned no valid gameDate for gamePk {pk}.")
             # The live API nests startTimeTBD inside "status". A top-level value
             # remains a fallback for older saved API responses.
             status_block = game.get("status") if isinstance(game.get("status"), dict) else {}
@@ -119,20 +177,42 @@ def observed_schedule(document: dict[str, Any], today: str) -> dict[str, dict[st
             home = teams.get("home", {}).get("team", {}).get("name") if isinstance(teams, dict) else None
             if not isinstance(away, str) or not away.strip() or not isinstance(home, str) or not home.strip():
                 raise MonitorError(f"The MLB Stats API returned no away/home team names for {game_date}.")
+            venue_block = game.get("venue") if isinstance(game.get("venue"), dict) else {}
+            venue = venue_block.get("name")
+            if not isinstance(venue, str) or not venue.strip():
+                raise MonitorError(f"The MLB Stats API returned no venue for gamePk {pk}.")
             if_necessary = game.get("ifNecessary")
             if if_necessary not in ("Y", "N"):
                 raise MonitorError(f"The MLB Stats API returned no valid ifNecessary marker for {game_date}.")
-            item = observed.setdefault(game_date, {
-                "count": 0,
-                "descriptions": Counter(),
-                "games": Counter(),
-                "start_time_tbd": [],
-            })
-            item["count"] += 1
-            item["descriptions"][description.strip()] += 1
-            item["games"][(description.strip(), away.strip(), home.strip(), if_necessary == "Y")] += 1
-            item["start_time_tbd"].append(start_time_tbd)
+
+            bucket = observed.setdefault(game_date, {"count": 0, "games": {}})
+            if pk in bucket["games"]:
+                raise MonitorError(f"The MLB Stats API returned gamePk {pk} twice on {game_date}.")
+            bucket["count"] += 1
+            bucket["games"][pk] = {
+                "description": description.strip(),
+                "away": away.strip(),
+                "home": home.strip(),
+                "venue": venue.strip(),
+                "conditional": if_necessary == "Y",
+                "start_time_tbd": start_time_tbd,
+                "game_date_utc": game_date_utc,
+            }
     return observed
+
+
+FIELDS = (
+    ("description", "description"),
+    ("away", "away team"),
+    ("home", "home team"),
+    ("venue", "venue"),
+    ("conditional", "if-necessary marker"),
+)
+
+
+def show_game(pk: int, game: dict[str, Any]) -> str:
+    status = " (if necessary)" if game.get("conditional") else ""
+    return f"gamePk {pk}, {game.get('description')}: {game.get('away')} at {game.get('home')}{status}"
 
 
 def compare(
@@ -143,47 +223,80 @@ def compare(
         before = expected.get(game_date)
         after = observed.get(game_date)
         if before is None:
+            listed = "; ".join(
+                f"{game['description']}: {game['away']} at {game['home']}"
+                for game in after["games"].values()
+            )
             differences.append(
-                f"- **{game_date}**: the API now lists {after['count']} game(s), but this snapshot has no row."
+                f"- **{game_date}**: the API now lists {after['count']} game(s) "
+                f"({listed}), but this snapshot has no row."
             )
             continue
         if after is None:
             differences.append(
-                f"- **{game_date}**: the snapshot records {before['count']} game(s), but the API now has none."
+                f"- **{game_date}**: the snapshot records {before['count']} game(s) "
+                f"in {len(before['row_ids'])} row(s), but the API now has none."
             )
             continue
+
+        date_notes: list[str] = []
         if before["count"] != after["count"]:
-            differences.append(
-                f"- **{game_date}**: game count changed from {before['count']} in the snapshot to {after['count']} in the API."
+            date_notes.append(
+                f"game count changed from {before['count']} in the snapshot to {after['count']} in the API."
             )
-        if before["descriptions"] != after["descriptions"]:
-            removed = list((before["descriptions"] - after["descriptions"]).elements())
-            added = list((after["descriptions"] - before["descriptions"]).elements())
-            if removed:
-                differences.append(f"  - No longer returned: {'; '.join(removed)}.")
-            if added:
-                differences.append(f"  - Newly returned or renamed: {'; '.join(added)}.")
-        if before["games"] != after["games"]:
-            def show_game(item: tuple[Any, ...]) -> str:
-                description, away, home, conditional = item
-                status = " (if necessary)" if conditional else ""
-                return f"{description}: {away} at {home}{status}"
-            removed_games = [show_game(item) for item in
-                             (before["games"] - after["games"]).elements()]
-            added_games = [show_game(item) for item in
-                           (after["games"] - before["games"]).elements()]
-            if removed_games:
-                differences.append(f"  - Matchup or conditional marker no longer returned: {'; '.join(removed_games)}.")
-            if added_games:
-                differences.append(f"  - Matchup or conditional marker now returned: {'; '.join(added_games)}.")
-        if before["all_start_times_tbd"] and not all(after["start_time_tbd"]):
-            newly_timed = sum(1 for value in after["start_time_tbd"] if not value)
-            differences.append(
-                f"- **{game_date}**: the API now supplies a start time for {newly_timed} game(s); the snapshot still shows TBD."
+
+        for pk in sorted(set(before["games"]) - set(after["games"])):
+            date_notes.append(
+                f"the API no longer returns {show_game(pk, before['games'][pk])}."
             )
-        elif not before["all_start_times_tbd"] and any(after["start_time_tbd"]):
+        for pk in sorted(set(after["games"]) - set(before["games"])):
+            date_notes.append(
+                f"the API now returns {show_game(pk, after['games'][pk])}, which this snapshot "
+                f"does not list (row would be `mlb-post-{pk}`)."
+            )
+
+        newly_timed: list[str] = []
+        reverted: list[str] = []
+        for pk in sorted(set(before["games"]) & set(after["games"])):
+            was, now = before["games"][pk], after["games"][pk]
+            for key, label in FIELDS:
+                if was[key] != now[key]:
+                    date_notes.append(
+                        f"{label} changed for gamePk {pk} ({was['description']}): "
+                        f"{was[key]!r} in the snapshot, {now[key]!r} in the API."
+                    )
+            if was["first_pitch"] is None:
+                if not now["start_time_tbd"]:
+                    newly_timed.append(
+                        f"gamePk {pk} ({now['description']}) first pitch "
+                        f"{utc_to_pt(now['game_date_utc'])} — API {now['game_date_utc']}"
+                    )
+            elif now["start_time_tbd"]:
+                reverted.append(
+                    f"gamePk {pk} ({now['description']}) was {was['first_pitch']} "
+                    f"({was['start_pt']} PT in the snapshot) but the API now marks it TBD"
+                )
+            elif was["first_pitch"] != now["game_date_utc"]:
+                date_notes.append(
+                    f"first pitch changed for gamePk {pk} ({now['description']}): the snapshot "
+                    f"was built from {was['first_pitch']} ({was['start_pt']} PT), the API now "
+                    f"says {now['game_date_utc']} ({utc_to_pt(now['game_date_utc'])})."
+                )
+
+        if newly_timed:
+            date_notes.append(
+                f"the API now supplies a start time for {len(newly_timed)} game(s) the snapshot "
+                "still shows as TBD: " + "; ".join(newly_timed) + "."
+            )
+        if reverted:
+            date_notes.append(
+                f"the API has withdrawn a start time the snapshot shows: " + "; ".join(reverted) + "."
+            )
+
+        if date_notes:
             differences.append(
-                f"- **{game_date}**: the API now marks at least one start time TBD; compare with the snapshot."
+                f"- **{game_date}** ({len(before['row_ids'])} snapshot row(s)):\n" +
+                "\n".join(f"  - {note}" for note in date_notes)
             )
     return differences
 
@@ -229,9 +342,11 @@ def make_report(
         f"- Source: [{url}]({url})\n"
         f"- Published snapshot date: {snapshot_date}\n\n"
         f"{body}\n\n"
-        "This is a read-only monitor of one machine-readable schedule source. It does not confirm a "
-        "Bay Area station's per-game clearance, check all six stations, change `data/broadcasts.json`, "
-        "or publish a new GitHub Pages snapshot. Open the source and review affected rows and radio "
+        "This is a read-only monitor of one machine-readable schedule source. Games are matched on "
+        "the API's own `gamePk`, and the comparison covers each game's description, away and home "
+        "labels, venue, if-necessary marker and first pitch. It does not confirm a Bay Area "
+        "station's per-game clearance, check all six stations, change `data/broadcasts.json`, or "
+        "publish a new GitHub Pages snapshot. Open the source and review affected rows and radio "
         "rights manually before updating the curated feed.\n"
     )
 

@@ -107,6 +107,7 @@
     .game-details ul { margin: 4px 0 0; padding-left: 18px; }
     .game-details li { margin: 2px 0; }
     .game-details .if-needed { color: #815500; font-weight: 650; }
+    .game-details .slot-venue { color: var(--muted); font-style: italic; }
     .badge {
       display: inline-block; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
       border-radius: 99px; padding: 2px 7px; border: 1px solid var(--line); margin: 0 4px 3px 0;
@@ -565,6 +566,9 @@
           out.push("SUMMARY:" + icsText(b.title + " — " + stationLabels(b) +
             (b.confidence === "official" ? "" : " (" + b.confidence + ")")));
           out.push("CATEGORIES:" + icsText(LEAGUE_LABEL[b.league] || b.league));
+          /* RFC 5545 defaults an event to CONFIRMED. An if-necessary game is a
+             possibility, not a booking, so it is marked TENTATIVE explicitly. */
+          if (L.isConditional(b)) out.push("STATUS:TENTATIVE");
           if (b.venue) out.push("LOCATION:" + icsText(b.venue));
           out.push("URL:" + b.sources[0].url);
           out.push("DESCRIPTION:" + icsText(
@@ -748,13 +752,20 @@
             return f && f.severity === "review" ? '<div class="notes">Flagged: ' + esc(f.title) + "</div>" : "";
           }).join("");
           var conditionalCount = L.conditionalGameCount(b);
-          var matchupDetails = Array.isArray(b.game_details) && b.game_details.length
-            ? '<div class="game-details"><strong>MLB schedule slots (not per-game 1050 clearance):</strong><ul>' +
+          /* A grouped date row lists every API schedule slot for that day. A
+             per-game row's title already carries its own slot, so repeating it
+             would be noise; the caveat still has to appear. */
+          var matchupDetails = '';
+          if (Array.isArray(b.game_details) && b.game_details.length > 1) {
+            matchupDetails = '<div class="game-details"><strong>MLB schedule slots (not per-game 1050 clearance):</strong><ul>' +
               b.game_details.map(function (g) {
                 return '<li>' + esc(g.description) + ': ' + esc(g.away) + ' at ' + esc(g.home) +
+                  (g.venue ? ' <span class="slot-venue">' + esc(g.venue) + '</span>' : '') +
                   (g.conditional ? ' <span class="if-needed">(if necessary)</span>' : '') + '</li>';
-              }).join('') + '</ul></div>'
-            : '';
+              }).join('') + '</ul></div>';
+          } else if (Array.isArray(b.game_details) && b.game_details.length === 1) {
+            matchupDetails = '<div class="game-details">MLB Stats API schedule slot, not per-game 1050 clearance.</div>';
+          }
           var conditionalBadge = conditionalCount
             ? '<span class="badge conditional">' + esc(L.isConditional(b)
               ? conditionalCount + " game" + (conditionalCount === 1 ? "" : "s") + " only if necessary"
