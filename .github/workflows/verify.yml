@@ -29,3 +29,5 @@ jobs:
         run: node scripts/ui_logic_test.js
       - name: Render the real page against the real feed
         run: node scripts/render_smoke_test.js
+      - name: Monitor status loading and failure states
+        run: node scripts/watch_status_test.js

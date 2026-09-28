@@ -205,11 +205,9 @@ Promise.resolve().then(function () {
     "a per-game row keeps the clearance caveat without repeating its own slot");
   assert.ok(els.log.innerHTML.indexOf("MLB schedule slots (not per-game 1050 clearance)") === -1,
     "a per-game row does not render a grouped slot list");
-  /* Two of the four games are three hours apart in estimate but two apart in
-     fact, and both are ESPN Radio: the warning must say single feed, not a
-     station being fought over. */
-  assert.ok(/network runs a single national/.test(els.conflicts.innerHTML),
-    "an overlap between two games on one network feed is explained as sequencing");
+  assert.ok(/overlap does not establish/.test(els.conflicts.innerHTML),
+    "overlapping ESPN listings do not imply a known feed or switching plan");
+  assert.ok(!/single national/.test(els.conflicts.innerHTML), "no unsupported single-feed claim");
 
   /* A date the API has not scheduled keeps the grouped shape: no clock time,
      every slot listed, venue strings included. */

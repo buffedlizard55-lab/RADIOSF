@@ -1,21 +1,15 @@
 {
-  "_about": "Read-only watch for the schedule entries whose start time is still TBD in the snapshot. Every entry below was read on the live page on 2026-09-27 and printed no kickoff, so the snapshot carries no clock time for it. When a time appears, this monitor reports it as changed and a human transcribes it into scripts/build_feed.py and rebuilds. It never edits data/broadcasts.json, never invents a time and never publishes GitHub Pages. Remove an entry once its row carries a start_pt in the feed.\n\nHeld out on purpose: the gostanford.com football schedule. Its 2026 ticker - the four TBA games - is built in the browser, so a plain request receives a page without it, confirmed by the source watch preview on pull request #12: every expected string was absent and the anchor could not be found. A target for it lives in scripts/tbd_time_watch_test.py, ready to move here if the school ever renders the schedule into the HTML it serves. Until then those four kickoffs are the one gap this monitor cannot cover, and they are re-read by hand - see docs/LIMITATIONS.md.",
+  "_about": "Cal\u2013Virginia Tech kickoff was published and re-read Sep 28 (12:30 PM PT on Oct 10), so that entry was removed. Six Cal kickoffs and 49ers Week 18 remain TBD. Read-only monitor: never edits the schedule or confirms station clearance. Stanford school ticker is browser-rendered and remains held out; ESPN feed is page-watched.",
   "checked": "2026-09-27",
   "targets": [
     {
       "id": "cal-football-kickoffs",
-      "label": "Cal football schedule, text view (calbears.com) - seven kickoffs still TBD",
+      "label": "Cal football schedule, text view (calbears.com) - six kickoffs still TBD",
       "url": "https://calbears.com/sports/football/schedule/text",
       "kind": "table-row",
       "anchor": "2026 Football Schedule",
-      "rows": "cal-2026-10-10, cal-2026-10-17, cal-2026-10-24, cal-2026-10-31, cal-2026-11-14, big-game-2026-11-21, cal-2026-11-28",
+      "rows": "cal-2026-10-17, cal-2026-10-24, cal-2026-10-31, cal-2026-11-14, big-game-2026-11-21, cal-2026-11-28",
       "entries": [
-        {
-          "date_cell": "Oct 10 (Sat)",
-          "opponent": "Virginia Tech",
-          "row": "cal-2026-10-10",
-          "why": "Cal home game; the schedule prints no kickoff"
-        },
         {
           "date_cell": "Oct 17 (Sat)",
           "opponent": "Wake Forest",

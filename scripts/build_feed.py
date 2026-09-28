@@ -394,15 +394,14 @@ FLAGS = [
             "AbbVie.\" KTCT 1050 AM is a full-time ESPN Radio affiliate: its published weekly grid "
             "is the ESPN Radio network schedule, and its station record lists ESPN Radio as the "
             "network. No Cumulus or ESPN page publishes a game-by-game Bay Area clearance list, so "
-            "these rows are \"indicated\". Two further caveats. There is one ESPN Radio feed, so on "
-            "a day with two or four scheduled games only one of them can be on 1050 at a time, and "
-            "an estimated window that runs into the next listed game is a single-feed artefact "
-            "rather than two games fighting for the station. And Stanford football, Earthquakes "
-            "soccer and Westwood One college football all preempt 1050 on autumn weekends. "
+            "these rows are indicated possibilities, not confirmed local broadcasts. A single "
+            "station cannot carry two complete games simultaneously. Estimated overlap does not "
+            "establish which game is carried or when a station switches. The stale affiliate grid "
+            "does not prove the number of national feeds. Local programming may preempt a game. "
             "Re-read 2026-09-28: the Stats API has now published real first pitches for the twelve "
             "Wild Card games on September 29, 30 and October 1, so those dates are split into "
-            "per-game rows with Pacific clock times, each cross-checked against the ET time "
-            "MLB.com's own Wild Card Series article prints. Every game from the Division Series "
+            "per-game rows with Pacific clock times. Games 1 and 2 match MLB.com's ET times; "
+            "Game 3 times are API-only and conditional. Every game from the Division Series "
             "onward still carries startTimeTBD true with a 07:33 UTC placeholder, so those dates "
             "stay grouped and show no time. Neither the Giants nor the Athletics are in this field."
         ),
@@ -1430,10 +1429,10 @@ def nba_espn_radio_rows() -> list[dict]:
             ],
             notes=(
                 f"Listed start {start_pt} PT, converted from the {et} ET printed on the NBA's "
-                "2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a "
+                "2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a "
                 "Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local "
-                "programming can take the station instead, and ESPN Radio runs one feed, so a second "
-                "game in the same window cannot also be on 1050. Matchup strings are the PDF's own."
+                "programming may take the station instead. Overlap does not establish which game "
+                "1050 will carry. Matchup strings are the PDF's own."
             ),
             flag_ids=["ESPN_RADIO_NBA", "TALK_NOT_GAMES", "SPANISH_EXCLUDED", "DURATION_ESTIMATE"],
         ))
@@ -1675,10 +1674,10 @@ def local_rows() -> list[dict]:
     # Cal: full Radio column re-read from the official schedule on 2026-09-27.
     cal = [
         ("2026-10-03", "12:30", "California at UNLV", "Allegiant Stadium, Las Vegas",
-         "Cal's schedule prints Oct 3, 12:30 PM PT at UNLV on CBSSN — the only 2026 row with a kickoff. Radio column: KSFO 810."),
-        ("2026-10-10", None, "Virginia Tech at California", "California Memorial Stadium",
-         "Radio column: KSFO 810. Kickoff not yet set on the schedule or on ESPN; "
-         "scripts/tbd_time_watch.py reads the text view daily and reports the first printed kickoff."),
+         "Cal's schedule prints Oct 3, 12:30 PM PT at UNLV on CBSSN — verified Sep 27. Radio column: KSFO 810."),
+        ("2026-10-10", "12:30", "Virginia Tech at California", "California Memorial Stadium",
+         "Radio column: KSFO 810 (verified Sep 27). Cal text schedule re-read Sep 28: Oct 10, "
+         "12:30 PM, home vs Virginia Tech at California Memorial Stadium. The TBD monitor caught this newly published kickoff."),
         ("2026-10-17", None, "Wake Forest at California", "California Memorial Stadium",
          "Radio column: KSFO 810. Kickoff not yet set. This row was missing from the previous snapshot "
          "and is now read directly from the Radio column; the TBD-kickoff watch reads the text view daily."),
@@ -2106,8 +2105,9 @@ def main() -> None:
                 "Line-checked against pages fetched 2026-09-27, except the MLB postseason rows, "
                 "which were re-read from the MLB Stats API on 2026-09-28 when it published the "
                 "twelve Wild Card first pitches; those dates are now split into per-game rows "
-                "with Pacific clock times, each cross-checked against the ET time MLB.com's own "
-                "Wild Card Series article prints. Not a live scrape. Row counts moved from 173 to "
+                "with Pacific clock times. Games 1 and 2 were cross-checked against MLB.com; Game 3 "
+                "times are API-only and conditional. Cal–Virginia Tech was updated from Cal's text "
+                "schedule on Sep 28 to 12:30 PM PT on Oct 10. Not a live scrape. Row counts moved from 173 to "
                 "182 because three grouped MLB dates became twelve per-game rows."
             ),
             "durations": DURATIONS,
@@ -2134,7 +2134,7 @@ def main() -> None:
                  "role": "Athletics baseball through the end of the regular season. Fox Sports Radio talk otherwise, which is not listed as games.",
                  "listen": ATH_RADIO},
                 {"id": "1050", "label": "1050 AM", "call": "KTCT", "brand": "KNBR 1050",
-                 "role": "Stanford football. Westwood One NFL, college football and U.S. Soccer affiliate. Full-time ESPN Radio affiliate, which is how the MLB postseason and the NBA's ESPN Radio games reach the Bay Area.",
+                 "role": "Stanford football. Westwood One NFL, college football and U.S. Soccer affiliate. ESPN Radio affiliate evidence supports indicated MLB/NBA listings, not confirmed local carriage.",
                  "listen": KNBR_1050_SHOWS},
                 {"id": "107.7", "label": "107.7 FM", "call": "KSAN", "brand": "107.7 The Bone",
                  "role": "49ers FM flagship, every listed regular-season game. Classic rock otherwise.",
