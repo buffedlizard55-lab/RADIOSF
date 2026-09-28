@@ -194,3 +194,21 @@ jobs:
               const { data: issue } = await github.rest.issues.create({ owner, repo, title, body });
               core.info(`Created review issue #${issue.number}`);
             }
+
+      - name: Publish latest monitoring report for the calendar
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const title = '[Source watch status] Latest scheduled check';
+            const files = ['mlb', 'wwo', 'page', 'espn', 'espn-week', 'tbd'];
+            const reports = files.map(name => {
+              const path = `${process.env.RUNNER_TEMP}/${name}-source-watch.md`;
+              return fs.existsSync(path) ? fs.readFileSync(path, 'utf8') : `${name}: unavailable — report missing`;
+            });
+            const body = `Checked: ${new Date().toISOString()}\nRun: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\nSnapshot commit: ${context.sha}\n\nRead-only checks, not proof of local carriage.\n\n${reports.join('\n---\n')}`;
+            const issues = await github.paginate(github.rest.issues.listForRepo, {...context.repo, state: 'open', creator: 'github-actions[bot]', per_page: 100});
+            const existing = issues.find(i => !i.pull_request && i.title === title);
+            if (existing) await github.rest.issues.update({...context.repo, issue_number: existing.number, body});
+            else await github.rest.issues.create({...context.repo, title, body});

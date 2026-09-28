@@ -6,6 +6,8 @@ Read this file at the start of every session on RADIOSF. It is the spec. Do not 
 
 Review the repo.
 
+Let's check to see if any of the MLB playoff games are going to be live over the radio in SF. We will need to constantly check the scheduling since some are TBD.
+
 Put this prompt into the repo readme and read it every time we work on the project as a starting point to make sure we are building what we are aiming for and have a strong base to continue building and improving on making something useful for everyday use. It should solve the problem of having to manually check everything ourselves and having an up to date current feed.
 
 Review the repo.

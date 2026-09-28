@@ -6,6 +6,8 @@ Read this before changing the feed. The same text is in [docs/PROJECT_PROMPT.md]
 
 Review the repo.
 
+Let's check to see if any of the MLB playoff games are going to be live over the radio in SF. We will need to constantly check the scheduling since some are TBD.
+
 Put this prompt into the repo readme and read it every time we work on the project as a starting point to make sure we are building what we are aiming for and have a strong base to continue building and improving on making something useful for everyday use. It should solve the problem of having to manually check everything ourselves and having an up to date current feed.
 
 Review the repo.
@@ -43,6 +45,10 @@ Pass 2: Review your work for bugs, missing requirements, incorrect assumptions, 
 Pass 3: Re-check the entire implementation against the original request. Improve accuracy, reliability, completeness, and code quality. Fix any remaining issues.
 
 Do not stop after the first pass. Each pass must build on the previous one. Before finishing, verify that the final result fully satisfies the original request. Work line by line verify everything no hallucinations.
+
+## Latest review — 2026-09-28
+
+PR #16 caught and incorporated Cal–Virginia Tech’s newly published **Oct 10, 12:30 PM PT** kickoff from [Cal’s schedule](https://calbears.com/sports/football/schedule/text). Seven TBD entries remain under the kickoff watcher. The calendar now shows dated monitoring reports, independently loaded from a bot-updated GitHub status issue; stale/failed reads never imply clear. Monitoring still does not automatically publish schedule changes. MLB local carriage is **indicated, not confirmed**. Historical coverage calculations below are estimates, not measured airtime.
 
 ## What this is
 
@@ -103,7 +109,7 @@ An earlier version of this feed called these dates "not official". They are the 
 
 Re-read 2026-09-28. The MLB Stats API lists all 53 postseason game slots across 28 dates and, as of this pass, has published a real first pitch for the twelve Wild Card games. Those three dates are now **one row per game with a Pacific clock time** instead of one grouped row with none. Every other postseason date still carries `startTimeTBD` true with the API's 07:33/08:33/10:33 UTC placeholder, so those dates stay grouped and show no time — a placeholder instant is never displayed as a clock time.
 
-**This is the direct answer to “are the MLB playoffs on the radio in San Francisco?”** Yes, on 1050 AM, and on the first two days it is close to continuous. Each first pitch below is the API's UTC instant converted to Pacific, and each is independently printed by MLB.com's own Wild Card Series article in Eastern time — two official sources, agreeing:
+**What can be verified for San Francisco?** MLB confirms that ESPN Radio will carry every 2026 postseason game nationally. The local KNBR/KTCT 1050 AM schedule we could verify is stale (it covers Aug. 31–Sep. 6), and neither it nor the station-affiliation evidence establishes that KTCT will carry any specific postseason game. Accordingly these are **indicated possibilities, not confirmed local broadcasts**; check a current station announcement or schedule before tuning in. The national schedule and first-pitch times below are source-backed, but local carriage is not. Each first pitch is the MLB Stats API's UTC instant converted to Pacific; Games 1 and 2 were cross-checked against MLB.com in Eastern time. Game 3 times are API-only and conditional:
 
 | PT first pitch | Game (API's own labels) | API instant | MLB.com's printed time | Venue |
 | --- | --- | --- | --- | --- |
@@ -130,7 +136,7 @@ Three conversions are worth seeing stated, because they are the kind of thing th
 - **Bracket placeholders move mid-pass.** The API printed the NL Wild Card 'A' away slot as `PHI/ARI` at 03:00 UTC on 2026-09-28 and as `Philadelphia Phillies` by 03:20 — the source watch preview on the pull request caught the twenty-minute window. The resolved label now ships, each of the three rows records that its away label *was* a placeholder, and the monitor reports every future resolution. The remaining Division Series slots (`NYY/BOS`, `HOU/CWS`, `SD/CHC`, `ATL/PHI`, `NL Lower Seed`) and venues (`NL Stadium`, `AL Stadium`, `TBD`) are still the API's own strings, shown as printed.
 - **The API's own typo ships too.** Its description for gamePk 849827 is `NLDS 'A' Game 4 ` with a trailing space.
 - **The Division Series bracket slots are placeholders** — `NYY/BOS`, `HOU/CWS`, `SD/CHC`, `ATL/PHI`, `NL Lower Seed` — and the venues for the later rounds are `NL Stadium`, `AL Stadium` and `TBD`. All are the API's strings, shown as printed.
-- **This is the MLB schedule, not a 1050 clearance.** ESPN Radio carries every postseason game nationally and KTCT is a full-time ESPN Radio affiliate, which supports an **indicated** listing and no more. There is one national feed, so only one game can be on 1050 at a time, and local programming can take the station.
+- **This is the MLB schedule, not a 1050 clearance.** ESPN Radio carries every postseason game nationally and KTCT is a full-time ESPN Radio affiliate, which supports an **indicated** listing and no more. 1050 cannot carry two complete games simultaneously; neither network feed count nor game switching is established by the affiliate evidence. Local programming may preempt a game.
 
 ### The monitor now checks first pitches, not just dates
 

@@ -218,26 +218,14 @@
         bEnd = endMinutes(b);
         if (aEnd == null || bEnd == null) continue;
         if (rangesOverlap(minutes(a.start_pt), aEnd, minutes(b.start_pt), bEnd)) {
-          /* Two ESPN Radio listings cannot both be on the station: MLB's own
-             release and the KNBR 1050 grid establish one national feed. The
-             overlap is then an artefact of estimating the earlier game's length,
-             not two games competing for the affiliate, and saying so is the
-             difference between a warning a reader can act on and one a reader
-             learns to ignore. The claim is deliberately not extended to
-             Westwood One, whose own grid names separate feeds. */
-          var sameNetwork = a.network === "ESPN Radio" && b.network === "ESPN Radio";
           out.push({
             kind: "overlap",
             station: shared.join(", "),
             ids: [a.id, b.id],
             text: "Estimated windows overlap on " + shared.join(", ") + ": " +
               conflictEntry(a) + " and " + conflictEntry(b) +
-              (sameNetwork
-                ? ". Both are " + a.network + " listings and the network runs a single national " +
-                  "feed, so the earlier estimated window is simply running into the next listed " +
-                  "start rather than two games competing for the station."
-                : ". A local game usually keeps the station; Westwood One says not every " +
-                  "affiliate airs every broadcast.")
+              ". These are estimated windows, not a station log. The overlap does not establish " +
+              "which game the station will carry, or when it will switch. Check the linked sources."
           });
         }
       }

@@ -34,7 +34,7 @@ FIXTURES = Path(__file__).resolve().parent / "fixtures"
 CAL_FIXTURE = (FIXTURES / "cal_text_schedule_2026-09-27.md").read_text(encoding="utf-8")
 NINERS_FIXTURE = (FIXTURES / "niners_schedule_2026-09-27.html").read_text(encoding="utf-8")
 STANFORD_FIXTURE = (FIXTURES / "stanford_schedule_2026-09-27.html").read_text(encoding="utf-8")
-CONFIG = json.loads((ROOT / "data" / "tbd_watch.json").read_text(encoding="utf-8"))
+CONFIG = json.loads((ROOT / "data/tbd_watch.json").read_text(encoding="utf-8"))
 DOCUMENTS = {
     "cal-football-kickoffs": CAL_FIXTURE,
     "niners-week-18-kickoff": NINERS_FIXTURE,
@@ -171,24 +171,24 @@ class TimePatternTest(unittest.TestCase):
 
 class CellListTest(unittest.TestCase):
     def test_html_cells_are_read_in_document_order(self) -> None:
-        cells = watch.cell_list("<table><tr><td>Oct 10 (Sat)</td><td> </td><td>Home</td></tr></table>")
-        self.assertEqual(cells, ["Oct 10 (Sat)", "", "Home"])
+        cells = watch.cell_list("<table><tr><td>Oct 17 (Sat)</td><td> </td><td>Home</td></tr></table>")
+        self.assertEqual(cells, ["Oct 17 (Sat)", "", "Home"])
 
     def test_a_cell_keeps_the_case_the_page_prints(self) -> None:
-        cells = watch.cell_list("<table><tr><td>Oct 10 (Sat)</td><td>7:00 PM</td><td>Home</td>"
-                                "<td>Virginia Tech</td></tr></table>")
+        cells = watch.cell_list("<table><tr><td>Oct 17 (Sat)</td><td>7:00 PM</td><td>Home</td>"
+                                "<td>Wake Forest</td></tr></table>")
         self.assertEqual(cells[1], "7:00 PM")
 
     def test_markdown_pipe_rows_are_read_as_cells(self) -> None:
-        cells = watch.cell_list("| Oct 10 (Sat) |  | Home | Virginia Tech |\n| --- | --- | --- | --- |")
-        self.assertEqual(cells, ["Oct 10 (Sat)", "", "Home", "Virginia Tech", "---", "---", "---", "---"])
+        cells = watch.cell_list("| Oct 17 (Sat) |  | Home | Wake Forest |\n| --- | --- | --- | --- |")
+        self.assertEqual(cells, ["Oct 17 (Sat)", "", "Home", "Wake Forest", "---", "---", "---", "---"])
 
     def test_both_shapes_agree_on_the_row_under_test(self) -> None:
-        html_row = "<table><tr><td>Oct 10 (Sat)</td><td></td><td>Home</td><td>Virginia Tech</td></tr></table>"
-        markdown_row = "| Oct 10 (Sat) |  | Home | Virginia Tech |"
+        html_row = "<table><tr><td>Oct 17 (Sat)</td><td></td><td>Home</td><td>Wake Forest</td></tr></table>"
+        markdown_row = "| Oct 17 (Sat) |  | Home | Wake Forest |"
         for document in (html_row, markdown_row):
             result = watch.check_table_row(
-                {"row": "cal-2026-10-10", "date_cell": "Oct 10 (Sat)", "opponent": "Virginia Tech"},
+                {"row": "cal-2026-10-17", "date_cell": "Oct 17 (Sat)", "opponent": "Wake Forest"},
                 watch.cell_list(document))
             self.assertEqual(result["state"], "tbd", document)
 
@@ -199,7 +199,7 @@ class LiveFixturesTest(unittest.TestCase):
                                                          {"cal-football-kickoffs": CAL_FIXTURE})
         self.assertEqual(status, "clear")
         self.assertEqual((changes, unreadable), ([], []))
-        self.assertEqual(len(details), 7)
+        self.assertEqual(len(details), 6)
         self.assertTrue(all("kickoff still TBD" in line for line in details))
 
     def test_the_real_niners_page_reports_week_18_still_tbd(self) -> None:
@@ -230,16 +230,16 @@ class LiveFixturesTest(unittest.TestCase):
 
     def test_a_row_whose_opponent_moved_column_is_unavailable(self) -> None:
         page = CAL_FIXTURE.replace(
-            "| Oct 10 (Sat) |  | Home | Virginia Tech |",
-            "| Oct 10 (Sat) |  | Virginia Tech | Home |", 1)
+            "| Oct 17 (Sat) |  | Home | Wake Forest |",
+            "| Oct 17 (Sat) |  | Wake Forest | Home |", 1)
         status, _, _, _ = watch.run(one_target(CONFIG, "cal-football-kickoffs"),
                                     {"cal-football-kickoffs": page})
         self.assertEqual(status, "unavailable")
 
-    def test_the_seven_cal_rows_carry_no_start_time_in_the_feed(self) -> None:
+    def test_the_six_cal_rows_carry_no_start_time_in_the_feed(self) -> None:
         feed = {row["id"]: row for row in
                 json.loads((ROOT / "data" / "broadcasts.json").read_text(encoding="utf-8"))["broadcasts"]}
-        for entry in CAL_TARGET["entries"]:
+        for entry in json.loads((ROOT / "data/tbd_watch.json").read_text())["targets"][0]["entries"]:
             self.assertIsNone(feed[entry["row"]].get("start_pt"), entry["row"])
 
 
@@ -360,10 +360,10 @@ class PublishedKickoffTest(unittest.TestCase):
     def test_a_new_cal_kickoff_is_reported_as_changed(self) -> None:
         status, changes, unreadable, details = watch.run(
             one_target(CONFIG, "cal-football-kickoffs"),
-            {"cal-football-kickoffs": cal_with_time("Oct 10 (Sat)", "7:00 PM")})
+            {"cal-football-kickoffs": cal_with_time("Oct 17 (Sat)", "7:00 PM")})
         self.assertEqual(status, "changed")
         self.assertEqual((len(changes), unreadable), (1, []))
-        self.assertIn("cal-2026-10-10", changes[0])
+        self.assertIn("cal-2026-10-17", changes[0])
         self.assertIn("7:00 PM", changes[0])
         self.assertIn("build_feed.py", changes[0])
         self.assertTrue(any("now published" in line for line in details))
@@ -383,7 +383,7 @@ class PublishedKickoffTest(unittest.TestCase):
             {"cal-football-kickoffs": cal_with_time("Nov 28 (Sat)", "1:00 PM")})
         self.assertEqual(status, "changed")
         self.assertEqual((len(changes), unreadable), (1, []))
-        self.assertEqual(sum("still TBD" in line for line in details), 6)
+        self.assertEqual(sum("still TBD" in line for line in details), 5)
 
 
 class FailClosedTest(unittest.TestCase):
@@ -402,7 +402,7 @@ class FailClosedTest(unittest.TestCase):
         self.assertEqual(status, "unavailable")
 
     def test_a_changed_opponent_is_unavailable_not_clear(self) -> None:
-        page = cal_with_row("Oct 10 (Sat)", "| Oct 10 (Sat) |  | Home | San Diego State |")
+        page = cal_with_row("Oct 17 (Sat)", "| Oct 17 (Sat) |  | Home | San Diego State |")
         status, _, _, _ = watch.run(one_target(CONFIG, "cal-football-kickoffs"),
                                  {"cal-football-kickoffs": page})
         self.assertEqual(status, "unavailable")
@@ -410,7 +410,7 @@ class FailClosedTest(unittest.TestCase):
     def test_an_unreadable_time_cell_is_unavailable(self) -> None:
         status, _, unreadable, details = watch.run(
             one_target(CONFIG, "cal-football-kickoffs"),
-            {"cal-football-kickoffs": cal_with_time("Oct 10 (Sat)", "Postponed")})
+            {"cal-football-kickoffs": cal_with_time("Oct 17 (Sat)", "Postponed")})
         self.assertEqual(status, "unavailable")
         self.assertTrue(any("Postponed" in line for line in unreadable), unreadable)
 
@@ -450,7 +450,7 @@ class FailClosedTest(unittest.TestCase):
                    dict(CAL_TARGET["entries"][1], date_cell="Oct 31 (Sat)", opponent="Virginia Tech")]
         config["targets"] = [dict(CAL_TARGET, entries=entries)]
         status, changes, unreadable, _ = watch.run(
-            config, {"cal-football-kickoffs": cal_with_time("Oct 10 (Sat)", "7:00 PM")})
+            config, {"cal-football-kickoffs": cal_with_time("Oct 17 (Sat)", "7:00 PM")})
         self.assertEqual(status, "changed")
         self.assertEqual(len(changes), 1)
         self.assertTrue(any("could not be read" in line for line in unreadable))
@@ -485,12 +485,12 @@ class ConfigValidationTest(unittest.TestCase):
         with self.assertRaises(watch.WatchError):
             watch.validate_config(broken)
 
-    def test_the_shipped_config_watches_eight_entries_over_eight_rows(self) -> None:
+    def test_the_shipped_config_watches_seven_entries_over_seven_rows(self) -> None:
         entries = [entry for target in CONFIG["targets"] for entry in target["entries"]]
         rows = {entry["row"] for entry in entries}
         self.assertEqual(len(CONFIG["targets"]), 2)
-        self.assertEqual(len(entries), 8)
-        self.assertEqual(len(rows), 8)
+        self.assertEqual(len(entries), 7)
+        self.assertEqual(len(rows), 7)
 
     def test_the_stanford_target_is_held_out_and_stays_valid(self) -> None:
         # Held out because the school page renders in the browser; if it ever
@@ -563,7 +563,7 @@ class ReportTest(unittest.TestCase):
                    dict(CAL_TARGET["entries"][1], date_cell="Oct 31 (Sat)", opponent="Virginia Tech")]
         config["targets"] = [dict(CAL_TARGET, entries=entries)]
         status, changes, unreadable, details = watch.run(
-            config, {"cal-football-kickoffs": cal_with_time("Oct 10 (Sat)", "7:00 PM")})
+            config, {"cal-football-kickoffs": cal_with_time("Oct 17 (Sat)", "7:00 PM")})
         report = watch.make_report(status, details, changes, unreadable, CONFIG["checked"])
         self.assertIn("A watched row changed", report)
         self.assertIn("could not be read", report)

@@ -5,7 +5,7 @@
     "window_start": "2026-09-27",
     "window_end": "2027-02-28",
     "timezone": "America/Los_Angeles",
-    "verified_note": "Line-checked against pages fetched 2026-09-27, except the MLB postseason rows, which were re-read from the MLB Stats API on 2026-09-28 when it published the twelve Wild Card first pitches; those dates are now split into per-game rows with Pacific clock times, each cross-checked against the ET time MLB.com's own Wild Card Series article prints. Not a live scrape. Row counts moved from 173 to 182 because three grouped MLB dates became twelve per-game rows.",
+    "verified_note": "Line-checked against pages fetched 2026-09-27, except the MLB postseason rows, which were re-read from the MLB Stats API on 2026-09-28 when it published the twelve Wild Card first pitches; those dates are now split into per-game rows with Pacific clock times. Games 1 and 2 were cross-checked against MLB.com; Game 3 times are API-only and conditional. Cal\u2013Virginia Tech was updated from Cal's text schedule on Sep 28 to 12:30 PM PT on Oct 10. Not a live scrape. Row counts moved from 173 to 182 because three grouped MLB dates became twelve per-game rows.",
     "durations": [
       {
         "id": "MLB",
@@ -103,7 +103,7 @@
         "label": "1050 AM",
         "call": "KTCT",
         "brand": "KNBR 1050",
-        "role": "Stanford football. Westwood One NFL, college football and U.S. Soccer affiliate. Full-time ESPN Radio affiliate, which is how the MLB postseason and the NBA's ESPN Radio games reach the Bay Area.",
+        "role": "Stanford football. Westwood One NFL, college football and U.S. Soccer affiliate. ESPN Radio affiliate evidence supports indicated MLB/NBA listings, not confirmed local carriage.",
         "listen": "https://www.thesportsleader.com/knbr1050shows/"
       },
       {
@@ -285,7 +285,7 @@
       "id": "MLB_POSTSEASON_ESPN",
       "severity": "review",
       "title": "MLB postseason is an ESPN Radio network row, not a Bay Area per-game clearance",
-      "detail": "MLB's own postseason release says \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games, beginning with the Wild Card Series presented by AbbVie.\" KTCT 1050 AM is a full-time ESPN Radio affiliate: its published weekly grid is the ESPN Radio network schedule, and its station record lists ESPN Radio as the network. No Cumulus or ESPN page publishes a game-by-game Bay Area clearance list, so these rows are \"indicated\". Two further caveats. There is one ESPN Radio feed, so on a day with two or four scheduled games only one of them can be on 1050 at a time, and an estimated window that runs into the next listed game is a single-feed artefact rather than two games fighting for the station. And Stanford football, Earthquakes soccer and Westwood One college football all preempt 1050 on autumn weekends. Re-read 2026-09-28: the Stats API has now published real first pitches for the twelve Wild Card games on September 29, 30 and October 1, so those dates are split into per-game rows with Pacific clock times, each cross-checked against the ET time MLB.com's own Wild Card Series article prints. Every game from the Division Series onward still carries startTimeTBD true with a 07:33 UTC placeholder, so those dates stay grouped and show no time. Neither the Giants nor the Athletics are in this field.",
+      "detail": "MLB's own postseason release says \"ESPN Radio will provide live national coverage of all 2026 MLB Postseason games, beginning with the Wild Card Series presented by AbbVie.\" KTCT 1050 AM is a full-time ESPN Radio affiliate: its published weekly grid is the ESPN Radio network schedule, and its station record lists ESPN Radio as the network. No Cumulus or ESPN page publishes a game-by-game Bay Area clearance list, so these rows are indicated possibilities, not confirmed local broadcasts. A single station cannot carry two complete games simultaneously. Estimated overlap does not establish which game is carried or when a station switches. The stale affiliate grid does not prove the number of national feeds. Local programming may preempt a game. Re-read 2026-09-28: the Stats API has now published real first pitches for the twelve Wild Card games on September 29, 30 and October 1, so those dates are split into per-game rows with Pacific clock times. Games 1 and 2 match MLB.com's ET times; Game 3 times are API-only and conditional. Every game from the Division Series onward still carries startTimeTBD true with a 07:33 UTC placeholder, so those dates stay grouped and show no time. Neither the Giants nor the Athletics are in this field.",
       "url": "https://www.mlb.com/news/press-release-mlb-announces-2026-postseason-schedule"
     },
     {
@@ -1645,7 +1645,7 @@
           "url": "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
         }
       ],
-      "notes": "Cal's schedule prints Oct 3, 12:30 PM PT at UNLV on CBSSN \u2014 the only 2026 row with a kickoff. Radio column: KSFO 810.",
+      "notes": "Cal's schedule prints Oct 3, 12:30 PM PT at UNLV on CBSSN \u2014 verified Sep 27. Radio column: KSFO 810.",
       "flag_ids": [
         "DURATION_ESTIMATE"
       ]
@@ -2485,6 +2485,42 @@
       ]
     },
     {
+      "id": "cal-2026-10-10",
+      "date": "2026-10-10",
+      "start_pt": "12:30",
+      "title": "Virginia Tech at California",
+      "league": "NCAAF",
+      "network": "",
+      "venue": "California Memorial Stadium",
+      "status": "scheduled",
+      "conditional": false,
+      "result": null,
+      "stations": [
+        "810"
+      ],
+      "confidence": "official",
+      "duration_key": "NCAAF",
+      "duration_est_min": 204,
+      "sources": [
+        {
+          "label": "Cal football schedule, Radio column",
+          "url": "https://calbears.com/sports/football/schedule"
+        },
+        {
+          "label": "Cal football schedule, text view (the TBD-kickoff watch reads this page)",
+          "url": "https://calbears.com/sports/football/schedule/text"
+        },
+        {
+          "label": "ESPN Cal schedule, date and time cross-check",
+          "url": "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
+        }
+      ],
+      "notes": "Radio column: KSFO 810 (verified Sep 27). Cal text schedule re-read Sep 28: Oct 10, 12:30 PM, home vs Virginia Tech at California Memorial Stadium. The TBD monitor caught this newly published kickoff.",
+      "flag_ids": [
+        "DURATION_ESTIMATE"
+      ]
+    },
+    {
       "id": "stanford-2026-10-10",
       "date": "2026-10-10",
       "start_pt": "12:30",
@@ -2557,42 +2593,6 @@
         "QUAKES_SUBJECT_TO_CHANGE",
         "QUAKES_ALT_STATION",
         "SPANISH_EXCLUDED",
-        "DURATION_ESTIMATE"
-      ]
-    },
-    {
-      "id": "cal-2026-10-10",
-      "date": "2026-10-10",
-      "start_pt": null,
-      "title": "Virginia Tech at California",
-      "league": "NCAAF",
-      "network": "",
-      "venue": "California Memorial Stadium",
-      "status": "tba",
-      "conditional": false,
-      "result": null,
-      "stations": [
-        "810"
-      ],
-      "confidence": "official",
-      "duration_key": "NCAAF",
-      "duration_est_min": 204,
-      "sources": [
-        {
-          "label": "Cal football schedule, Radio column",
-          "url": "https://calbears.com/sports/football/schedule"
-        },
-        {
-          "label": "Cal football schedule, text view (the TBD-kickoff watch reads this page)",
-          "url": "https://calbears.com/sports/football/schedule/text"
-        },
-        {
-          "label": "ESPN Cal schedule, date and time cross-check",
-          "url": "https://www.espn.com/college-football/team/schedule/_/id/25/california-golden-bears"
-        }
-      ],
-      "notes": "Radio column: KSFO 810. Kickoff not yet set on the schedule or on ESPN; scripts/tbd_time_watch.py reads the text view daily and reports the first printed kickoff.",
-      "flag_ids": [
         "DURATION_ESTIMATE"
       ]
     },
@@ -3811,7 +3811,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 16:00 PT, converted from the 7:00 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 16:00 PT, converted from the 7:00 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
@@ -5010,7 +5010,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 16:30 PT, converted from the 7:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 16:30 PT, converted from the 7:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
@@ -5327,7 +5327,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 18:30 PT, converted from the 9:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 18:30 PT, converted from the 9:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
@@ -5694,7 +5694,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 19:00 PT, converted from the 10:00 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 19:00 PT, converted from the 10:00 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
@@ -7140,7 +7140,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 09:00 PT, converted from the 12:00 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 09:00 PT, converted from the 12:00 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
@@ -7224,7 +7224,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 11:30 PT, converted from the 2:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 11:30 PT, converted from the 2:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
@@ -7741,7 +7741,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 19:00 PT, converted from the 10:00 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 19:00 PT, converted from the 10:00 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
@@ -8038,7 +8038,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 14:00 PT, converted from the 5:00 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 14:00 PT, converted from the 5:00 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
@@ -8126,7 +8126,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 16:30 PT, converted from the 7:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 16:30 PT, converted from the 7:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
@@ -8259,7 +8259,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 18:30 PT, converted from the 9:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 18:30 PT, converted from the 9:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
@@ -8302,7 +8302,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 17:30 PT, converted from the 8:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 17:30 PT, converted from the 8:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
@@ -8390,7 +8390,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 17:30 PT, converted from the 8:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 17:30 PT, converted from the 8:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
@@ -8433,7 +8433,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 16:00 PT, converted from the 7:00 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 16:00 PT, converted from the 7:00 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
@@ -8476,7 +8476,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 18:30 PT, converted from the 9:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 18:30 PT, converted from the 9:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
@@ -8519,7 +8519,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 17:30 PT, converted from the 8:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 17:30 PT, converted from the 8:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
@@ -8602,7 +8602,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 17:30 PT, converted from the 8:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 17:30 PT, converted from the 8:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
@@ -8645,7 +8645,7 @@
           "url": "https://en.wikipedia.org/wiki/KTCT"
         }
       ],
-      "notes": "Listed start 12:30 PT, converted from the 3:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is the national ESPN Radio feed on 1050, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming can take the station instead, and ESPN Radio runs one feed, so a second game in the same window cannot also be on 1050. Matchup strings are the PDF's own.",
+      "notes": "Listed start 12:30 PT, converted from the 3:30 PM ET printed on the NBA's 2026-27 ESPN Radio schedule. This is a national ESPN Radio listing, not a Bay Area per-game clearance: Stanford football, Earthquakes soccer or other local programming may take the station instead. Overlap does not establish which game 1050 will carry. Matchup strings are the PDF's own.",
       "flag_ids": [
         "ESPN_RADIO_NBA",
         "TALK_NOT_GAMES",
