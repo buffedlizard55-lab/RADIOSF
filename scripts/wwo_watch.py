@@ -22,8 +22,12 @@ Two failure modes are deliberately kept apart:
     parser that silently matches nothing would look exactly like a source that
     had not changed.
   * A real difference is reported as **changed**, split into events the grid now
-    lists that the snapshot lacks, snapshot rows for future dates the grid no
-    longer lists, and events whose printed title differs.
+    lists that the snapshot lacks, snapshot rows for dates whose broadcast has
+    not yet started that the grid no longer lists, and events whose printed
+    title differs. An event the grid drops after its own listed start time is
+    expected — the grid advertises *upcoming* broadcasts, and a started game is
+    no longer upcoming — so that is not drift. The same applies to any row whose
+    date is already past.
 
 The grid pages carry a second, generic "Upcoming Broadcasts" widget below the
 sport-specific one. Only anchors under the heading named by the widget are
@@ -192,7 +196,11 @@ def expected_events(feed: dict[str, Any], prefix: str) -> dict[str, dict[str, st
         title = str(row.get("title", ""))
         if title.startswith(TITLE_PREFIX):
             title = title[len(TITLE_PREFIX):]
-        expected[event_id] = {"title": normalise(title), "date": row.get("date") or ""}
+        expected[event_id] = {
+            "title": normalise(title),
+            "date": row.get("date") or "",
+            "start": str(row.get("start_pt") or ""),
+        }
     return expected
 
 
@@ -202,7 +210,18 @@ def compare_widget(
     observed: dict[str, str],
     merged: set[str],
     today: str,
+    now_hhmm: str | None = None,
+    skipped: list[str] | None = None,
 ) -> list[str]:
+    """Return the differences for one widget.
+
+    ``now_hhmm`` is the current Pacific wall clock (zero-padded "HH:MM"). When a
+    same-day row is missing from the grid and its listed start has already
+    passed, the disappearance is expected on an upcoming-only grid and is
+    skipped, appended to ``skipped`` when that list is given. A same-day row
+    with no listed start — or when ``now_hhmm`` is unknown — is still reported:
+    the monitor never guesses that a started broadcast explains a removal.
+    """
     differences: list[str] = []
     sport = widget["sport"]
 
@@ -218,6 +237,15 @@ def compare_widget(
         # A grid only advertises upcoming events, so a past row dropping off is
         # expected and is not drift.
         if row["date"] and row["date"] < today:
+            continue
+        # The same is true of a same-day row whose listed start has already
+        # passed: the broadcast is no longer upcoming. The start must be
+        # printed, and the current clock must be known, before that conclusion
+        # is drawn — a missing start is reported, never assumed.
+        start = str(row.get("start") or "")
+        if row["date"] and row["date"] == today and start and now_hhmm and now_hhmm > start:
+            if skipped is not None:
+                skipped.append(f"\u201c{row['title']}\u201d on {row['date']} (started {start} PT)")
             continue
         when = row["date"] or "an undated row"
         differences.append(
@@ -255,7 +283,12 @@ def load_config(feed: dict[str, Any]) -> tuple[str, list[dict[str, Any]], set[st
     return endpoint, widgets, merged
 
 
-def run(feed: dict[str, Any], today: str, pages: dict[str, str] | None) -> tuple[str, list[str], list[str]]:
+def run(
+    feed: dict[str, Any],
+    today: str,
+    pages: dict[str, str] | None,
+    now_hhmm: str | None = None,
+) -> tuple[str, list[str], list[str]]:
     """Return (status, difference lines, detail lines)."""
     endpoint, widgets, merged = load_config(feed)
     differences: list[str] = []
@@ -288,11 +321,20 @@ def run(feed: dict[str, Any], today: str, pages: dict[str, str] | None) -> tuple
             )
             continue
 
-        differences.extend(compare_widget(widget, expected, observed, merged, today))
+        started_off_grid: list[str] = []
+        differences.extend(
+            compare_widget(widget, expected, observed, merged, today, now_hhmm, started_off_grid)
+        )
         state = "empty, as the snapshot expects" if not observed else f"{len(observed)} event(s)"
         details.append(
             f"- **{widget['sport']}** ([grid]({url})): checked, {state}; "
             f"{len(expected)} snapshot row(s) compared."
+            + (
+                " No longer listed, as expected for broadcasts that already started: "
+                + "; ".join(started_off_grid) + "."
+                if started_off_grid
+                else ""
+            )
         )
 
     # A difference outranks a failed check: something concrete needs review.
@@ -306,7 +348,12 @@ def run(feed: dict[str, Any], today: str, pages: dict[str, str] | None) -> tuple
 
 
 def make_report(
-    status: str, today: str, details: list[str], differences: list[str], snapshot_date: str
+    status: str,
+    today: str,
+    details: list[str],
+    differences: list[str],
+    snapshot_date: str,
+    now_hhmm: str | None = None,
 ) -> str:
     checked_at = datetime.now(ZoneInfo("UTC")).strftime("%Y-%m-%d %H:%M UTC")
     if status == "clear":
@@ -332,7 +379,8 @@ def make_report(
         "# Automated source watch — Westwood One grids\n\n"
         f"- Checked: {checked_at}\n"
         f"- Pacific date used for comparison: {today}\n"
-        f"- Published snapshot date: {snapshot_date}\n"
+        + (f"- Pacific clock used for comparison: {now_hhmm}\n" if now_hhmm else "")
+        + f"- Published snapshot date: {snapshot_date}\n"
         f"- Status: **{status}**\n\n"
         f"{body}\n\n"
         "This is a read-only monitor of the rights holder's own upcoming-broadcast grids. It does "
@@ -346,32 +394,41 @@ def local_today() -> str:
     return datetime.now(ZoneInfo("America/Los_Angeles")).date().isoformat()
 
 
+def local_now() -> str:
+    """Current Pacific wall clock, zero-padded HH:MM."""
+    return datetime.now(ZoneInfo("America/Los_Angeles")).strftime("%H:%M")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--report", type=Path, help="write the human-readable report to this path")
     parser.add_argument("--github-output", type=Path, help="write status as a GitHub Actions output")
     parser.add_argument("--today", help="override the Pacific date (intended for tests)")
+    parser.add_argument("--now", help="override the Pacific clock as HH:MM (intended for tests)")
     parser.add_argument("--input", type=Path,
                         help="read saved grid HTML from this JSON file instead of fetching")
     args = parser.parse_args()
 
     today = args.today or local_today()
+    now_hhmm = args.now or local_now()
     snapshot_date = "unknown"
     try:
         if date.fromisoformat(today).isoformat() != today:
             raise ValueError(f"Date must use YYYY-MM-DD, got {today!r}.")
+        if not re.fullmatch(r"([01]\d|2[0-3]):[0-5]\d", now_hhmm):
+            raise ValueError(f"Time must use zero-padded HH:MM, got {now_hhmm!r}.")
         feed = json.loads(FEED_PATH.read_text(encoding="utf-8"))
         snapshot_date = str(feed.get("meta", {}).get("snapshot_date", "unknown"))
         pages = json.loads(args.input.read_text(encoding="utf-8")) if args.input else None
         if pages is not None and not isinstance(pages, dict):
             raise MonitorError("--input must be a JSON object keyed by widget id.")
-        status, differences, details = run(feed, today, pages)
+        status, differences, details = run(feed, today, pages, now_hhmm)
     except (MonitorError, OSError, json.JSONDecodeError, ValueError) as exc:
         status = "unavailable"
         differences = []
         details = [f"- {exc}"]
 
-    report = make_report(status, today, details, differences, snapshot_date)
+    report = make_report(status, today, details, differences, snapshot_date, now_hhmm)
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(report, encoding="utf-8")
