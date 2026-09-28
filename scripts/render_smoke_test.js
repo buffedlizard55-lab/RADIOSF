@@ -388,3 +388,8 @@ Promise.resolve().then(function () {
   console.error(err && err.stack ? err.stack : err);
   process.exit(1);
 });
+
+/* The monitoring section must show a dated record and never read as a live status. */
+assert.ok(/id="monitoring"/.test(html), "the page has a visible source-monitoring section");
+assert.ok(/This is a dated record, not a live status\./.test(html), "monitor results are labelled as dated");
+assert.ok(/no MLB postseason game is confirmed on 1050 yet/.test(html), "1050 MLB carriage is not overclaimed");
