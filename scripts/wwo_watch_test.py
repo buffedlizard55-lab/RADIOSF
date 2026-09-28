@@ -153,8 +153,10 @@ class FeedBaselineTests(unittest.TestCase):
 
 
 class CompareTests(unittest.TestCase):
-    def compare(self, widget, expected, observed, merged=frozenset(), today=TODAY):
-        return wwo_watch.compare_widget(widget, expected, observed, set(merged), today)
+    def compare(self, widget, expected, observed, merged=frozenset(), today=TODAY,
+                now=None, skipped=None):
+        return wwo_watch.compare_widget(widget, expected, observed, set(merged), today,
+                                        now, skipped)
 
     def test_matching_grid_is_clear(self):
         expected = {"557146": {"title": "SEC Championship Game", "date": "2026-12-05"}}
@@ -188,6 +190,44 @@ class CompareTests(unittest.TestCase):
         diffs = self.compare(NFL_WIDGET, expected, {})
         self.assertEqual(len(diffs), 1)
         self.assertIn("undated row", diffs[0])
+
+    # The grid advertises *upcoming* broadcasts, so a same-day event that has
+    # already started is legitimately gone. Regression for the 2026-09-28 live
+    # preview: the Rams at Broncos row (listed 16:30 PT) dropped off the grid
+    # at 22:34 PT on its own game day and was first reported as drift.
+    def started_row(self, start="16:30", now="22:34", skipped=None):
+        expected = {
+            "548494": {
+                "title": "Los Angeles Rams at Denver Broncos",
+                "date": TODAY,
+                "start": start,
+            }
+        }
+        return self.compare(NFL_WIDGET, expected, {}, now=now, skipped=skipped)
+
+    def test_same_day_row_missing_after_its_start_is_not_drift(self):
+        skipped = []
+        self.assertEqual(self.started_row(skipped=skipped), [])
+        self.assertEqual(len(skipped), 1)
+        self.assertIn("started 16:30 PT", skipped[0])
+
+    def test_same_day_row_missing_before_its_start_is_still_reported(self):
+        diffs = self.started_row(start="16:30", now="15:00")
+        self.assertEqual(len(diffs), 1)
+        self.assertIn("no longer lists event 548494", diffs[0])
+
+    def test_same_day_row_without_a_listed_start_is_still_reported(self):
+        diffs = self.started_row(start="", now="22:34")
+        self.assertEqual(len(diffs), 1)
+
+    def test_same_day_row_without_a_known_clock_is_still_reported(self):
+        diffs = self.started_row(start="16:30", now=None)
+        self.assertEqual(len(diffs), 1)
+
+    def test_future_date_is_not_excused_by_the_clock(self):
+        expected = {"548494": {"title": "Rams at Broncos", "date": "2026-10-04", "start": "10:00"}}
+        diffs = self.compare(NFL_WIDGET, expected, {}, now="22:34")
+        self.assertEqual(len(diffs), 1)
 
     def test_renamed_event_is_reported(self):
         expected = {"557146": {"title": "SEC Championship", "date": "2026-12-05"}}
@@ -225,6 +265,34 @@ class RunTests(unittest.TestCase):
         self.assertEqual(differences, [])
         self.assertEqual(len(details), 4)
         self.assertTrue(all("checked" in line for line in details))
+
+    def test_started_event_dropping_off_the_grid_is_clear_with_a_note(self):
+        # Replay of the live 2026-09-28 preview: event 548494 (Rams at Broncos,
+        # listed start 16:30 PT) left the upcoming grid at 22:34 PT on game day.
+        pages = mirror_pages()
+        nfl_expected = wwo_watch.expected_events(FEED, "wwo-nfl-")
+        cards = [
+            card(int(eid), row["title"], "", "")
+            for eid, row in sorted(nfl_expected.items())
+            if eid != "548494"
+        ]
+        pages["47029"] = grid(NFL_HEADING, cards, generic=GENERIC)
+        status, differences, details = wwo_watch.run(FEED, TODAY, pages, now_hhmm="22:34")
+        self.assertEqual(status, "clear", differences)
+        self.assertTrue(any("started 16:30 PT" in line for line in details), details)
+
+    def test_same_day_event_missing_before_its_start_is_still_drift(self):
+        pages = mirror_pages()
+        nfl_expected = wwo_watch.expected_events(FEED, "wwo-nfl-")
+        cards = [
+            card(int(eid), row["title"], "", "")
+            for eid, row in sorted(nfl_expected.items())
+            if eid != "548494"
+        ]
+        pages["47029"] = grid(NFL_HEADING, cards, generic=GENERIC)
+        status, differences, _ = wwo_watch.run(FEED, TODAY, pages, now_hhmm="15:00")
+        self.assertEqual(status, "changed")
+        self.assertTrue(any("548494" in line for line in differences))
 
     def test_basketball_grid_publishing_events_is_drift(self):
         # The largest open limitation is an empty college basketball grid. The
@@ -273,6 +341,13 @@ class ReportAndExitCodeTests(unittest.TestCase):
         self.assertIn("read-only", report)
         self.assertIn("does not confirm", report)
         self.assertNotIn("published a new snapshot", report)
+        self.assertNotIn("Pacific clock used for comparison", report)
+
+    def test_report_states_the_clock_when_one_is_known(self):
+        report = wwo_watch.make_report(
+            "clear", TODAY, ["- **NFL**: checked"], [], "2026-09-27", "22:34"
+        )
+        self.assertIn("Pacific clock used for comparison: 22:34", report)
 
     def test_changed_report_lists_every_difference(self):
         report = wwo_watch.make_report(

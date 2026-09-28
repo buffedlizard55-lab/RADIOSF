@@ -6,6 +6,26 @@ Window: **2026-09-27 through 2027-02-28**, America/Los_Angeles. Days before Sep 
 
 Result: **182 date-level schedule entries**: 168 rows with at least one non-conditional listing (2 are mixed) and 14 entirely if-necessary rows. 181 entries have a date; 1 is deliberately unplaced. 37 official, 143 indicated, 2 review. 35 flags. The two mixed postseason rows also contain three if-necessary games; the feed records **21 possible games across 13 dates**. Two dates have only if-necessary possibilities and no non-conditional listing.
 
+## Re-verified by hand in the tenth pass, 2026-09-28
+
+No source re-read in this pass produced a change to the feed; the purpose was to confirm the ninth pass against the live sources again, line by line, before anything else was touched. Read through the session fetch tool, because the development sandbox still cannot open TLS connections to these hosts.
+
+| Source | What was re-read, and the result |
+| --- | --- |
+| [MLB Stats API, Wild Card games (`gameTypes=F`)](https://statsapi.mlb.com/api/v1/schedule?season=2026&sportId=1&gameTypes=F&startDate=2026-09-29&endDate=2026-10-01) | **12 of 12 games match the snapshot**: every gamePk, `gameDate` instant, `officialDate`, description, away/home label, venue, `ifNecessary` marker and `startTimeTBD: false`. The three published first pitches per day are unchanged (18:00/21:00/00:00/02:00 Z). The Thursday if-necessary slots still carry real instants while MLB.com still prints "Thursday" with no time — flag `MLB_WC_THURSDAY_PROVISIONAL` still applies. |
+| [MLB Stats API, Division Series (`gameTypes=D`)](https://statsapi.mlb.com/api/v1/schedule?season=2026&sportId=1&gameTypes=D&startDate=2026-10-01&endDate=2026-10-12) | **20 of 20 games match the snapshot**: all eight dates, all gamePks, all venue strings (`Progressive Field`, `Tropicana Field`, `American Family Field`, `UNIQLO Field at Dodger Stadium`, `NL Stadium`, `AL Stadium`), all bracket placeholders (`NYY/BOS`, `HOU/CWS`, `SD/CHC`, `ATL/PHI`), all `ifNecessary` markers — and **every game still carries `startTimeTBD: true`**, so no Division Series date has clock times to transcribe yet. The trailing space in gamePk 849827's description is still printed by the source. |
+| [MLB Stats API, League Championship (`gameTypes=L`)](https://statsapi.mlb.com/api/v1/schedule?season=2026&sportId=1&gameTypes=L&startDate=2026-10-11&endDate=2026-10-21) | **14 of 14 games match**: ten dates, placeholder seed labels, `NL Stadium`/`AL Stadium`, if-necessary markers (including the Oct 16 mixed row), `startTimeTBD: true` throughout. |
+| [MLB Stats API, World Series (`gameTypes=W`)](https://statsapi.mlb.com/api/v1/schedule?season=2026&sportId=1&gameTypes=W&startDate=2026-10-22&endDate=2026-11-01) | **7 of 7 games match**: seven dates, `TBD` venue, league-champion placeholders, if-necessary markers on Games 5–7, `startTimeTBD: true` throughout. Total across the four reads: 53 games, 28 dates — **zero drift**. |
+| `49ers.com/schedule/` | **All 15 rows match**, read end to end: Week 4 through Week 18 dates, Pacific kickoffs, the `KSAN 107.7 FM / KNBR 104.5 FM / 680 AM` radio line on every future game, venues (including `Estadio Banorte`), the Week 8 bye, and Week 18 still `TBD` with `State Farm Stadium`. The tbd watch on Week 18 is **clear**. |
+| [Cal football schedule, text view](https://calbears.com/sports/football/schedule/text) | All seven watched kickoffs (Oct 10, Oct 17, Oct 24, Oct 31, Nov 14, Nov 21, Nov 28) still print empty Time cells — **clear**, no kickoff to transcribe. Oct 3 at UNLV still prints 12:30 PM, as the snapshot carries. |
+| [ESPN's weekly Radio grid](https://www.espn.com/espnradio/schedule) | Still the **week of Sep 21–27** — same four printed games (`MLB: Mets @ Rangers`, `MLB: Guardians @ Royals`, `CFB: Wisconsin @ Penn State`, `CFB: Texas A&M @ LSU`), all now in the past. Nothing to add; the rollover limitation stands. A `?xhr=1` probe returns the same grid, and neither proves anything about what GitHub's runners receive (they still get HTTP 202), so no monitor behaviour was changed on speculation. |
+| [KNBR 1050 weekly grid](https://www.thesportsleader.com/knbr1050shows/) | Still frozen on **MONDAY 8-31 through SUNDAY 9-6**, unchanged since it was first read. Flag `KNBR_GRID_STALE` still applies. (A guess at `knbr.com/radioschedule` returns a 404 page — the watched URL is the `thesportsleader.com/knbr1050shows` one above.) |
+| [nfl.com/schedules/2026/POST](https://www.nfl.com/schedules/2026/POST) | Still redirects to the regular-season schedule (week 3 results). No postseason grid, so the NFL playoff rows stay window-level, exactly as documented. |
+
+**The live source-watch preview on PR #15 ran all six monitors on GitHub's runners twice, at 05:34 and 05:42 UTC on 2026-09-28.** The first run caught one thing the hand re-read above had not: the Westwood One NFL grid no longer listed event 548494 ("Los Angeles Rams at Denver Broncos" on 2026-09-27). The hand re-read had covered six other sources but not the four Westwood One grids, and the monitor only excused missing rows dated *strictly before* today — so the finished broadcast (listed start 16:30 PT, preview at 22:34 PT) read as drift even though an upcoming-only grid is supposed to drop what has started. The snapshot row was verified correct against the row's own sources and left alone; the monitor was fixed to compare the Pacific clock with the row's listed start for same-day rows, to name skipped broadcasts in the report, and to keep reporting anything whose start or clock is unknown. Eight offline tests cover it. The second run then reported **clear** with the exact note — "No longer listed, as expected for broadcasts that already started: 'Los Angeles Rams at Denver Broncos' on 2026-09-27 (started 16:30 PT)". Final state on the pull request: MLB **clear**, Westwood One **clear**, pages **clear**, NBA PDF **clear**, TBD kickoffs **clear**, ESPN weekly grid **unavailable** (HTTP 202, pre-existing) — five of six, zero drift.
+
+Issue #13 (`[Automated source watch] Schedule sources need review`) was raised from these same sources on 2026-09-27; its MLB findings are all in the feed through PR #14. This pass could not close it — the session's GitHub token has no `issues` write permission (pull requests yes, issues no) — so the close is recorded here and in LIMITATIONS for the next session.
+
 ## Re-read and rebuilt in the ninth pass, 2026-09-28
 
 Open issue #13 reported MLB schedule drift. Every source below was fetched again on 2026-09-28 through the session fetch tool — the sandbox has no outbound network at all, `curl` to any host including example.com fails with `SSL_ERROR_SYSCALL`, so nothing here came from a cache or from the previous pass's notes.
@@ -174,11 +194,11 @@ Because KTCT 1050 is a full-time ESPN Radio affiliate, the 28 postseason date-ro
 
 ## Automated monitoring boundary
 
-`.github/workflows/source-watch.yml` runs daily and can also be dispatched manually. It runs **five** read-only monitors and opens or refreshes **one** combined review issue.
+`.github/workflows/source-watch.yml` runs daily and can also be dispatched manually. It runs **six** read-only monitors and opens or refreshes **one** combined review issue.
 
 | Monitor | Source | Compares | Rows |
 | --- | --- | --- | ---: |
-| `scripts/source_watch.py` | MLB postseason Stats API | future dates, game counts, descriptions, away/home matchup labels, if-necessary markers and start-time TBD status | 28 |
+| `scripts/source_watch.py` | MLB postseason Stats API | every game matched on its permanent `gamePk`: description, away/home labels, venue, if-necessary marker **and first pitch**, aggregated across the per-game rows that share a date | 37 |
 | `scripts/espn_watch.py` | NBA 2026-27 ESPN Radio schedule PDF | parsed shape, in-window dates, matchups and printed ET times | 20 |
 | `scripts/wwo_watch.py` | Westwood One NFL grid (widget 47029) | event ids and printed titles | 63 |
 | `scripts/wwo_watch.py` | Westwood One college football grid (47030) | event ids and printed titles | 11 |
@@ -190,8 +210,9 @@ Because KTCT 1050 is a full-time ESPN Radio affiliate, the 28 postseason date-ro
 | `scripts/page_watch.py` | NFL important dates (seahawks.com); nfl.com/schedules/2026/POST | round-date text; alert on "Wild Card Weekend" | 7 |
 | `scripts/page_watch.py` | KNBR 1050 grid; USF 2026-27 men's basketball text schedule | frozen-week marker; alert on "KNBR" | gap watch |
 | `scripts/espn_radio_week_watch.py` | espn.com/espnradio/schedule | dates the undated Monday–Sunday week from ESPN's scoreboard; reports future in-window games the snapshot does not name | gap watch |
+| `scripts/tbd_time_watch.py` | Cal's football schedule (text view) and 49ers.com | the eight rows whose kickoff is still unpublished: still TBD, **published**, or `unavailable` | 8 |
 
-That is **171 of the 173 rows** under a daily watch, plus the weekly-grid gap watch. The remaining two rows (Giants and Athletics finales) are dated 2026-09-27, the snapshot date. The Westwood One watcher reads its widget ids, row-id prefixes and merged 49ers event ids from `meta.wwo_watch` in the feed. The page watcher reads `data/page_watch.json`; every `expect` string there was read on the live page on 2026-09-27 and every `alert_if_present` string was absent.
+That is **180 of the 182 rows** under a daily watch, plus the weekly-grid gap watch. The remaining two rows (Giants and Athletics finales) are dated 2026-09-27, the first day of the window, and are now in the past. The Westwood One watcher reads its widget ids, row-id prefixes and merged 49ers event ids from `meta.wwo_watch` in the feed. The page watcher reads `data/page_watch.json`; every `expect` string there was read on the live page on 2026-09-27 and every `alert_if_present` string was absent.
 
 All monitors are read-only: none edits the snapshot, publishes a Pages build, or verifies affiliate clearance. The page watcher reports that text moved; it does not parse a schedule. A monitor that cannot complete reports **unavailable** and never "no drift". Where one check fails and another shows real drift, the combined status is **changed**, so a failure cannot bury a difference.
 
