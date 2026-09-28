@@ -26,6 +26,11 @@
   `data/tbd_watch.json`, and covers the school pages that show two seasons at once: gostanford.com
   opens with the completed 2025 results above the 2026 ticker, so an anchor matched on a date
   alone is not enough — match the opponent too.
+- An MLB postseason date splits into per-game rows when, and only when, the Stats API has published a real
+  first pitch for **every** game on it. That rule lives in `mlb_postseason_rows()` as the per-date
+  `start_time_tbd` flag; flipping it and transcribing the instants is how a Division Series date gets clock
+  times. A placeholder instant (07:33Z, 08:33Z, 10:33Z) is never a time, and `validate()` refuses a row
+  whose displayed clock time does not re-derive from the instant its own source label cites.
 - A page that builds its schedule in the browser cannot be watched at all. gostanford.com serves
   its 2026 ticker to a browser, not to a plain request, so no `expect` string from it can ever be
   found — an entry for it reported every string missing on its first live run and was removed.

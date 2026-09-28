@@ -260,7 +260,8 @@ feed.broadcasts.forEach(function (row) {
 assert.strictEqual(feed.meta.counts.broadcasts, feed.broadcasts.length);
 assert.strictEqual(feed.meta.counts.conditional,
   feed.broadcasts.filter(function (row) { return L.isConditional(row); }).length);
-assert.strictEqual(feed.meta.counts.conditional, 11, "fully conditional date-level rows");
+assert.strictEqual(feed.meta.counts.conditional, 14,
+  "wholly conditional rows: 10 grouped postseason dates plus the four October 1 Wild Card Game 3 rows");
 assert.strictEqual(feed.meta.counts.conditional_games, 21, "if-necessary postseason games across fully and partially conditional rows");
 assert.strictEqual(feed.meta.counts.conditional_games,
   feed.broadcasts.reduce(function (sum, row) { return sum + (row.conditional_game_count || 0); }, 0),
@@ -285,18 +286,32 @@ assert.strictEqual(real.daysWithListings, 97, "non-conditional listing-day count
 assert.strictEqual(real.daysWithPossibilities, 13, "conditional possibility-day count, including mixed postseason rows");
 assert.strictEqual(real.conditionalGames, 21, "conditional game count");
 assert.strictEqual(real.daysConditionalOnly, 2, "conditional-only date count");
-assert.strictEqual(real.daysMajority, 18, "non-conditional estimated-window majority count");
-assert.strictEqual(L.formatDuration(real.meanCovered), "2h 2m");
-assert.strictEqual(L.formatDuration(real.meanCoveredOnListingDays), "3h 15m");
+assert.strictEqual(real.daysMajority, 20, "non-conditional estimated-window majority count");
+assert.strictEqual(L.formatDuration(real.meanCovered), "2h 10m");
+assert.strictEqual(L.formatDuration(real.meanCoveredOnListingDays), "3h 28m");
 assert.deepStrictEqual(real.byWeekday.map(function (day) {
   return day.days ? L.formatDuration(Math.round(day.covered / day.days)) : "0m";
-}), ["3h 53m", "2h 20m", "23m", "20m", "2h 48m", "1h 3m", "3h 24m"],
+}), ["3h 53m", "2h 20m", "48m", "50m", "2h 48m", "1h 3m", "3h 24m"],
   "weekday coverage in the README matches the snapshot");
-/* The 20 NBA rows are transcribed from one official PDF. They bought 17 more
-   listing days, which is why the mean on listing days fell while the mean across
-   all dates rose: a 150-minute evening game on a previously empty date. */
-assert.strictEqual(L.formatDuration(real.busiest.covered), "9h 45m",
-  "Christmas Day is the busiest date in the snapshot");
+/* Publishing the twelve Wild Card first pitches moved the busiest date in the
+   snapshot. September 29 and 30 each carry four timed postseason games plus a
+   Westwood One match on the 29th, which is more of the 10 AM-10 PM band than
+   Christmas Day's five NBA games fill. This is the first date the feed can
+   describe as almost continuously covered. */
+assert.strictEqual(real.busiest.date, "2026-09-29", "the first Wild Card day is the busiest date");
+assert.strictEqual(L.formatDuration(real.busiest.covered), "11h",
+  "September 29 covers eleven of the twelve band hours");
+["2026-09-29", "2026-09-30"].forEach(function (iso) {
+  var day = real.days.find(function (d) { return d.date === iso; });
+  assert.strictEqual(day.covered, 660, iso + " covers 11h of the 12h band");
+  assert.strictEqual(day.tbd, 0, iso + " has no listing left without a clock time");
+  assert.ok(day.share > 0.9, iso + " fills more than 90% of the band");
+});
+/* October 1's four games are all if-necessary, so the day must stay out of the
+   coverage maths even though the API now prints a first pitch for each. */
+var oct1 = real.days.find(function (d) { return d.date === "2026-10-01"; });
+assert.strictEqual(oct1.possibilities, 4, "October 1 carries four conditional games");
+assert.strictEqual(oct1.conditionalGames, 4, "each October 1 row is one possible game");
 
 function scenario(durationFor) {
   var rows = feed.broadcasts.map(function (row) {
@@ -317,11 +332,11 @@ var sensitivity = [
 assert.deepStrictEqual(sensitivity.map(function (s) {
   return [s.daysWithListings, s.daysMajority, L.formatDuration(s.meanCovered), L.formatDuration(s.meanCoveredOnListingDays)];
 }), [
-  [97, 0, "1h 1m", "1h 38m"],
-  [97, 5, "1h 43m", "2h 44m"],
-  [97, 18, "2h 2m", "3h 15m"],
-  [97, 18, "2h 37m", "4h 11m"],
-  [97, 18, "2h 35m", "4h 8m"]
+  [97, 1, "1h 6m", "1h 45m"],
+  [97, 7, "1h 51m", "2h 57m"],
+  [97, 20, "2h 10m", "3h 28m"],
+  [97, 20, "2h 44m", "4h 23m"],
+  [97, 20, "2h 42m", "4h 19m"]
 ], "README sensitivity figures match the logic");
 /* NFL playoff rows are round windows, not games. They must never grow a time, a
    venue, a game count or the 49ers FM flagship, because no source publishes one. */
@@ -342,6 +357,66 @@ playoffs.forEach(function (row) {
 });
 assert.ok(feed.flags.some(function (f) { return f.id === "NFL_POSTSEASON_WINDOWS"; }),
   "the corrected postseason flag is shipped");
+
+/* MLB postseason: a date whose first pitches are published is split into
+   per-game rows with a Pacific clock time; any other date stays one grouped row
+   with no time. Both shapes must carry the API's own gamePk so the monitor can
+   match them, and no row may invent a participant the API left as a placeholder. */
+var mlb = feed.broadcasts.filter(function (row) { return row.id.indexOf("mlb-post-") === 0; });
+assert.strictEqual(mlb.length, 37, "twelve per-game Wild Card rows plus twenty-five grouped dates");
+var mlbPks = [];
+mlb.forEach(function (row) {
+  assert.deepStrictEqual(row.stations, ["1050"], row.id + " is ESPN Radio on KTCT only");
+  assert.strictEqual(row.confidence, "indicated",
+    row.id + " is a network row, never a per-game Bay Area clearance");
+  row.game_details.forEach(function (g) {
+    assert.ok(Number.isInteger(g.game_pk), row.id + " slot carries the API's integer gamePk");
+    assert.ok(mlbPks.indexOf(g.game_pk) === -1, "gamePk " + g.game_pk + " appears in two rows");
+    mlbPks.push(g.game_pk);
+    assert.ok(typeof g.venue === "string" && g.venue.length > 0,
+      row.id + " slot carries the API's own venue string");
+  });
+  if (row.start_pt) {
+    assert.strictEqual(row.game_details.length, 1,
+      row.id + " carries a clock time, so it must be exactly one game");
+    assert.ok(row.id === "mlb-post-" + row.game_details[0].game_pk,
+      row.id + " is named after its own gamePk");
+    assert.ok(row.sources.some(function (s) { return /first pitch \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/.test(s.label); }),
+      row.id + " cites the API instant its clock time was converted from");
+    assert.ok(row.sources.some(function (s) { return s.url.indexOf("/game/" + row.game_details[0].game_pk + "/") !== -1; }),
+      row.id + " links the API game feed a human can open");
+  } else {
+    assert.ok(!row.sources.some(function (s) { return /first pitch/.test(s.label); }),
+      row.id + " has no clock time, so it must not cite a first pitch");
+  }
+});
+assert.strictEqual(mlbPks.length, 53, "the API's 53 postseason games are each represented once");
+assert.strictEqual(new Set(mlb.map(function (row) { return row.date; })).size, 28,
+  "the API's 28 postseason dates are all covered");
+/* The two dates the API has scheduled, and only those, are split per game. */
+assert.deepStrictEqual(
+  mlb.filter(function (row) { return row.start_pt; }).map(function (row) { return row.date; })
+    .filter(function (d, i, all) { return all.indexOf(d) === i; }),
+  ["2026-09-29", "2026-09-30", "2026-10-01"],
+  "only the Wild Card dates carry per-game clock times");
+/* The API resolved its PHI/ARI bracket slot during this pass. The resolved team
+   ships, and the row records that the label was a placeholder before it moved —
+   a resolved slot must not read as though it had always been settled. */
+var nlwcA = mlb.filter(function (row) {
+  return row.game_details.some(function (g) { return g.description.indexOf("NL Wild Card 'A'") === 0; });
+});
+assert.strictEqual(nlwcA.length, 3, "three NL Wild Card 'A' games");
+nlwcA.forEach(function (row) {
+  assert.strictEqual(row.game_details[0].away, "Philadelphia Phillies",
+    row.id + " carries the API's resolved away label");
+  assert.ok(/printed this away slot as the placeholder PHI\/ARI/.test(row.notes),
+    row.id + " records that its away label was a placeholder before the API resolved it");
+});
+assert.ok(!mlb.some(function (row) {
+  return row.game_details.some(function (g) { return g.away === "PHI/ARI"; });
+}), "no resolved placeholder is still shipped as a placeholder");
+assert.ok(feed.flags.some(function (f) { return f.id === "MLB_WC_THURSDAY_PROVISIONAL"; }),
+  "the provisional October 1 times are flagged for review");
 assert.ok(!feed.flags.some(function (f) { return f.id === "WWO_POSTSEASON_UNDATED"; }),
   "the flag that called the official round dates unofficial is gone");
 

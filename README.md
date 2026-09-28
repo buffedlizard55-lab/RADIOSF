@@ -59,15 +59,15 @@ On the page you can:
 - **download the selected day as a calendar file** (`.ics`) that carries each row's source link and confidence;
 - **open a source for every row** and inspect its confidence and irregularity notes.
 
-Snapshot date: **2026-09-27**. Window: **2026-09-27 through 2027-02-28**, America/Los_Angeles (155 calendar days). The snapshot contains **173 date-level schedule entries**: 162 rows include at least one non-conditional listing and 11 rows are entirely if-necessary, plus 34 flags. Two of the 162 rows are mixed postseason rows and also carry three if-necessary game possibilities. In total, 21 possible postseason games are represented across 13 dates. 172 entries have a date; one 49ers Week 18 row remains deliberately unplaced. The snapshot is not a live station log; see [docs/VERIFICATION.md](docs/VERIFICATION.md).
+Snapshot date: **2026-09-28**. Window: **2026-09-27 through 2027-02-28**, America/Los_Angeles (155 calendar days). The snapshot contains **182 date-level schedule entries**: 168 rows include at least one non-conditional listing and 14 rows are entirely if-necessary, plus 35 flags. Two of the 168 rows are mixed postseason rows and also carry three if-necessary game possibilities. In total, 21 possible postseason games are represented across 13 dates. 181 entries have a date; one 49ers Week 18 row remains deliberately unplaced. Everything except the MLB postseason rows was last line-checked on 2026-09-27; the MLB rows were re-read on 2026-09-28, when the Stats API published the first Wild Card first pitches. The snapshot is not a live station log; see [docs/VERIFICATION.md](docs/VERIFICATION.md).
 
 | Confidence | Meaning | Entries |
 | --- | --- | ---: |
 | official | A club, school, league API or rights holder printed both the event and station, or an explicit TBD. | 37 |
-| indicated | A network or rights-holder lists the event, and a separate source establishes a Bay Area affiliate relationship. This is **not** per-game clearance; local programming may preempt it. | 134 |
+| indicated | A network or rights-holder lists the event, and a separate source establishes a Bay Area affiliate relationship. This is **not** per-game clearance; local programming may preempt it. | 143 |
 | review | Sources disagree, or the station line is not stated for that exact event. Shown for review, not silently resolved. | 2 |
 
-The 11 fully conditional rows are among the indicated entries; together they account for 18 possible games. Two other postseason date-rows mix three if-necessary games with non-conditional games. The row badges and source notes show that split. Conditional games are never treated as confirmed; any grouped postseason row containing a conditional game is conservatively excluded from duration and conflict calculations. A mixed row still counts as a non-conditional listing day because it also represents games not marked if-necessary. Past dates and elapsed estimated windows are labelled unchecked. Even a final game result does not prove that a local radio station carried it.
+The 14 fully conditional rows are among the indicated entries; together they account for 18 possible games. Two other postseason date-rows mix three if-necessary games with non-conditional games. The row badges and source notes show that split. Conditional games are never treated as confirmed; any grouped postseason row containing a conditional game is conservatively excluded from duration and conflict calculations. A mixed row still counts as a non-conditional listing day because it also represents games not marked if-necessary. Past dates and elapsed estimated windows are labelled unchecked. Even a final game result does not prove that a local radio station carried it.
 
 ## Stations
 
@@ -77,7 +77,7 @@ The 11 fully conditional rows are among the indicated entries; together they acc
 | 104.5 FM | KNBR-FM | Full-time simulcast of 680. Same events whenever a source lists both. Never Stanford. | 97 / 70 |
 | 810 AM | KSFO | 49ers Week 3 only; Cal football except the Big Game; Earthquakes English flagship. | 15 / 11 |
 | 960 AM | KNEW | Athletics through the last day of the regular season. Fox Sports Radio talk is not a game listing. | 1 / 1 |
-| 1050 AM | KTCT | Stanford football; Westwood One NFL, college football and U.S. Soccer; MLB postseason and the NBA's ESPN Radio schedule indicated via the affiliation, not a per-game clearance. | 142 / 96, including 11 if-necessary-only rows and the 20 NBA/Cup rows |
+| 1050 AM | KTCT | Stanford football; Westwood One NFL, college football and U.S. Soccer; MLB postseason and the NBA's ESPN Radio schedule indicated via the affiliation, not a per-game clearance. | 151 / 96, including 14 if-necessary-only rows and the 20 NBA/Cup rows |
 | 107.7 FM | KSAN | 49ers, every regular-season week listed here. | 15 / 14 |
 
 “Entries / dates” counts rows assigned to each station; one row may count on more than one station. The 1050 count includes 11 fully conditional postseason rows, two mixed rows that also contain if-necessary games, and the 20 NBA rows from the league's own ESPN Radio schedule — 17 games with a printed time and three Cup dates with none. Spanish calls (1370, 1510, 93.7, Univision Radio, the 49ers app) are not on these six frequencies and are omitted. HD subchannels (KNBR-F2, KSAN HD3) are omitted. Warriors, Valkyries (95.7) and Sharks (98.5) are out of scope, not missing.
@@ -99,11 +99,42 @@ Leaving January 17, 18, 23 and 24 blank would have read as "no live sports radio
 
 An earlier version of this feed called these dates "not official". They are the league's own announcement; that was wrong and it is corrected here.
 
-## MLB postseason: published matchups, start times still TBD
+## MLB postseason: the Wild Card round now has clock times
 
-The MLB Stats API currently lists all 53 postseason game slots across 28 dates, with away/home labels and `ifNecessary` status. The site now shows those API-printed matchup labels on each date, including unresolved placeholders such as “AL 4/5 Winner”; it does not guess the teams behind a placeholder. The API still marks every first pitch TBD, so no MLB postseason clock time is displayed. Games marked if necessary remain possibilities, not confirmed games. This is the MLB schedule—not a per-game 1050 clearance: ESPN's national radio coverage plus KTCT's ESPN affiliate relationship only supports an **indicated** listing, and local preemption remains possible.
+Re-read 2026-09-28. The MLB Stats API lists all 53 postseason game slots across 28 dates and, as of this pass, has published a real first pitch for the twelve Wild Card games. Those three dates are now **one row per game with a Pacific clock time** instead of one grouped row with none. Every other postseason date still carries `startTimeTBD` true with the API's 07:33/08:33/10:33 UTC placeholder, so those dates stay grouped and show no time — a placeholder instant is never displayed as a clock time.
 
-The original watch only compared dates, counts, descriptions and TBD status. It could miss a changed opponent or conditional marker while still reporting “clear.” The monitor now compares each game's description, away/home labels and if-necessary status too. Its saved real-response fixture includes those fields; changes open a review issue and never auto-publish.
+**This is the direct answer to “are the MLB playoffs on the radio in San Francisco?”** Yes, on 1050 AM, and on the first two days it is close to continuous. Each first pitch below is the API's UTC instant converted to Pacific, and each is independently printed by MLB.com's own Wild Card Series article in Eastern time — two official sources, agreeing:
+
+| PT first pitch | Game (API's own labels) | API instant | MLB.com's printed time | Venue |
+| --- | --- | --- | --- | --- |
+| Tue Sep 29, 11:00 AM | NL Wild Card 'A' Game 1: Philadelphia Phillies at Atlanta Braves | 2026-09-29T18:00:00Z | 2 p.m. ET | Truist Park |
+| Tue Sep 29, 2:00 PM | AL Wild Card 'A' Game 1: Chicago White Sox at Houston Astros | 2026-09-29T21:00:00Z | 5 p.m. ET | Daikin Park |
+| Tue Sep 29, 5:00 PM | AL Wild Card 'B' Game 1: Boston Red Sox at New York Yankees | 2026-09-30T00:00:00Z | 8 p.m. ET | Yankee Stadium |
+| Tue Sep 29, 7:00 PM | NL Wild Card 'B' Game 1: Chicago Cubs at San Diego Padres | 2026-09-30T02:00:00Z | 10 p.m. ET/7 p.m. PT | Petco Park |
+| Wed Sep 30, 11:00 AM | NL Wild Card 'A' Game 2: Philadelphia Phillies at Atlanta Braves | 2026-09-30T18:00:00Z | 2 p.m. ET | Truist Park |
+| Wed Sep 30, 2:00 PM | AL Wild Card 'A' Game 2: Chicago White Sox at Houston Astros | 2026-09-30T21:00:00Z | 5 p.m. ET | Daikin Park |
+| Wed Sep 30, 5:00 PM | AL Wild Card 'B' Game 2: Boston Red Sox at New York Yankees | 2026-10-01T00:00:00Z | 8 p.m. ET | Yankee Stadium |
+| Wed Sep 30, 7:00 PM | NL Wild Card 'B' Game 2: Chicago Cubs at San Diego Padres | 2026-10-01T02:00:00Z | 10 p.m. ET/7 p.m. PT | Petco Park |
+| Thu Oct 1, 11:00 AM | NL Wild Card 'A' Game 3: Philadelphia Phillies at Atlanta Braves *(if necessary)* | 2026-10-01T18:00:00Z | “Thursday”, no time | Truist Park |
+| Thu Oct 1, 2:00 PM | AL Wild Card 'A' Game 3: Chicago White Sox at Houston Astros *(if necessary)* | 2026-10-01T21:00:00Z | “Thursday”, no time | Daikin Park |
+| Thu Oct 1, 5:00 PM | AL Wild Card 'B' Game 3: Boston Red Sox at New York Yankees *(if necessary)* | 2026-10-02T00:00:00Z | “Thursday”, no time | Yankee Stadium |
+| Thu Oct 1, 7:00 PM | NL Wild Card 'B' Game 3: Chicago Cubs at San Diego Padres *(if necessary)* | 2026-10-02T02:00:00Z | “Thursday”, no time | Petco Park |
+
+The four Thursday games are all `ifNecessary` in the API, so they stay conditional: they are excluded from the coverage maths and the conflict panel, and they export to `.ics` as `STATUS:TENTATIVE` rather than as bookings.
+
+Three conversions are worth seeing stated, because they are the kind of thing that goes wrong silently. The API's `gameDate` is an absolute UTC instant, so the 8 p.m. ET game on September 29 is `2026-09-30T00:00:00Z` — the *next* day in UTC but still September 29 in Pacific. `build_feed.py` converts through the IANA zone, checks the resulting Pacific date against the API's `officialDate`, and refuses the row if they disagree. It then re-derives each row's clock time from the instant its own source label cites, so a typed time cannot survive a rebuild. The third check is that all 53 gamePks appear exactly once across the 37 rows and all 28 dates are covered.
+
+### What is still unknown, and flagged rather than smoothed over
+
+- **The Thursday times are not final.** The API returns `startTimeTBD false` with real instants for all four October 1 games; MLB.com's own article prints “Game 3 (if necessary): Thursday” with no time and says “Thursday's game times and TV networks are subject to change depending on which series remain ongoing.” Both are official, they disagree about how settled it is, and flag `MLB_WC_THURSDAY_PROVISIONAL` carries the whole caveat on the page.
+- **Bracket placeholders move mid-pass.** The API printed the NL Wild Card 'A' away slot as `PHI/ARI` at 03:00 UTC on 2026-09-28 and as `Philadelphia Phillies` by 03:20 — the source watch preview on the pull request caught the twenty-minute window. The resolved label now ships, each of the three rows records that its away label *was* a placeholder, and the monitor reports every future resolution. The remaining Division Series slots (`NYY/BOS`, `HOU/CWS`, `SD/CHC`, `ATL/PHI`, `NL Lower Seed`) and venues (`NL Stadium`, `AL Stadium`, `TBD`) are still the API's own strings, shown as printed.
+- **The API's own typo ships too.** Its description for gamePk 849827 is `NLDS 'A' Game 4 ` with a trailing space.
+- **The Division Series bracket slots are placeholders** — `NYY/BOS`, `HOU/CWS`, `SD/CHC`, `ATL/PHI`, `NL Lower Seed` — and the venues for the later rounds are `NL Stadium`, `AL Stadium` and `TBD`. All are the API's strings, shown as printed.
+- **This is the MLB schedule, not a 1050 clearance.** ESPN Radio carries every postseason game nationally and KTCT is a full-time ESPN Radio affiliate, which supports an **indicated** listing and no more. There is one national feed, so only one game can be on 1050 at a time, and local programming can take the station.
+
+### The monitor now checks first pitches, not just dates
+
+The original watch compared dates, counts, descriptions and TBD status. A second version added away/home labels and `ifNecessary`. Both could still report “clear” while a game's clock time moved, and neither could tell a renamed placeholder from a game that had vanished. The monitor now matches games on the API's permanent **`gamePk`** and compares each game's description, away and home labels, venue, if-necessary marker **and first pitch**; when a first pitch is newly published the report prints the Pacific time a human would transcribe. It aggregates a date carried by several per-game rows instead of assuming one row per date, and its fail-closed cases now include a snapshot row with a clock time but no cited instant. 28 offline tests, including one that replays the pre-split state and asserts the report names exactly the fields that moved.
 
 ## NBA on ESPN Radio: the first basketball rows, from the league's own schedule
 
@@ -135,14 +166,16 @@ For each of the 155 dates, the page takes the union of estimated windows for **n
 | Dates with any if-necessary possibility | 13 |
 | If-necessary postseason game possibilities | 21 |
 | Conditional-only dates (no non-conditional listing) | 2 |
-| Dates where estimated windows cover **more than half** of 10 AM–10 PM | **18** |
-| Average estimated coverage, all dates | 2h 2m of 12h (17%) |
-| Average estimated coverage, the 97 listing dates | 3h 15m of 12h |
-| Busiest date | Christmas Day, Dec 25 — 9h 45m |
+| Dates where estimated windows cover **more than half** of 10 AM–10 PM | **20** |
+| Average estimated coverage, all dates | 2h 10m of 12h (18%) |
+| Average estimated coverage, the 97 listing dates | 3h 28m of 12h |
+| Busiest date | **Tue Sep 29 — 11h (92% of the band)** |
 
-Average estimated coverage by weekday across **all** dates: **Sunday 3h 53m · Saturday 3h 24m · Friday 1h 3m · Thursday 2h 48m · Monday 2h 20m · Wednesday 20m · Tuesday 23m.** Weekends are busier, but this snapshot does not show a 10-to-10 live-game pattern on most dates. Talk programming is not counted as a game.
+Average estimated coverage by weekday across **all** dates: **Sunday 3h 53m · Saturday 3h 24m · Friday 1h 3m · Thursday 2h 48m · Monday 2h 20m · Wednesday 50m · Tuesday 48m.** Weekends are busier, but this snapshot does not show a 10-to-10 live-game pattern on most dates. Talk programming is not counted as a game.
 
-Adding the 20 NBA rows moved both averages in opposite directions, which is worth seeing plainly: the mean across **all** dates rose from 1h 47m to 2h 2m because 17 previously empty dates now carry a listed game, while the mean on **listing days** fell from 3h 28m to 3h 15m because those new days carry one 150-minute evening game each rather than a full afternoon. Oct 20 is the clearest example: it had only if-necessary postseason possibilities before, and now has the NBA's opening-night game plus that possibility.
+**Publishing the twelve Wild Card first pitches displaced Christmas Day as the busiest date in the snapshot.** September 29 now carries four timed postseason games plus a Westwood One USMNT match, and September 30 four more; each day's estimated windows run from 11:00 AM to 10:30 PM, which is 11 of the 12 band hours. Those are the only two dates this snapshot can describe as near-continuously covered, and they are the first real evidence for the 10-to-10 hunch in the charter — on a postseason weekday, not on a weekend. Both means moved up (2h 2m → 2h 10m across all dates, 3h 15m → 3h 28m on listing dates) and the weekday means for Tuesday and Wednesday more than doubled, because those were the emptiest weekdays in the window.
+
+The earlier passes each moved these numbers a little. This pass moved them for a different reason: not by adding rows, but by giving existing rows a clock time. A row with no published start contributes zero minutes no matter how many games it groups, so the same 97 listing dates were measured before and after — only the twelve Wild Card rows changed what they contribute.
 
 ### Sensitivity to estimated game lengths
 
@@ -150,13 +183,15 @@ No source publishes when each radio broadcast actually ends. The default lengths
 
 | Scenario | Dates with non-conditional listings | Dates over half the band | Mean across all dates | Mean on listing dates |
 | --- | ---: | ---: | ---: | ---: |
-| Uniform 90-minute estimate for timed listings | 97 | 0 | 1h 1m | 1h 38m |
-| Defaults minus 30 minutes | 97 | 5 | 1h 43m | 2h 44m |
-| **Defaults** | **97** | **18** | **2h 2m** | **3h 15m** |
-| Defaults plus 60 minutes | 97 | 18 | 2h 37m | 4h 11m |
-| Uniform 240-minute windows | 97 | 18 | 2h 35m | 4h 8m |
+| Uniform 90-minute estimate for timed listings | 97 | 1 | 1h 6m | 1h 45m |
+| Defaults minus 30 minutes | 97 | 7 | 1h 51m | 2h 57m |
+| **Defaults** | **97** | **20** | **2h 10m** | **3h 28m** |
+| Defaults plus 60 minutes | 97 | 20 | 2h 44m | 4h 23m |
+| Uniform 240-minute windows | 97 | 20 | 2h 42m | 4h 19m |
 
-Even assigning a generous four-hour estimate to every timed non-conditional listing yields a 2h 35m mean across the 12-hour band, and only 18 of 155 dates over half. The count of dates over half the band has not moved from 18 through four successive additions of rows, which is the useful part: the finding is stable against how the snapshot is filled in, not an artifact of one pass. Rows with no published time — the six NFL playoff windows, the three NBA Cup slots and the 11 wholly if-necessary rows — contribute zero estimated minutes, the honest treatment rather than a flattering one. This is a sensitivity check on the snapshot—not a prediction of airtime or station clearance.
+A correction to a claim the previous passes made: they reported that the count of dates over half the band “has not moved from 18 through four successive additions of rows,” and read that as evidence the finding was stable. It was stable against *adding rows*, and this pass shows why that was the wrong test — it moved to 20 as soon as twelve existing rows were given clock times. The honest statement is narrower: the 10-to-10 pattern is not visible across the window as a whole, and whether a given date approaches it depends on how many of its listings have a published start. Even a uniform four-hour estimate for every timed listing yields a 2h 42m mean across the 12-hour band.
+
+Rows with no published time — the six NFL playoff windows, the three NBA Cup slots, the 25 grouped MLB postseason dates and the 14 wholly if-necessary rows — contribute zero estimated minutes, the honest treatment rather than a flattering one. This is a sensitivity check on the snapshot—not a prediction of airtime or station clearance.
 
 ## Monitoring, rebuild and tests
 
@@ -164,7 +199,7 @@ A scheduled, read-only GitHub Action (`source watch`, daily) runs **six** monito
 
 | Monitor | Source | What it watches | Rows covered |
 | --- | --- | --- | ---: |
-| `source_watch.py` | MLB 2026 postseason Stats API | future dates, counts, descriptions, away/home matchup labels, if-necessary markers and TBD start times | 28 |
+| `source_watch.py` | MLB 2026 postseason Stats API | every game matched on its permanent `gamePk`: description, away/home labels, venue, if-necessary marker **and first pitch**, aggregated across the per-game rows that now share a date | 37 |
 | `espn_watch.py` | NBA 2026-27 ESPN Radio schedule PDF | the parsed shape (27 dated rows, 10 `*` and 3 `^` Cup markers, both footnotes) plus every in-window date, matchup and printed ET time, re-derived from the snapshot rows | 20 |
 | `wwo_watch.py` | Westwood One NFL grid | event ids and printed titles the network advertises | 63 |
 | `wwo_watch.py` | Westwood One college football grid | same, including the SEC Championship and Army–Navy | 11 |
@@ -176,9 +211,9 @@ A scheduled, read-only GitHub Action (`source watch`, daily) runs **six** monito
 | `espn_radio_week_watch.py` | espn.com/espnradio/schedule weekly grid | dates the undated week from ESPN's scoreboard, then reports any future in-window game the snapshot does not name | 0 (gap watch) |
 | `tbd_time_watch.py` | Cal's football schedule in its text view, 49ers.com | the eight rows whose kickoff is still TBD, and nothing else: it reports the first clock time that appears where the snapshot has none | 8 |
 
-That is **171 of the 173 rows** under a daily watch, plus one gap-watch on the weekly ESPN Radio grid — a source of games the snapshot does not yet list, not extra coverage of existing rows. The other two rows are the Giants and Athletics finales on the snapshot date itself. The TBD-kickoff watch adds no row to that count, because every row it watches is already watched by another monitor; what it adds is the thing none of the others can see. A page watcher can tell that a string moved, and the MLB monitor can tell that `startTimeTBD` flipped, but nothing could tell that Cal or the 49ers had *published a kickoff* for a game the snapshot lists without one. It reads the one row it was given — matched on the date cell **and** the opponent column, or on the anchor plus the row's own identity strings, with the search ending at the next game's printed date so a kickoff published for the following game is never read as this one's — and reports one of three things: still TBD, **published**, or unknown. A row it cannot locate is `unavailable`, never "still TBD", and an unreadable row is never reported as a change. Its eight watch entries cover eight rows across two pages, including the 49ers' Week 18 row, whose date and kickoff no other monitor can see at all. **Confirmed live on 2026-09-27** from GitHub's runners (the development sandbox cannot reach these hosts): MLB clear, all four Westwood One grids clear, all nine pages clear, NBA PDF clear, weekly grid `unavailable` because ESPN answers automation with HTTP 202, TBD-kickoff watch clear on both of its pages. The TBD-kickoff monitor is new this pass; its first live run is the source watch preview on this pull request, and it is that run which showed gostanford.com builds its ticker in the browser. A week it cannot date reports `unavailable`, never `clear`, and never produces a date. Every pull request also runs the `source watch preview` workflow, which runs all six monitors live and keeps one sticky PR comment with the reports, so a reviewer sees the current source state before merging.
+That is **180 of the 182 rows** under a daily watch, plus one gap-watch on the weekly ESPN Radio grid — a source of games the snapshot does not yet list, not extra coverage of existing rows. The other two rows are the Giants and Athletics finales of 2026-09-27, now in the past. The TBD-kickoff watch adds no row to that count, because every row it watches is already watched by another monitor; what it adds is the thing none of the others can see. A page watcher can tell that a string moved, and the MLB monitor can tell that `startTimeTBD` flipped, but nothing could tell that Cal or the 49ers had *published a kickoff* for a game the snapshot lists without one. It reads the one row it was given — matched on the date cell **and** the opponent column, or on the anchor plus the row's own identity strings, with the search ending at the next game's printed date so a kickoff published for the following game is never read as this one's — and reports one of three things: still TBD, **published**, or unknown. A row it cannot locate is `unavailable`, never "still TBD", and an unreadable row is never reported as a change. Its eight watch entries cover eight rows across two pages, including the 49ers' Week 18 row, whose date and kickoff no other monitor can see at all. **Live status: 2026-09-28 03:25 UTC, on this pull request.** MLB postseason **clear**, all four Westwood One grids **clear**, all nine watched pages **clear**, NBA PDF **clear**, TBD-kickoff watch **clear** on both pages, and the weekly ESPN Radio grid **unavailable** — ESPN answers scripted clients with HTTP 202, which is a pre-existing limitation and never reported as unchanged. That is five of six monitors clear against this snapshot. The run before it, 2026-09-27 18:29 UTC, is what opened issue #13 and started this pass; the run between them caught two further drifts, both fixed. Re-checked by hand in this session through the fetch tool, because the development sandbox has no outbound network at all: the Stats API (53 games, 28 dates, twelve published first pitches), MLB.com's postseason release and its Wild Card Series matchups article, 49ers.com's schedule, the KNBR 1050 weekly grid (still the week of Aug 31 – Sep 6) and ESPN's weekly radio grid (still the week of Sep 21–27, so nothing new to add). **The source watch preview on this pull request then ran all six monitors live and found two things this session's hand re-read had missed**, both acted on before merging: the Stats API had resolved `PHI/ARI` to the Philadelphia Phillies twenty minutes after it was transcribed, and 49ers.com had dropped the broadcast line from the completed Week 3 game, which made one page-watch string permanently unfound. That is the preview workflow earning its place — see [docs/LIMITATIONS.md](docs/LIMITATIONS.md). A week it cannot date reports `unavailable`, never `clear`, and never produces a date. Every pull request also runs the `source watch preview` workflow, which runs all six monitors live and keeps one sticky PR comment with the reports, so a reviewer sees the current source state before merging.
 
-**Monitor fixes:** the MLB monitor first read `startTimeTBD` from the top level of each game, but the API nests it inside `status`; that was fixed and covered by a real-response regression fixture. This pass found another blind spot: the monitor compared dates/counts/descriptions/time-TBD but not opponent labels or `ifNecessary`, so it could report clear while the matchups changed. The monitor now validates and compares all four game identity/status fields: description, away team, home team and conditional status. The feed and UI expose the verified API matchup labels while preserving unresolved seed placeholders and TBD starts. Regression tests cover matchup and conditional drift.
+**Monitor fixes:** the MLB monitor first read `startTimeTBD` from the top level of each game, but the API nests it inside `status`; that was fixed and covered by a real-response regression fixture. The sixth pass found a second blind spot — it compared dates, counts, descriptions and time-TBD but not opponent labels or `ifNecessary`. This pass found a third and fixed all three at once: matching games on a description string means a renamed placeholder reads as one game vanishing and another appearing, and a yes/no time-TBD comparison cannot see a *moved* clock time. The monitor now keys on the API's permanent `gamePk` and compares five fields plus the first pitch itself, reports a newly published instant as the Pacific time a human would transcribe, aggregates a date carried by several per-game rows, and fails closed on a snapshot row whose clock time has no cited instant behind it. Its saved real-response fixture is `scripts/fixtures/mlb_postseason_2026-09-28.json`.
 
 The page watcher does **not** parse schedules. Each `expect` string in `data/page_watch.json` was read on the live page; if one disappears, the page changed and the listed rows need a human re-read. Each `alert_if_present` string was absent; if it appears, new information may have been published. A page that cannot be fetched is **unavailable**, never "unchanged". ESPN's HTML schedule answers automated requests with HTTP 202, so the watcher reads ESPN's schedule feed for the same data. **gostanford.com's football schedule builds its 2026 ticker in the browser**, so a plain request receives a page without it: the first live run of an entry for it reported every expected string missing, and the entry was removed. The school page stays cited on every Stanford row for a human to open, and Stanford dates, opponents and kickoffs stay watched through ESPN's feed.
 
@@ -188,7 +223,7 @@ The monitors **never** edit `data/broadcasts.json` or publish a new GitHub Pages
 
 ```bash
 python3 scripts/build_feed.py        # regenerates data/broadcasts.json + docs/LINE_BY_LINE.md
-python3 scripts/source_watch_test.py # offline tests for the MLB monitor (incl. real-response fixture)
+python3 scripts/source_watch_test.py # offline tests for the MLB monitor (28 tests, real-response fixture)
 python3 scripts/espn_watch_test.py   # offline tests for the NBA ESPN Radio monitor (incl. real-PDF text fixture)
 python3 scripts/espn_radio_week_watch_test.py  # offline tests for the weekly ESPN Radio grid monitor
 python3 scripts/wwo_watch_test.py    # offline tests for the Westwood One grid monitor
